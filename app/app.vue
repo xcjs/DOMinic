@@ -7,6 +7,7 @@ import Taskbar from "./features/os/components/Taskbar.vue";
 import ChatWindow from "./features/chat/components/ChatWindow.vue";
 import SettingsApp from "./features/settings/components/SettingsApp.vue";
 import DynamicAppRunner from "./features/apps/runner/DynamicAppRunner.vue";
+import { removeAppStyles } from "./features/apps/runner/loader";
 import { getApp, hydrateRegistry, listApps, registerApp, unregisterApp } from "./features/apps/registry";
 import { installFixture } from "./features/apps/fixtures";
 import { readFile, writeFile } from "./features/shared/vfs";
@@ -98,6 +99,7 @@ function updateApp(params: UpdateAppParams) {
   const app = getApp(params.id);
   if (!app) throw new Error(`App "${params.id}" is not installed`);
   writeFile(app.entry, params.vueSfcCode);
+  removeAppStyles(params.id);
   sourceVersion[params.id] = Date.now();
 }
 
