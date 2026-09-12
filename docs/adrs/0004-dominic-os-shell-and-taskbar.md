@@ -93,3 +93,4 @@ and the Settings app launchable.
 - Related to [ADR 0000](0000-record-architecture-decisions.md)
 - Related to [ADR 0001](0001-feature-slices-with-domain-driven-organization.md)
 - Related to [ADR 0005](0005-agent-chat-via-vercel-ai-sdk-with-server-side-provider-proxy.md)
+- Related to [ADR 0006](0006-agent-authored-runtime-compiled-components.md)
