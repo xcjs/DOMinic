@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, ref } from "vue";
+import { onMounted, ref, type ComponentPublicInstance } from "vue";
 import { useOsStore } from "./features/os/stores/os";
 import { useAppsStore } from "./features/apps/stores/apps";
 import WindowFrame from "./features/os/components/WindowFrame.vue";
@@ -56,6 +56,10 @@ function updateApp(params: UpdateAppParams) {
 function askFix(payload: { appId: string; error: string }) {
   chat.value?.sendMessage(`The app ${payload.appId} encountered an error: ${payload.error}. Please fix it.`);
 }
+
+function setChat(instance: Element | ComponentPublicInstance | null) {
+  chat.value = instance as InstanceType<typeof ChatWindow> | null;
+}
 </script>
 
 <template>
@@ -68,7 +72,7 @@ function askFix(payload: { appId: string; error: string }) {
     </div>
 
     <WindowFrame v-for="win in os.windows" :key="win.id" :win="win">
-      <ChatWindow v-if="win.appId === 'chat'" ref="chat" :options="{ getProviderConfig: () => settings, getInstalledApps: () => apps.installed, onInstallApp: installApp, onUpdateApp: updateApp, onOpenWindow: openApp }" />
+      <ChatWindow v-if="win.appId === 'chat'" :ref="setChat" :options="{ getProviderConfig: () => settings, getInstalledApps: () => apps.installed, onInstallApp: installApp, onUpdateApp: updateApp, onOpenWindow: openApp }" />
       <SettingsApp v-else-if="win.appId === 'settings'" />
       <DynamicAppRunner v-else-if="win.appId && getApp(win.appId)" :app-id="win.appId" :window-id="win.id" :source-code="readFile(getApp(win.appId)?.entry || '') || ''" @ask-fix="askFix" />
       <p v-else class="text-sm text-slate-400">{{ win.title }}</p>
