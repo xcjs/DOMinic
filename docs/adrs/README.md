@@ -36,3 +36,4 @@ them with new ones.
 | ADR | Title | Status |
 | --- | --- | --- |
 | [0000](0000-record-architecture-decisions.md) | Record architecture decisions | accepted |
+| [0001](0001-feature-slices-with-domain-driven-organization.md) | Feature slices with domain-driven organization | accepted |
