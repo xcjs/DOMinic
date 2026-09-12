@@ -16,7 +16,7 @@ const SETTINGS_FILE = 'system/settings.json'
 export const useSettingsStore = defineStore('settings', {
   state: (): SettingsState => ({
     provider: 'openai',
-    model: 'gpt-4o',
+    model: '',
     apiKey: '',
     baseUrl: '',
     hasHydrated: false
