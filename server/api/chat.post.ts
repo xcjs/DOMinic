@@ -1,4 +1,4 @@
-import { streamText, tool } from 'ai'
+import { streamText } from 'ai'
 import { createOpenAI } from '@ai-sdk/openai'
 import { createAnthropic } from '@ai-sdk/anthropic'
 import { createGoogleGenerativeAI } from '@ai-sdk/google'
@@ -39,14 +39,14 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  // Configure provider instance
+  // Configure provider instance with current frontier model defaults
   let modelInstance: any
   if (provider === 'anthropic') {
     const anthropic = createAnthropic({ apiKey })
-    modelInstance = anthropic(requestedModel || 'claude-3-5-sonnet-20241022')
+    modelInstance = anthropic(requestedModel || 'claude-sonnet-5')
   } else if (provider === 'google') {
     const google = createGoogleGenerativeAI({ apiKey })
-    modelInstance = google(requestedModel || 'gemini-1.5-pro')
+    modelInstance = google(requestedModel || 'gemini-2.5-pro')
   } else if (provider === 'deepseek') {
     const deepseek = createOpenAI({
       apiKey,
@@ -59,7 +59,7 @@ export default defineEventHandler(async (event) => {
       apiKey,
       baseURL: clientBaseUrl || process.env.OPENAI_BASE_URL
     })
-    modelInstance = openai(requestedModel || 'gpt-4o')
+    modelInstance = openai(requestedModel || 'gpt-5')
   }
 
   const system = buildSystemPrompt(installedApps)
@@ -69,18 +69,19 @@ export default defineEventHandler(async (event) => {
     system,
     messages,
     tools: {
-      install_app: tool({
+      install_app: {
         description:
           'Install and launch a new application in DOMinic OS. Provide complete Vue 3 SFC code with <template> and <script setup>.',
-        inputSchema: installAppSchema
-      }),
-      update_app: tool({
+        parameters: installAppSchema
+      },
+      update_app: {
         description:
           'Update the source code of an existing installed application in DOMinic OS.',
-        inputSchema: updateAppSchema
-      })
-    }
+        parameters: updateAppSchema
+      }
+    },
+    maxSteps: 3
   })
 
-  return (result as any).toDataStreamResponse?.() || result.toTextStreamResponse()
+  return result.toDataStreamResponse()
 })
