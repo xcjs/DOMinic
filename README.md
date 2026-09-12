@@ -41,6 +41,7 @@ the decision record for every foundational choice.
 | [docs/agents/rubric.md](docs/agents/rubric.md) | Hackathon judging rubric and win strategy |
 | [docs/agents/demo-path.md](docs/agents/demo-path.md) | The two-minute demo as rubric-mapped beats |
 | [docs/agents/coordination.md](docs/agents/coordination.md) | Multi-agent task coordination over GitHub Issues (`/coordinate`) |
+| [docs/agents/coordination-best-practices.md](docs/agents/coordination-best-practices.md) | Sprint-minimum and full coordination protocol, with evidence |
 | [docs/superpowers/specs/](docs/superpowers/specs/) | Design specs from brainstorming sessions |
 | [docs/superpowers/plans/](docs/superpowers/plans/) | Implementation plans derived from specs |
 
