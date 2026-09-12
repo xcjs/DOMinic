@@ -35,6 +35,7 @@ records below for why it is built this way.
 
 | Path | Contents |
 | --- | --- |
+| [docs/JUDGES.md](docs/JUDGES.md) | **Judges start here:** five-minute tour of the demo, the code behind it, and what is deferred |
 | [docs/adrs/](docs/adrs/README.md) | Architecture decision records (MADR 4.0) |
 | [NEXT.md](NEXT.md) | Post-hackathon roadmap & deferred architecture |
 | [QUESTIONS.md](QUESTIONS.md) | Open technical decisions for the hackathon team |
