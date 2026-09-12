@@ -9,6 +9,8 @@ verified: { by: human:zack, at: 2026-09-12T00:00:00Z }
 
 # DOMinic
 
+![DOMinic desktop with the Agent Chat window open](docs/images/desktop.png)
+
 A web-based desktop operating system running in a browser tab, where
 an AI agent is the primary app author: the user talks, the agent
 answers, and the apps it writes install, run, and persist like
