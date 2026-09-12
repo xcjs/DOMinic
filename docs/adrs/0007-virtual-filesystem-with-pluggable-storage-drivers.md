@@ -85,3 +85,4 @@ reload.
 - Related to [ADR 0000](0000-record-architecture-decisions.md)
 - Related to [ADR 0005](0005-agent-chat-via-vercel-ai-sdk-with-server-side-provider-proxy.md)
 - Related to [ADR 0006](0006-agent-authored-runtime-compiled-components.md)
+- Related to [ADR 0008](0008-runtime-npm-dependency-loading-via-esm-sh-with-vetting.md)
