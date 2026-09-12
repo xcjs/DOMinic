@@ -142,7 +142,12 @@ function setChat(instance: Element | ComponentPublicInstance | null) {
       <p v-else class="text-sm text-slate-400">{{ win.title }}</p>
     </WindowFrame>
 
-    <Taskbar :apps="apps.installed" :on-open-app="openApp" />
+    <Taskbar
+      :apps="apps.installed"
+      :on-open-app="openApp"
+      :on-view-source="viewSource"
+      :on-uninstall-app="uninstallApp"
+    />
 
     <div class="absolute right-4 top-4 z-50 flex flex-col gap-2 rounded-lg border border-white/10 bg-slate-900/90 p-3 backdrop-blur">
       <span class="text-xs font-semibold uppercase tracking-wide text-slate-400">System</span>
