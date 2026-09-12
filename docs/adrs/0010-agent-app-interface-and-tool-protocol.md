@@ -102,6 +102,50 @@ Agent-generated components must conform to:
   Auto-install immediately upon tool call completion for maximum demo
   flow and delight).
 
+### As built (2026-09-12)
+
+**Matches the golden path:**
+
+- `install_app` / `update_app` zod schemas carry the ADR's parameter names
+  (`app/features/chat/tools/schemas.ts:3`, `:29`) and are registered on
+  `streamText` (`server/api/chat.post.ts:71`).
+- `vue`, `@vueuse/core`, `lucide-vue-next` come from `moduleCache`
+  (`app/features/apps/runner/loader.ts:16`); install opens the window
+  (`app/app.vue:60`) and the chat shows a per-call badge
+  (`app/features/chat/components/ChatWindow.vue:53`).
+
+**Differs from this record:**
+
+- Schema is stricter: `id` must match `/^[a-z0-9-]+$/` (`schemas.ts:6`),
+  `icon` defaults to `'Sparkles'` (`schemas.ts:15`), `title` max 50 chars.
+- ADR: OS executes tools -> main: server declares them without `execute`
+  (`server/api/chat.post.ts:72`); the client `handleToolCall` runs the
+  `onInstallApp` / `onUpdateApp` / `onOpenWindow` callbacks of
+  `UseAgentChatOptions` (`app/features/chat/composables/useAgentChat.ts:5`,
+  `:166`), wired in `app/app.vue:123`.
+- ADR: `index.vue` + `manifest.json`, register in `useOsStore` -> main:
+  `installApp` writes only `apps/<id>/index.vue` (`app/app.vue:90`); no
+  manifest; metadata goes to `registry.json` via `registerApp`
+  (`app/features/apps/registry/registry.ts:45`, `app/app.vue:92`) and
+  `apps.installed = listApps()` on `useAppsStore` (`app/app.vue:93`).
+- ADR: `{ windowId, appId }` props -> main:
+  `app/features/apps/runner/DynamicAppRunner.vue:50` binds `:app-id` and
+  `:window-id` as attrs; generated SFCs do not declare them: the prompt
+  contract (`app/features/chat/prompts/systemPrompt.ts:23`) omits them.
+- Imports: main also pre-resolves `canvas-confetti` (`loader.ts:20`) and
+  fetches other imports from `esm.sh` (`loader.ts:27`); ADR lists three.
+- Tool results never reach the model: `invocation.result` is set locally
+  (`useAgentChat.ts:173`) and prior tool turns replay as the text
+  `(called <tool>)` (`useAgentChat.ts:82`); `summary` is unused.
+
+**Open question outcome:**
+
+- Installation approval: auto-install. `handleToolCall` runs `onInstallApp`
+  then `onOpenWindow` with no confirmation gate (`useAgentChat.ts:170`);
+  `update_app` also applies at once (`useAgentChat.ts:181`).
+
+Reconciled against main on 2026-09-12; the decision text above is unchanged.
+
 ## Pros and Cons of the Options
 
 ### Structured tool calling via Vercel AI SDK

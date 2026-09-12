@@ -82,6 +82,48 @@ A CORS-enabled endpoint loads directly (visible in network tools);
 a CORS-blocking endpoint transparently returns content through
 `/api/proxy`.
 
+### As built (2026-09-12)
+
+**Matches the golden path:**
+
+- Generated apps reach the network with plain browser `fetch`; the system
+  prompt lists `fetch` among the allowed standard browser APIs
+  (`app/features/chat/prompts/systemPrompt.ts:36`).
+- No `useSmartFetch` composable, User-Agent spoofing, or header scrubbing
+  exists on main; those items stayed deferred as this record planned.
+
+**Differs from this record:**
+
+- ADR: a minimal `/api/proxy?url=<encoded>` Nuxt route exists as an escape
+  hatch -> main: `server/api/` holds only `chat.post.ts`; no proxy route was
+  built (`server/api/chat.post.ts:8`).
+- ADR: components call `/api/proxy?url=...` when CORS is missing -> main:
+  the prompt never mentions a proxy, so agent-authored apps have no fallback
+  and a CORS-blocked endpoint simply fails
+  (`app/features/chat/prompts/systemPrompt.ts:36`).
+- ADR: direct fetch targets public data APIs -> main: the only direct
+  cross-origin fetch in OS code is `getFile` in `compileVueSfc`, which
+  passes absolute `http` import URLs through unchanged and rewrites bare
+  specifiers to `https://esm.sh/${url}?bundle` before calling `fetch`
+  (`app/features/apps/runner/loader.ts:27`).
+- ADR: Confirmation shows a CORS-blocking endpoint returning through
+  `/api/proxy` -> main: the `pomodoro-timer` fixture imports only `vue` and
+  makes no network calls, so the demo exercises neither path
+  (`app/features/apps/fixtures/pomodoro-timer/index.vue.txt:94`).
+- ADR: one generic server route -> main: the sole server route is the LLM
+  relay, which forwards a client-supplied `baseUrl` to the provider SDK
+  (`server/api/chat.post.ts:53`).
+
+**Open question outcome:**
+
+- Not addressed: with no proxy route there is no private-IP regex to add; the
+  client-supplied `baseUrl` is passed to `createOpenAI` unfiltered in both
+  the `deepseek` and default `openai` branches (`server/api/chat.post.ts:53`,
+  `server/api/chat.post.ts:60`) and is the only client-steerable outbound
+  target on the server.
+
+Reconciled against main on 2026-09-12; the decision text above is unchanged.
+
 ## Pros and Cons of the Options
 
 ### Single generic proxy route with CORS-first fallback

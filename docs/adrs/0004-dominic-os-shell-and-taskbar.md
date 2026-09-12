@@ -90,6 +90,51 @@ displays):
 The first Nuxt build renders the shell: taskbar, at least one window,
 and the Settings app launchable.
 
+### As built (2026-09-12)
+
+**Matches the golden path:**
+
+- Windows support title-bar drag, focus with z-ordering, minimize to the
+  taskbar, maximize/restore and close (`app/features/os/stores/os.ts:60`,
+  `:75`, `:83`, `:48`); the taskbar is fixed to the viewport bottom
+  (`app/features/os/components/Taskbar.vue:18`).
+- Dark glass chrome uses `border-white/10`, `bg-slate-900/95`, `shadow-2xl`
+  and `backdrop-blur` (`app/features/os/components/WindowFrame.vue:54`).
+- No resize handles; size is fixed at open (`app/features/os/stores/os.ts:37`)
+  and maximize swaps to `100vw` x `calc(100vh - 48px)` (`WindowFrame.vue:14`).
+- No responsive or mobile layout exists in the `os` slice.
+
+**Differs from this record:**
+
+- `@vueuse/core` `useDraggable` -> raw `pointerdown`/`pointermove`/`pointerup`
+  handlers using `setPointerCapture` and `movementX`/`movementY`, clamped to
+  the viewport (`app/features/os/components/WindowFrame.vue:28`, `:35`);
+  `@vueuse/core` (`package.json:21`) is imported only by
+  `app/features/apps/runner/loader.ts:2` to expose composables to
+  agent-authored apps; nothing under `app/` imports `useDraggable`.
+- Taskbar with App Launcher, chat toggle and clock -> `Taskbar.vue` renders a
+  `DOMinic` label plus one button per window (`Taskbar.vue:19`, `:21`); the
+  launcher is a floating top-right panel (`app/app.vue:142`), the clock a bare
+  `<span>` above the taskbar (`app/app.vue:178`); there is no dedicated
+  chat toggle, only the chat window's generic taskbar button, which
+  `onTaskbarClick` minimizes or restores (`Taskbar.vue:6`).
+- `backdrop-blur-md` -> `backdrop-blur` (`WindowFrame.vue:54`,
+  `Taskbar.vue:18`, `app/app.vue:142`).
+- Desktop wallpaper support -> a Tailwind gradient
+  (`bg-gradient-to-br from-slate-950 via-indigo-950 to-slate-900`) with a
+  faded `DOMinic` heading (`app/app.vue:114`, `:117`); no image wallpaper.
+- Settings as a pre-installed registry app -> a hard-coded builtin branched on
+  `win.appId === 'settings'` (`app/app.vue:55`, `:124`), launched from a
+  dashed button under the Launch panel (`app/app.vue:170`).
+
+**Open question outcome:**
+
+- Chat is a standard draggable window opened once at mount by
+  `openBuiltin('chat')` (`app/app.vue:31`, `:57`) with the normal `topZ + 1`
+  (`app/features/os/stores/os.ts:39`); no high z-index, dock icon or drawer.
+
+Reconciled against main on 2026-09-12; the decision text above is unchanged.
+
 ## Pros and Cons of the Options
 
 ### Full windowing shell with taskbar

@@ -90,6 +90,47 @@ loading with pre-provisioned essentials:
 A component importing a vetted package loads and runs; a package
 failing the vetting gate is refused with its reasons surfaced.
 
+### As built (2026-09-12)
+
+**Matches the golden path:**
+
+- `compileVueSfc` hands `vue3-sfc-loader` a `moduleCache` binding `vue`,
+  `@vueuse/core`, `lucide-vue-next` and `canvas-confetti` to host imports,
+  so those four skip the network (`app/features/apps/runner/loader.ts:16`).
+- Every other specifier is fetched from `https://esm.sh/${url}?bundle`; a
+  non-OK response throws `Failed to load external dependency`
+  (`app/features/apps/runner/loader.ts:27`).
+- The system prompt advertises the host imports and forbids Node built-ins
+  (`fs`, `path`, `child_process`, `process`)
+  (`app/features/chat/prompts/systemPrompt.ts:36`).
+- No vetting gate and no VFS dependency cache exist; `vfs.ts` is a
+  localStorage store the loader never calls (`app/features/shared/vfs.ts:11`).
+
+**Differs from this record:**
+
+- ADR: the `loadModule` handler resolves specifiers -> main: resolution lives
+  in the `getFile` option and every non-`http` path, relative imports
+  included, is rewritten to esm.sh (`app/features/apps/runner/loader.ts:27`).
+- ADR: the prompt steers the LLM to "browser-safe ESM packages" -> main: the
+  prompt never mentions esm.sh or npm, only the host set, and names Lucide
+  without its `lucide-vue-next` specifier
+  (`app/features/chat/prompts/systemPrompt.ts:30`).
+- ADR: silent on styling -> main: classes in agent SFCs resolve through the
+  Tailwind play CDN `https://cdn.tailwindcss.com` (`nuxt.config.ts:32`), a
+  second unpinned CDN dependency; build-time content globs scan only
+  `app/**` and `features/**` `*.{vue,ts,txt}` files (`nuxt.config.ts:17`).
+- ADR "Confirmation": a refused package surfaces vetting reasons -> main:
+  only fetch failures surface, via the runner's error state
+  (`app/features/apps/runner/DynamicAppRunner.vue:93`).
+
+**Open question outcome:**
+
+- Version pinning: not addressed. The prompt gives no pinning guidance and
+  the loader forwards specifiers verbatim, so bare names resolve to esm.sh
+  latest; only the host copies carry semver ranges (`package.json:36`).
+
+Reconciled against main on 2026-09-12; the decision text above is unchanged.
+
 ## Pros and Cons of the Options
 
 ### esm.sh with automated vetting

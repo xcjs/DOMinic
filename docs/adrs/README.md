@@ -46,3 +46,11 @@ them with new ones.
 | [0008](0008-runtime-npm-dependency-loading-via-esm-sh-with-vetting.md) | Runtime NPM dependency loading via esm.sh with vetting | accepted |
 | [0009](0009-cors-first-networking-with-chrome-masking-proxy-fallback.md) | CORS-first networking with Chrome-masking proxy fallback | accepted |
 | [0010](0010-agent-app-interface-and-tool-protocol.md) | Agent app interface and tool protocol | accepted |
+
+## As-built reconciliation
+
+On 2026-09-12 each accepted ADR from 0001 to 0010 gained an
+`### As built (2026-09-12)` subsection at the end of its Decision
+Outcome. It records, with file references, where the code on `main`
+matches the golden path and where it diverges. The decision text
+itself is unchanged: the record stays a record.
