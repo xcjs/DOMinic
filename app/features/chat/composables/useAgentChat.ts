@@ -10,6 +10,21 @@ export interface UseAgentChatOptions {
   onOpenWindow?: (appId: string) => void
 }
 
+function parseStreamError(data: string): string {
+  try {
+    const parsed: unknown = JSON.parse(data)
+    if (typeof parsed === 'string') return parsed
+    if (parsed && typeof parsed === 'object') {
+      const details = parsed as Record<string, unknown>
+      if (typeof details.message === 'string') return details.message
+      if (typeof details.error === 'string') return details.error
+    }
+  } catch {
+    // Some providers return an unquoted error message.
+  }
+  return data.trim() || 'The chat request failed'
+}
+
 export function useAgentChat(options: UseAgentChatOptions = {}) {
   const messages = ref<ChatMessage[]>([
     {
@@ -117,7 +132,7 @@ export function useAgentChat(options: UseAgentChatOptions = {}) {
           // 0: "text" -> text chunk
           // 9: { toolCallId, toolName, args } -> tool call
           // a: { toolCallId, result } -> tool result
-          // e: error
+          // 3: error
           const prefix = line.slice(0, 2)
           const dataStr = line.slice(2)
 
@@ -150,15 +165,21 @@ export function useAgentChat(options: UseAgentChatOptions = {}) {
             } catch (err) {
               console.error('Failed to parse tool call chunk:', err)
             }
-          } else if (prefix === 'e:') {
-            console.error('Stream error message:', dataStr)
+          } else if (prefix === '3:') {
+            throw new Error(parseStreamError(dataStr))
           }
         }
       }
     } catch (err: any) {
       error.value = err?.message || 'Chat error occurred'
-      assistantMessage.value.content += `\n\n*(Error: ${error.value})*`
+      const separator = assistantMessage.value.content.trim() ? '\n\n' : ''
+      assistantMessage.value.content += `${separator}I could not complete that request. ${error.value}`
     } finally {
+      const hasToolCall = (assistantMessage.value.toolInvocations?.length ?? 0) > 0
+      if (!assistantMessage.value.content.trim() && !hasToolCall) {
+        error.value = 'DOMinic did not return a response. Please try again.'
+        assistantMessage.value.content = error.value
+      }
       isStreaming.value = false
     }
   }

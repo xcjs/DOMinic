@@ -60,6 +60,11 @@ function openBuiltin(appId: 'chat' | 'settings') {
 function openApp(appId: string) {
   const app = getApp(appId);
   if (!app) return;
+  const existing = os.windows.find((win) => win.appId === appId);
+  if (existing) {
+    os.focusWindow(existing.id);
+    return;
+  }
   os.openWindow({ appId, title: app.title, width: 520, height: 400 });
 }
 
@@ -137,36 +142,15 @@ function setChat(instance: Element | ComponentPublicInstance | null) {
       <p v-else class="text-sm text-slate-400">{{ win.title }}</p>
     </WindowFrame>
 
-    <Taskbar />
+    <Taskbar
+      :apps="apps.installed"
+      :on-open-app="openApp"
+      :on-view-source="viewSource"
+      :on-uninstall-app="uninstallApp"
+    />
 
     <div class="absolute right-4 top-4 z-50 flex flex-col gap-2 rounded-lg border border-white/10 bg-slate-900/90 p-3 backdrop-blur">
-      <span class="text-xs font-semibold uppercase tracking-wide text-slate-400">Launch</span>
-      <div
-        v-for="app in apps.installed"
-        :key="app.id"
-        class="flex items-center gap-1"
-      >
-        <button
-          class="flex-1 rounded border border-white/10 bg-slate-800 px-3 py-1.5 text-left text-xs text-slate-100 hover:bg-slate-700"
-          @click="openApp(app.id)"
-        >
-          {{ app.title }}
-        </button>
-        <button
-          class="rounded border border-white/10 bg-slate-800 px-2 py-1.5 text-xs text-slate-400 hover:text-slate-100"
-          title="View source"
-          @click="viewSource(app.id)"
-        >
-          &lt;&gt;
-        </button>
-        <button
-          class="rounded border border-white/10 bg-slate-800 px-2 py-1.5 text-xs text-slate-400 hover:text-red-300"
-          title="Uninstall"
-          @click="uninstallApp(app.id)"
-        >
-          &times;
-        </button>
-      </div>
+      <span class="text-xs font-semibold uppercase tracking-wide text-slate-400">System</span>
       <button
         class="rounded border border-dashed border-white/20 px-3 py-1.5 text-left text-xs text-slate-400 hover:text-slate-100"
         @click="openBuiltin('settings')"
