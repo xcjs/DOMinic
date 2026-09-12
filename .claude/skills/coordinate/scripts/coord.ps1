@@ -1,7 +1,7 @@
 # coord.ps1 - multi-agent coordination over GitHub Issues via the gh CLI.
 # Protocol: ../SKILL.md and ../references/protocol.md
 # Usage:    powershell -File .claude/skills/coordinate/scripts/coord.ps1 <command> [args]
-# Env:      COORD_AGENT (who you are), COORD_REPO, COORD_STALE_MIN
+# Env:      COORD_AGENT (who you are), COORD_REPO, COORD_HUB, COORD_STALE_MIN
 # Windows counterpart of coord.sh; use this on Windows hosts.
 
 $ErrorActionPreference = 'Stop'
@@ -74,6 +74,22 @@ function Has-Label([int]$n, [string]$label) {
   (Labels-Of $n) -contains $label
 }
 
+# Declared file scope from the issue body's '## Files' section; empty list if none.
+function Files-Of([int]$n) {
+  $j = Get-IssueJson $n body
+  $m = [regex]::Match([string]$j.body, '## Files\s*\n([^#]*)')
+  if (-not $m.Success) { return @() }
+  $raw = $m.Groups[1].Value -replace "`r", '' -replace "`n", ' '
+  $raw = $raw -replace '_\(none listed\)_', '' -replace '-\(none listed\)-', ''
+  @($raw -split ';|,|\s{2,}' | ForEach-Object { $_.Trim(' .') } | Where-Object { $_ })
+}
+
+# Issue numbers referenced as #N anywhere in a body.
+function Referenced-Issues([string]$body) {
+  @([regex]::Matches([string]$body, '#(\d+)') | ForEach-Object { [int]$_.Groups[1].Value }) |
+    Select-Object -Unique
+}
+
 function Set-Status([int]$n, [string]$status) {
   $a = @('--add-label', "status:$status")
   foreach ($s in $STATUSES) { if ($s -ne $status) { $a += @('--remove-label', "status:$s") } }
@@ -82,9 +98,13 @@ function Set-Status([int]$n, [string]$status) {
 }
 
 function Hub-Number {
-  $r = Gh issue list --repo $REPO --label hub --state open --limit 1 --json number |
+  # COORD_HUB pins the hub; otherwise the lowest-numbered open hub issue wins
+  # (a later dashboard issue may also carry the label).
+  if ($env:COORD_HUB) { return [int]$env:COORD_HUB }
+  $r = Gh issue list --repo $REPO --label hub --state open --limit 20 --json number |
        ConvertFrom-Json
-  if (@($r).Count -gt 0) { @($r)[0].number } else { $null }
+  $nums = @(@($r) | ForEach-Object { [int]$_.number }) | Sort-Object
+  if ($nums.Count -gt 0) { $nums[0] } else { $null }
 }
 
 # Minutes since the last heartbeat verb on an issue; 999999 if none.
@@ -148,7 +168,7 @@ function Usage {
   @'
 coord.ps1 - multi-agent coordination over GitHub Issues via the gh CLI.
 Protocol: SKILL.md and references/protocol.md
-Env:      COORD_AGENT (who you are), COORD_REPO, COORD_STALE_MIN
+Env:      COORD_AGENT (who you are), COORD_REPO, COORD_HUB, COORD_STALE_MIN
 
 Commands:
   setup                                  labels + pinned hub issue (idempotent)
@@ -372,6 +392,25 @@ function Cmd-Claim([object[]]$argv) {
   if ($owners.Count -gt 0) {
     Die "#$N is held by @$(($owners -join ', ')) - use: propose $N `"split: ...`"  or  question $N `"...`""
   }
+  # v3 file scope: a claim must declare a non-empty Files scope.
+  $scope = Files-Of $N
+  if ($scope.Count -eq 0) {
+    Die "#$N declares no Files scope - add a '## Files' section (coord new --files) before claiming"
+  }
+  # v3 file scope: refuse active overlap unless the issue records a split or shares an owner.
+  foreach ($o in (Gh issue list --repo $REPO --state open --limit 100 --json 'number,labels,assignees,body' |
+                  ConvertFrom-Json)) {
+    if ($o.number -eq $N) { continue }
+    if (@($o.labels | ForEach-Object { $_.name }) -contains 'hub') { continue }
+    $their = Files-Of $o.number
+    if ($their.Count -eq 0) { continue }
+    $clash = @($scope | Where-Object { $their -contains $_ })
+    if ($clash.Count -eq 0) { continue }
+    if (([string]$o.body) -match '(?m)^split:') { continue }
+    $common = @($owners + @(Assignees-Of $o.number))
+    if ($common.Count -gt 0) { continue }
+    Die "#$N scope overlaps #$($o.number) on: $($clash -join ', ') - record a split on one of the issues or hand off ownership first"
+  }
   Comment $N 'CLAIM' ("plan: $(if ($OPT['plan']) { $OPT['plan'] } else { '_(none given)_' })`neta: $(if ($OPT['eta']) { $OPT['eta'] } else { '_(none given)_' })")
   & $GH issue edit $N --repo $REPO --add-assignee '@me' *> $null
   if ($LASTEXITCODE -ne 0) { Die "failed to assign #$N" }
@@ -521,7 +560,26 @@ function Cmd-Handoff([object[]]$argv) {
 
 function Cmd-Review([object[]]$argv) {
   Parse-Args $argv; Need-Issue
-  $pr = if ($OPT['pr']) { $OPT['pr'] } else { '_(none given)_' }
+  $pr = $OPT['pr']
+  if (-not $pr) { Die 'review N --pr URL ["text"]' }
+  if ($pr -notmatch '/pull/(\d+)') { Die "--pr must be a pull-request URL: $pr" }
+  $prN = [int]$Matches[1]
+  # v3 file scope: PR paths must fall within the union of linked issues' Files.
+  $body = [string](Get-IssueJson $N body).body
+  $linked = @(Referenced-Issues $body) + $N
+  $allowed = @()
+  foreach ($l in ($linked | Select-Object -Unique)) {
+    $allowed += Files-Of $l
+  }
+  $allowed = @($allowed | Select-Object -Unique)
+  if ($allowed.Count -gt 0) {
+    $prFiles = @(Gh pr view $prN --repo $REPO --json files | ConvertFrom-Json |
+                 ForEach-Object { $_.files } | ForEach-Object { $_.path })
+    $undeclared = @($prFiles | Where-Object { $p = $_; -not ($allowed | Where-Object { $p -like $_ -or $_ -like $p -or $p.StartsWith($_.TrimEnd('*').TrimEnd('/')) }) })
+    if ($undeclared.Count -gt 0) {
+      Die "PR #$prN touches paths outside the linked issues' Files scope: $($undeclared -join ', ') - update the issues' Files or drop the paths"
+    }
+  }
   $extra = if ($POS[1]) { "`n$($POS[1])" } else { '' }
   Comment $N 'REVIEW' "pr: $pr$extra"
   Set-Status $N 'in-review'
@@ -529,20 +587,31 @@ function Cmd-Review([object[]]$argv) {
 
 function Cmd-Done([object[]]$argv) {
   Parse-Args $argv; Need-Issue
-  $pr = if ($OPT['pr']) { $OPT['pr'] } else { '_(none given)_' }
+  # v3 completion: refuse while a Done-when box is unchecked or the linked PR is unmerged.
+  $body = [string](Get-IssueJson $N body).body
+  if ($body -match '(?m)^## Done when\b' -and $body -match '(?m)^\s*-\s*\[ \]') {
+    Die "#$N still has unchecked '## Done when' criteria - check them off after verifying (caller attests)"
+  }
+  $prUrl = $OPT['pr']
+  if (-not $prUrl) {
+    $j = Get-IssueJson $N comments
+    $m = @(@($j.comments) | Where-Object { $_.body -match '(?m)^pr: \S+/pull/\d+' } | Select-Object -Last 1)
+    if ($m.Count -gt 0 -and $m[0].body -match 'pr: (\S+/pull/\d+)') { $prUrl = $Matches[1] }
+  }
+  if ($prUrl) {
+    if ($prUrl -notmatch '/pull/(\d+)') { Die "cannot parse a PR number from: $prUrl" }
+    $prN = [int]$Matches[1]
+    $state = (Gh pr view $prN --repo $REPO --json 'state,mergedAt' | ConvertFrom-Json)
+    if ($state.state -ne 'MERGED' -and -not $state.mergedAt) {
+      Die "PR #$prN is not merged yet - merge it before closing #$N"
+    }
+  }
+  $pr = if ($prUrl) { $prUrl } else { '_(none given)_' }
   $extra = if ($POS[1]) { "`n$($POS[1])" } else { '' }
   Comment $N 'DONE' "pr: $pr$extra"
   & $GH issue close $N --repo $REPO *> $null
   if ($LASTEXITCODE -ne 0) { Die "failed to close #$N" }
   "#$N closed" | Write-Output
-  $open = Gh issue list --repo $REPO --state open --limit 100 --json 'number,body' |
-          ConvertFrom-Json
-  foreach ($i in $open) {
-    $b = if ($null -eq $i.body) { '' } else { $i.body }
-    if ($b -match "#$N\b") {
-      Comment $i.number 'DEP-DONE' "#$N is done. If it was blocking you: coord unblock $($i.number) `"...`""
-    }
-  }
 }
 
 function Cmd-Show([object[]]$argv) {

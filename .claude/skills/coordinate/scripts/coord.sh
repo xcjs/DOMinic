@@ -2,7 +2,7 @@
 # coord.sh - multi-agent coordination over GitHub Issues via the gh CLI.
 # Protocol: ../SKILL.md and ../references/protocol.md
 # Usage:    bash .claude/skills/coordinate/scripts/coord.sh <command> [args]
-# Env:      COORD_AGENT (who you are), COORD_REPO, COORD_STALE_MIN
+# Env:      COORD_AGENT (who you are), COORD_REPO, COORD_HUB, COORD_STALE_MIN
 set -euo pipefail
 
 REPO="${COORD_REPO:-xcjs/DOMinic}"
@@ -63,6 +63,21 @@ labels_of()    { gh issue view "$1" --repo "$REPO" --json labels --jq '.labels[]
 assignees_of() { gh issue view "$1" --repo "$REPO" --json assignees --jq '.assignees[].login'; }
 has_label()    { labels_of "$1" | grep -qx "$2"; }
 is_mine()      { assignees_of "$1" | grep -qx "$ME"; }
+
+# Declared file scope from the issue body's '## Files' section; empty if none.
+files_of() { # issue
+  gh issue view "$1" --repo "$REPO" --json body --jq '.body // ""' |
+    sed -n '/^## Files/,/^## /p' | sed '1d;$d' |
+    tr '\r' ' ' | tr '\n' ' ' |
+    sed 's/_(none listed)_//g; s/-(none listed)-//g' |
+    tr ';' ',' | tr ',' '\n' | sed 's/^ *//; s/ *$//; s/^\.//; s/ *$//' |
+    grep -v '^$' || true
+}
+
+# Issue numbers referenced as #N anywhere in a body (unique, first-ref order).
+referenced_issues() { # body
+  printf '%s' "$1" | grep -o '#[0-9]\+' | tr -d '#' | awk '!seen[$0]++' || true
+}
 
 set_status() { # issue status
   local args=(--add-label "status:$2") s
@@ -266,6 +281,32 @@ cmd_claim() {
   if [ -n "${owners// /}" ]; then
     die "#$N is held by @${owners% } - use: propose $N \"split: ...\"  or  question $N \"...\""
   fi
+  # v3 file scope: a claim must declare a non-empty Files scope.
+  local scope; scope="$(files_of "$N")"
+  if [ -z "$scope" ]; then
+    die "#$N declares no Files scope - add a '## Files' section (coord new --files) before claiming"
+  fi
+  # v3 file scope: refuse active overlap unless the issue records a split or shares an owner.
+  local o their clash common
+  while IFS=$'\t' read -r o _; do
+    [ -n "$o" ] || continue
+    their="$(files_of "$o")"
+    [ -n "$their" ] || continue
+    clash="$(printf '%s\n' $scope | sort -u | while read -r p; do
+      printf '%s\n' $their | grep -qx "$p" && echo "$p"
+    done)"
+    [ -n "$clash" ] || continue
+    if gh issue view "$o" --repo "$REPO" --json body --jq '.body // ""' | grep -q '^split:'; then
+      continue
+    fi
+    common=""
+    for w in $owners; do
+      assignees_of "$o" | grep -qx "$w" && { common="$w"; break; }
+    done
+    [ -n "$common" ] && continue
+    die "#$N scope overlaps #$o on: $(printf '%s' "$clash" | paste -sd, -) - record a split on one of the issues or hand off ownership first"
+  done < <(gh issue list --repo "$REPO" --state open --limit 100 --json number,labels,body \
+             --jq '.[] | select(((.labels // []) | map(.name) | index("hub")) | not) | select(.number != '"$N"') | "\(.number)\t\(.body // "")"')
   comment "$N" CLAIM "plan: ${OPT_plan:-_(none given)_}"$'\n'"eta: ${OPT_eta:-_(none given)_}"
   gh issue edit "$N" --repo "$REPO" --add-assignee "@me" >/dev/null
   set_status "$N" claimed
@@ -393,20 +434,51 @@ cmd_handoff() {
 
 cmd_review() {
   parse "$@"; need_issue
-  comment "$N" REVIEW "pr: ${OPT_pr:-_(none given)_}"$'\n'"${POS[1]:-}"
+  [ -n "${OPT_pr:-}" ] || die 'review N --pr URL ["text"]'
+  [[ "$OPT_pr" =~ /pull/([0-9]+) ]] || die "--pr must be a pull-request URL: $OPT_pr"
+  local prn="${BASH_REMATCH[1]}"
+  # v3 file scope: PR paths must fall within the union of linked issues' Files.
+  local body allowed linked
+  body="$(gh issue view "$N" --repo "$REPO" --json body --jq '.body // ""')"
+  linked="$N $(referenced_issues "$body")"
+  allowed="$( { for l in $linked; do files_of "$l"; done; } | sort -u)"
+  if [ -n "$allowed" ]; then
+    local undeclared p
+    undeclared="$(gh pr view "$prn" --repo "$REPO" --json files --jq '.files[].path' |
+      while read -r p; do
+        printf '%s\n' $allowed | grep -qF "$p" || echo "$p"
+      done)"
+    if [ -n "$undeclared" ]; then
+      die "PR #$prn touches paths outside the linked issues' Files scope: $(printf '%s' "$undeclared" | paste -sd, -) - update the issues' Files or drop the paths"
+    fi
+  fi
+  comment "$N" REVIEW "pr: ${OPT_pr}"$'\n'"${POS[1]:-}"
   set_status "$N" in-review
 }
 
 cmd_done() {
   parse "$@"; need_issue
-  comment "$N" DONE "pr: ${OPT_pr:-_(none given)_}"$'\n'"${POS[1]:-}"
+  # v3 completion: refuse while a Done-when box is unchecked or the linked PR is unmerged.
+  local body prurl
+  body="$(gh issue view "$N" --repo "$REPO" --json body --jq '.body // ""')"
+  if printf '%s' "$body" | grep -q '^## Done when' &&
+     printf '%s' "$body" | grep -q '^[[:space:]]*-[[:space:]]*\[ \]'; then
+    die "#$N still has unchecked '## Done when' criteria - check them off after verifying (caller attests)"
+  fi
+  prurl="${OPT_pr:-}"
+  if [ -z "$prurl" ]; then
+    prurl="$(gh issue view "$N" --repo "$REPO" --json comments --jq \
+      '[.comments[] | select(.body|test("pr: \\S+/pull/\\d+"))] | last | .body | capture("pr: (?<u>\\S+/pull/\\d+)").u // empty')"
+  fi
+  if [ -n "$prurl" ]; then
+    [[ "$prurl" =~ /pull/([0-9]+) ]] || die "cannot parse a PR number from: $prurl"
+    local prn="${BASH_REMATCH[1]}" state
+    state="$(gh pr view "$prn" --repo "$REPO" --json state,merged --jq '.state')"
+    [ "$state" = "MERGED" ] || die "PR #$prn is not merged yet - merge it before closing #$N"
+  fi
+  comment "$N" DONE "pr: ${prurl:-_(none given)_}"$'\n'"${POS[1]:-}"
   gh issue close "$N" --repo "$REPO" >/dev/null
   echo "#$N closed"
-  local d
-  for d in $(gh issue list --repo "$REPO" --state open --limit 100 --json number,body \
-              --jq ".[] | select((.body // \"\") | test(\"#${N}\\\\b\")) | .number"); do
-    comment "$d" DEP-DONE "#$N is done. If it was blocking you: coord.sh unblock $d \"...\""
-  done
 }
 
 cmd_show() {
