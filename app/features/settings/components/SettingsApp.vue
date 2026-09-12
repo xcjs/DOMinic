@@ -39,8 +39,8 @@
         <input
           v-model="modelInput"
           type="text"
-          placeholder="e.g. gpt-4o, claude-3-5-sonnet-20241022, gemini-1.5-pro"
-          class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500"
+          placeholder="gpt-5, claude-sonnet-5, gemini-2.5-pro, or deepseek-chat"
+          class="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-xs text-white placeholder:text-slate-500 transition focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
         />
       </div>
 
@@ -59,8 +59,10 @@
         <input
           v-model="apiKeyInput"
           :type="showKey ? 'text' : 'password'"
-          placeholder="Enter provider API key (stored in browser localStorage only)..."
-          class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500 font-mono"
+          :placeholder="`${selectedProvider} API key (stored locally in this browser)`"
+          autocomplete="off"
+          spellcheck="false"
+          class="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 font-mono text-xs text-white placeholder:text-slate-500 transition focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
         />
         <span class="text-[11px] text-slate-500">
           Your key never leaves your browser at rest. It is passed ephemerally per request.
@@ -74,7 +76,7 @@
           v-model="baseUrlInput"
           type="text"
           placeholder="https://api.openai.com/v1 or custom proxy"
-          class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500 font-mono"
+          class="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 font-mono text-xs text-white placeholder:text-slate-500 transition focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
         />
       </div>
 
