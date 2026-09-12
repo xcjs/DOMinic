@@ -39,3 +39,4 @@ them with new ones.
 | [0001](0001-feature-slices-with-domain-driven-organization.md) | Feature slices with domain-driven organization | accepted |
 | [0002](0002-strict-typescript-and-lint-toolchain.md) | Strict TypeScript and lint toolchain | accepted |
 | [0003](0003-pinia-per-domain-stores.md) | Pinia per-domain stores | accepted |
+| [0004](0004-dominic-os-shell-and-taskbar.md) | DOMinic OS shell and taskbar | accepted |
