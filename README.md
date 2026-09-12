@@ -27,8 +27,9 @@ first-party software.
   virtual filesystem and loading npm dependencies from a vetted ESM
   CDN.
 
-There is no application code yet — the repository currently carries
-the decision record for every foundational choice.
+Application code is landing on `main` throughout the hackathon. See
+[Running DOMinic](#running-dominic) to start it, and the decision
+records below for why it is built this way.
 
 ## Documentation
 
@@ -88,10 +89,25 @@ team divides into clear, parallel workstreams:
    demo showcase apps (synthwave pomodoro, crypto ticker), and visual
    polish.
 
+## Running DOMinic
+
+```bash
+npm install
+npm run dev          # Nuxt dev server, default http://localhost:3000
+```
+
+Open **Settings** from the taskbar and paste an API key for your model
+provider. The key stays in your browser and travels per request; the
+server never stores it (ADR 0005). Then open the Agent Chat and
+describe an app: it is written, compiled in the browser, installed
+to the taskbar, and kept across reloads.
+
+Other scripts: `npm run build`, `npm run typecheck`, `npm run lint:md`.
+
 ## Development
 
-This is a docs-only repository so far. Markdown is linted with
-markdownlint-cli2 (80-column prose) and an OKF frontmatter block.
+Markdown is linted with markdownlint-cli2 (80-column prose) and
+carries OKF frontmatter.
 
 ```bash
 npm install
