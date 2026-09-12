@@ -39,8 +39,9 @@
         <input
           v-model="modelInput"
           type="text"
-          placeholder="gpt-5, claude-sonnet-5, gemini-2.5-pro, or deepseek-chat"
+          :placeholder="selectedProvider === 'custom' ? 'e.g. openai/gpt-4o-mini or llama3.2' : 'gpt-5, claude-sonnet-5, gemini-2.5-pro, or deepseek-chat'"
           class="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-xs text-white placeholder:text-slate-500 transition focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+          @input="baseUrlError = ''"
         />
       </div>
 
@@ -69,15 +70,22 @@
         </span>
       </div>
 
-      <!-- Custom Base URL (Optional) -->
+      <!-- Custom Base URL -->
       <div class="space-y-1.5">
-        <label class="text-xs text-slate-300 font-medium">Custom Base URL (Optional)</label>
+        <label class="text-xs text-slate-300 font-medium">
+          Custom Base URL <span v-if="selectedProvider === 'custom'" class="text-rose-400">(required)</span>
+          <span v-else class="text-slate-500">(Optional)</span>
+        </label>
         <input
           v-model="baseUrlInput"
           type="text"
-          placeholder="https://api.openai.com/v1 or custom proxy"
+          :placeholder="selectedProvider === 'custom' ? 'https://openrouter.ai/api/v1' : 'https://api.openai.com/v1 or custom proxy'"
           class="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 font-mono text-xs text-white placeholder:text-slate-500 transition focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+          @input="baseUrlError = ''"
         />
+        <span v-if="selectedProvider === 'custom'" class="text-[11px] text-slate-500">
+          Any OpenAI-compatible endpoint, e.g. https://openrouter.ai/api/v1, http://localhost:11434/v1
+        </span>
       </div>
 
       <!-- Save Button -->
@@ -92,6 +100,10 @@
 
         <span v-if="savedNotice" class="text-xs text-emerald-400 animate-fade-in">
           ✓ Saved to local storage
+        </span>
+
+        <span v-if="baseUrlError" class="text-xs text-rose-400">
+          {{ baseUrlError }}
         </span>
       </div>
     </div>
@@ -126,17 +138,20 @@ const providers: { id: LlmProvider; name: string; icon: string; defaultModel: st
   { id: 'openai', name: 'OpenAI', icon: '⚡', defaultModel: 'gpt-5' },
   { id: 'anthropic', name: 'Anthropic', icon: '🧠', defaultModel: 'claude-sonnet-5' },
   { id: 'google', name: 'Google', icon: '✨', defaultModel: 'gemini-2.5-pro' },
-  { id: 'deepseek', name: 'DeepSeek', icon: '🐋', defaultModel: 'deepseek-chat' }
+  { id: 'deepseek', name: 'DeepSeek', icon: '🐋', defaultModel: 'deepseek-chat' },
+  { id: 'custom', name: 'Custom', icon: '🔌', defaultModel: '' }
 ]
 
 const selectedProvider = ref<LlmProvider>('openai')
 const modelInput = ref('gpt-5')
 const apiKeyInput = ref('')
 const baseUrlInput = ref('')
+const baseUrlError = ref('')
 const showKey = ref(false)
 const savedNotice = ref(false)
 
 function selectProvider(p: LlmProvider) {
+  baseUrlError.value = ''
   selectedProvider.value = p
   const preset = providers.find((x) => x.id === p)
   if (preset) {
@@ -145,6 +160,11 @@ function selectProvider(p: LlmProvider) {
 }
 
 function save() {
+  if (selectedProvider.value === 'custom' && (!baseUrlInput.value.trim() || !modelInput.value.trim())) {
+    baseUrlError.value = 'Custom provider requires a Base URL and a model identifier.'
+    return
+  }
+  baseUrlError.value = ''
   settingsStore.saveSettings({
     provider: selectedProvider.value,
     model: modelInput.value,

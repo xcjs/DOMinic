@@ -53,6 +53,21 @@ export default defineEventHandler(async (event) => {
       baseURL: clientBaseUrl || process.env.DEEPSEEK_API_URL || 'https://api.deepseek.com'
     })
     modelInstance = deepseek(requestedModel || 'deepseek-chat')
+  } else if (provider === 'custom') {
+    if (!clientBaseUrl) {
+      throw createError({
+        statusCode: 400,
+        statusMessage: 'Custom provider requires a Base URL in Settings'
+      })
+    }
+    if (!requestedModel) {
+      throw createError({
+        statusCode: 400,
+        statusMessage: 'Custom provider requires a model'
+      })
+    }
+    const custom = createOpenAI({ apiKey, baseURL: clientBaseUrl })
+    modelInstance = custom(requestedModel)
   } else {
     // Default OpenAI
     const openai = createOpenAI({

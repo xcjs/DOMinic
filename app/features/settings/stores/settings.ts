@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
 import { clearVfs, readFile, writeFile } from '../../shared/vfs'
 
-export type LlmProvider = 'openai' | 'anthropic' | 'google' | 'deepseek'
+export type LlmProvider = 'openai' | 'anthropic' | 'google' | 'deepseek' | 'custom'
 
 export interface SettingsState {
   provider: LlmProvider

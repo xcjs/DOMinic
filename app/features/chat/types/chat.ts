@@ -17,7 +17,7 @@ export interface ChatMessage {
 }
 
 export interface ProviderConfig {
-  provider: 'openai' | 'anthropic' | 'google' | 'deepseek'
+  provider: 'openai' | 'anthropic' | 'google' | 'deepseek' | 'custom'
   model: string
   apiKey: string
   baseUrl?: string
