@@ -8,3 +8,6 @@ yarn-error.log*
 pnpm-debug.log*
 .npm
 .husky/_/
+
+# Agents
+AGENTS.md

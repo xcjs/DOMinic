@@ -35,13 +35,16 @@ the decision record for every foundational choice.
 | Path | Contents |
 | --- | --- |
 | [docs/adrs/](docs/adrs/README.md) | Architecture decision records (MADR 4.0) |
+| [NEXT.md](NEXT.md) | Post-hackathon roadmap & deferred architecture |
+| [QUESTIONS.md](QUESTIONS.md) | Open technical decisions for the hackathon team |
 | [docs/agents/use-okf.md](docs/agents/use-okf.md) | OKF v0.2 frontmatter convention for docs |
 | [docs/superpowers/specs/](docs/superpowers/specs/) | Design specs from brainstorming sessions |
 | [docs/superpowers/plans/](docs/superpowers/plans/) | Implementation plans derived from specs |
 
 ### Decision highlights
 
-The accepted ADR series fixes the platform's foundations:
+The accepted ADR series establishes the platform's foundations with an
+explicit **Hackathon POC Golden Path** in each record:
 
 - [0001](docs/adrs/0001-feature-slices-with-domain-driven-organization.md)
   Feature slices with domain-driven organization
@@ -61,6 +64,25 @@ The accepted ADR series fixes the platform's foundations:
   Runtime NPM dependency loading via esm.sh with vetting
 - [0009](docs/adrs/0009-cors-first-networking-with-chrome-masking-proxy-fallback.md)
   CORS-first networking with Chrome-masking proxy fallback
+- [0010](docs/adrs/0010-agent-app-interface-and-tool-protocol.md)
+  Agent app interface and tool protocol
+
+## Hackathon POC: Team Workstreams
+
+To deliver a working, high-impact POC within a few hours, the 5-engineer
+team divides into clear, parallel workstreams:
+
+1. **SDE 1 (OS Shell & Window Manager)**: Desktop wallpaper, taskbar,
+   window frames with drag/minimize/maximize/close via `@vueuse/core`.
+2. **SDE 2 (Agent Chat & Tool Calling)**: `/api/chat` route, streaming UI,
+   system prompt, and `install_app` / `update_app` tool execution.
+3. **SDE 3 (Runtime App Engine)**: In-process `vue3-sfc-loader` wrapper,
+   Tailwind styling, and error boundary with auto-fix reporting.
+4. **SDE 4 (Persistence & App Registry)**: Lightweight VFS over
+   `localStorage`, app registry hydration, and Settings persistence.
+5. **SDE 5 (Integration, Polish & Curated Demos)**: Built-in Settings app,
+   demo showcase apps (synthwave pomodoro, crypto ticker), and visual
+   polish.
 
 ## Development
 

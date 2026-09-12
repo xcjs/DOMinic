@@ -49,15 +49,41 @@ because it serves the whole npm ecosystem (CJS transpile, subpaths,
 GitHub refs) as ready ESM with zero server build, while the vetting
 gate satisfies the security driver.
 
-- Every dependency passes a vetting gate before first load: npm
-  registry and advisory (audit) data, weekly download volume,
-  license check, publish age, and maintainer signals.
-- Vetted package metadata and cached builds persist in the VFS
-  (ADR 0007).
-- Recorded caveats: native/binary addons cannot run in a browser;
-  heavy Node built-in usage depends on esm.sh polyfills; CDN
-  availability is a dependency mitigated by the vetting gate and VFS
-  caching; the first request pays build latency.
+### Hackathon POC (Golden Path)
+
+Building an automated multi-signal security vetting engine (querying
+npm registry APIs, advisory databases, and maintainer signals) is
+prohibitive within a hackathon timeframe. The POC implements direct
+loading with pre-provisioned essentials:
+
+- **Direct esm.sh Resolver**: The `vue3-sfc-loader` `loadModule` handler
+  maps unrecognized package specifiers directly to
+  `https://esm.sh/${specifier}?bundle`.
+- **Pre-provisioned Host Libraries**: Key libraries are mapped
+  directly to in-memory host instances to avoid any network round-trip:
+  - `vue`: Bound to the running Vue 3 instance.
+  - `@vueuse/core`: Essential reactive utilities.
+  - `lucide-vue-next`: Crisp icons for apps and controls.
+  - `canvas-confetti`: Instant visual feedback for demo apps.
+- **System Prompt Guardrails**: The agent system prompt directs the LLM
+  to rely on the pre-provisioned set and browser-safe ESM packages,
+  avoiding Node.js built-ins (`fs`, `child_process`).
+
+### Future / Out of Scope for POC
+
+- Automated vetting gate querying npm advisory databases (audit), weekly
+  download thresholds, license compliance, and package age.
+- Local VFS caching of resolved ESM vendor bundles for offline
+  execution.
+- Static import-analysis sandbox gating.
+
+### Open Questions
+
+- **OPEN QUESTION: Version Pinning**: Should the agent be instructed to
+  pin dependency versions (e.g. `canvas-confetti@1.9.3`) or use bare
+  names? (Recommendation for POC: Bare names or `@latest` let esm.sh
+  resolve quickly; pre-provisioned libraries bypass resolution
+  entirely).
 
 ### Confirmation
 

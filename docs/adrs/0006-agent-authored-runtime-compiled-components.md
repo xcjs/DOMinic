@@ -50,14 +50,39 @@ process**, because it compiles agent-authored SFCs directly in the
 browser with no per-app infrastructure and keeps compiled apps first-
 class OS citizens.
 
-- Compiled components register as ordinary Vue components, apps, or
-  widgets through the component registry in the `os` slice.
-- A `DominicApp` base component contract standardizes app metadata,
-  launch context props, and install/uninstall lifecycle hooks; the
-  built-in Settings app (ADR 0004) is the first implementation.
-- Component source persists in the VFS (ADR 0007).
-- iframe isolation is documented as a future escape hatch for
-  untrusted or crashing apps, not the default path.
+### Hackathon POC (Golden Path)
+
+For the hackathon POC, runtime compilation delivers an instant
+compile-and-render loop directly in the browser:
+
+- **DynamicAppRunner**: A wrapper component compiles raw Vue SFC strings
+  using `vue3-sfc-loader` and mounts the result dynamically via
+  `<component :is="compiledComponent" />`.
+- **Pre-injected Ecosystem**: The `loadModule` callback of `vue3-sfc-loader`
+  immediately resolves `vue`, `@vueuse/core`, and standard icon sets
+  (`lucide-vue-next`) from in-memory host bundles with zero network latency.
+- **Tailwind Utility Styling**: Host Tailwind CSS styles are directly
+  accessible inside the component templates, enabling rich UIs with zero
+  custom CSS overhead.
+- **Error Boundary**: A Vue `onErrorCaptured` boundary wraps every running
+  component. If an agent-authored app throws a render or syntax error,
+  the window displays a clean error card with an "Ask Agent to Fix" button
+  that feeds the error trace back into the chat.
+- **DominicApp Contract**: Governed by ADR 0010.
+
+### Future / Out of Scope for POC
+
+- Sandboxed `<iframe>` compile isolation with `postMessage` bridge.
+- Web Worker compilation and off-thread parsing.
+- Hot-module state preservation across component updates (POC re-mounts
+  the updated component).
+
+### Open Questions
+
+- **OPEN QUESTION: Global CSS Pollution**: Could an agent write unscoped
+  `<style>` tags that break OS shell styling? (Recommendation for POC:
+  System prompt instructs the agent to use Tailwind utility classes or
+  `<style scoped>`).
 
 ### Confirmation
 

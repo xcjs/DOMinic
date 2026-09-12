@@ -47,13 +47,41 @@ Chosen option: **a single `VirtualFileSystem` interface plus a driver
 registry**, because it hides the storage split behind one API while
 letting each path use the backend that fits its payload.
 
-- Two drivers ship together: a `localStorage` driver (small,
-  synchronous payloads) and an IndexedDB driver (large payloads,
-  async-backed).
-- Per-path driver mapping is stored in VFS metadata, so callers use
-  either depending on the need at each path.
-- The VFS underpins component source, settings, provider keys, and
-  the dependency cache (ADRs 0006, 0005, 0008).
+### Hackathon POC (Golden Path)
+
+To guarantee reliable persistence across page reloads without the
+overhead of managing multi-driver synchronization tables during the
+hackathon sprint:
+
+- **Unified VFS Interface**: Callers use an async `VirtualFileSystem`
+  contract (`readFile(path)`, `writeFile(path, content)`, `deleteFile(path)`,
+  `listFiles(directory)`). Making methods return Promises ensures future
+  driver swaps require zero caller refactoring.
+- **Single Storage Backend**: Implemented using `localStorage` (prefixed
+  keys) for maximum simplicity, zero runtime dependencies, and instant
+  boot hydration. The 5 MB browser quota easily stores dozens of Vue SFC
+  components and JSON manifests for the demo.
+- **Canonical Path Conventions**:
+  - `/system/settings.json`: Provider API keys, model selections.
+  - `/apps/<app-id>/index.vue`: Runtime component source code.
+  - `/apps/<app-id>/manifest.json`: Title, icon, timestamps, author.
+- **Boot Hydration**: On OS boot, the app registry reads `/apps/` and
+  re-registers all installed applications into the taskbar and launcher.
+
+### Future / Out of Scope for POC
+
+- Dynamic per-path driver routing table between localStorage and
+  IndexedDB.
+- Origin Private File System (OPFS) driver for binary files.
+- Hierarchical POSIX permissions, directory watchers, and quota
+  warning events.
+
+### Open Questions
+
+- **OPEN QUESTION: Storage Reset Utility**: Should a one-click "Reset OS"
+  button be provided in Settings to flush VFS during testing?
+  (Recommendation for POC: Yes, add a clear-storage utility button in
+  the Settings app).
 
 ### Confirmation
 

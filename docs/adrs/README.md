@@ -45,3 +45,4 @@ them with new ones.
 | [0007](0007-virtual-filesystem-with-pluggable-storage-drivers.md) | Virtual filesystem with pluggable storage drivers | accepted |
 | [0008](0008-runtime-npm-dependency-loading-via-esm-sh-with-vetting.md) | Runtime NPM dependency loading via esm.sh with vetting | accepted |
 | [0009](0009-cors-first-networking-with-chrome-masking-proxy-fallback.md) | CORS-first networking with Chrome-masking proxy fallback | accepted |
+| [0010](0010-agent-app-interface-and-tool-protocol.md) | Agent app interface and tool protocol | accepted |

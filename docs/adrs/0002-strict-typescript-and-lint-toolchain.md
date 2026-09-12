@@ -49,14 +49,36 @@ eslint-plugin-vue, plus `vue-tsc --noEmit`**, because it is the only
 option with mature Vue-aware rules, full type-checking, and a flat
 config that the Nuxt ecosystem (`@nuxt/eslint`) integrates directly.
 
-- Versions pinned to current stable at acceptance: ESLint 10,
-  typescript-eslint 8, eslint-plugin-vue 10, vue-tsc 3, TypeScript 7,
-  `@nuxt/eslint` 1, lint-staged 17, husky 9 (registry-verified on
-  2026-09-12).
-- TypeScript runs with `strict` and `noUncheckedIndexedAccess`.
-- ESLint uses flat config with `recommendedTypeChecked` rules for
-  TypeScript and `eslint-plugin-vue` for SFCs.
-- `vue-tsc --noEmit` gates CI and pre-commit via lint-staged/husky.
+### Hackathon POC (Golden Path)
+
+To maximize developer velocity across the 5 SDE team during the
+hackathon sprint without sacrificing core type safety:
+
+- TypeScript strict mode (`strict: true`) is enabled in `tsconfig.json`
+  for editor assistance, auto-complete, and immediate error highlighting.
+- Pre-commit hooks (`husky`) run only fast markdown linting and basic
+  syntax checks. Blocking `vue-tsc --noEmit` runs are explicitly
+  deferred from pre-commit hooks to avoid commit friction during rapid
+  parallel feature hacking.
+- Full `vue-tsc` and lint checks are executed on-demand and during final
+  pre-demo verification.
+- Runtime SFC compilation (ADR 0006) executes agent-authored code
+  without compile-time type-blocking; runtime errors are caught via
+  Vue error boundaries.
+
+### Future / Out of Scope for POC
+
+- Mandatory blocking pre-commit gate running full `vue-tsc --noEmit` and
+  type-aware ESLint rules on every git commit.
+- Automated static linting and type analysis of agent-authored code
+  before runtime installation.
+
+### Open Questions
+
+- **OPEN QUESTION: Agent TypeScript Support**: Should the agent be
+  prompted to output `<script setup lang="ts">` or plain
+  `<script setup>`? (Recommendation for POC: Plain `<script setup>` in
+  JavaScript minimizes runtime transpile failures in `vue3-sfc-loader`).
 
 ### Confirmation
 
