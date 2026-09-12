@@ -127,8 +127,9 @@ numbers and kebab-case names, per ADR 0000. All are `accepted` on
   manager, taskbar, app registry, and built-in **Settings** app as the
   first first-party app on the base app contract (ADR 0006). Mobile
   first: on narrow viewports the taskbar degrades to bottom-nav-style
-  sheet with stacked/maximized windows. Settings is the global place
-  to configure OS preferences at any time.
+  sheet with stacked/maximized windows. Shell chrome uses modern
+  transparency/backdrop-blur effects with opaque fallbacks. Settings
+  is the global place to configure OS preferences at any time.
 
 ### 0005 — Agent chat via Vercel AI SDK with server-side provider proxy
 

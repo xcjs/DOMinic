@@ -53,6 +53,9 @@ degradation rather than a separate shell.
   registry.
 - The taskbar lists running apps; on narrow viewports it degrades to
   a bottom-nav-style sheet and windows stack or maximize.
+- Shell chrome (taskbar, window titlebars, desktop surfaces) uses
+  modern transparency and backdrop-blur effects where supported, with
+  opaque fallbacks where they are not.
 - The built-in **Settings** app is the first first-party app on the
   base app contract; it is the global surface for OS preferences
   (including LLM provider configuration, ADR 0005).
