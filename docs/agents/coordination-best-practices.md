@@ -3,7 +3,8 @@ type: playbook
 title: Coordination Best Practices — Sprint Minimum and Full Protocol
 description: Evidence-based hardening of the /coordinate protocol — which verbs and parameters to run while the clock is short, what to drop, and when to switch back to the full protocol.
 tags: [agents, coordination, process, hackathon, research]
-status: active
+status: superseded
+superseded_by: coordination-best-practices-2.md
 generated: { by: claude-code/claude-fable-5.1, at: 2026-09-12T18:30:00Z }
 sources:
   - id: q01-external
@@ -18,6 +19,11 @@ sources:
 ---
 
 # Coordination best practices — sprint minimum and full protocol
+
+> **Superseded** on 2026-09-12 by
+> [coordination-best-practices-2.md](coordination-best-practices-2.md),
+> which reconciles three research answers. Kept for the record; follow
+> v2 where they differ.
 
 Issues plus `gh` is the right ledger for agents: they cannot hear the
 table. It is the wrong place for human ceremony. This playbook hardens
