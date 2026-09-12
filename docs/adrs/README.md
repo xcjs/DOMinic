@@ -46,6 +46,7 @@ them with new ones.
 | [0008](0008-runtime-npm-dependency-loading-via-esm-sh-with-vetting.md) | Runtime NPM dependency loading via esm.sh with vetting | accepted |
 | [0009](0009-cors-first-networking-with-chrome-masking-proxy-fallback.md) | CORS-first networking with Chrome-masking proxy fallback | accepted |
 | [0010](0010-agent-app-interface-and-tool-protocol.md) | Agent app interface and tool protocol | accepted |
+| [0011](0011-node-24-lts-runtime-standard.md) | Node 24 LTS runtime standard | accepted |
 
 ## As-built reconciliation
 
@@ -54,4 +55,3 @@ On 2026-09-12 each accepted ADR from 0001 to 0010 gained an
 Outcome. It records, with file references, where the code on `main`
 matches the golden path and where it diverges. The decision text
 itself is unchanged: the record stays a record.
-| [0010](0010-node-24-lts-runtime-standard.md) | Node 24 LTS runtime standard | accepted |

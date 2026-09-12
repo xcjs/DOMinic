@@ -12,7 +12,7 @@ verified: { by: human:zack, at: 2026-09-12T00:00:00Z }
 
 | ADR&nbsp;Number | Status | Date | Deciders |
 | --- | --- | --- | --- |
-| 0010 | accepted | 2026-09-12 | Zack |
+| 0011 | accepted | 2026-09-12 | Zack |
 
 ## Technical Story
 
