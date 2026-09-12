@@ -39,6 +39,7 @@ the decision record for every foundational choice.
 | [QUESTIONS.md](QUESTIONS.md) | Open technical decisions for the hackathon team |
 | [docs/agents/use-okf.md](docs/agents/use-okf.md) | OKF v0.2 frontmatter convention for docs |
 | [docs/agents/rubric.md](docs/agents/rubric.md) | Hackathon judging rubric and win strategy |
+| [docs/agents/demo-path.md](docs/agents/demo-path.md) | The two-minute demo as rubric-mapped beats |
 | [docs/superpowers/specs/](docs/superpowers/specs/) | Design specs from brainstorming sessions |
 | [docs/superpowers/plans/](docs/superpowers/plans/) | Implementation plans derived from specs |
 
