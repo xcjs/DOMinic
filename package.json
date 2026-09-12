@@ -4,9 +4,11 @@
   "private": true,
   "description": "DOMinic",
   "scripts": {
-    "lint:md": "markdownlint-cli2 \"**/*.md\" \"#node_modules\" \"#.superpowers\""
+    "lint:md": "markdownlint-cli2 \"**/*.md\" \"#node_modules\" \"#.superpowers\"",
+    "prepare": "husky"
   },
   "devDependencies": {
+    "husky": "^9.1.7",
     "markdownlint-cli2": "^0.18.1"
   }
 }
