@@ -121,6 +121,31 @@ Exact prompt: *"Build a beautiful retro synthwave Pomodoro focus timer with
 25-minute work and 5-minute break cycles, start/pause/reset controls, and
 confetti celebration on finish."*
 
+### Rehearsing the Recover beat (stretch)
+
+For the Recover beat (1:15–1:32), the error boundary handles both
+template/script compilation errors and runtime render exceptions:
+
+1. **Triggering the error**:
+   - Rehearsal helper in devtools:
+     `window.__dominic.injectBrokenApp('compile')` or
+     `window.__dominic.injectBrokenApp('runtime')`.
+   - On-camera prompt: *"Update the pomodoro timer to intentionally test
+     error recovery by adding a deliberate syntax error or runtime throw."*
+2. **The error state**:
+   The window displays the dark rose glass error card labeled
+   **Component Compilation Error** (or **Application Runtime Error**)
+   with the formatted syntax error or stack trace and a
+   **✨ Ask Agent to Fix** button.
+3. **The recovery loop**:
+   Clicking **Ask Agent to Fix** focuses the Agent Chat window and
+   submits the error trace along with the target app's current source
+   code. The model calls `update_app` with the corrected SFC code.
+4. **In-place repair**:
+   `update_app` writes the repaired SFC to `apps/<id>/index.vue` and
+   bumps `sourceVersion[id]`, causing the runner to re-compile and mount
+   the working component in place without reloading the page.
+
 ## Filming rules — criterion 1 on camera
 
 - Rehearse the exact prompt three times before recording. Record two

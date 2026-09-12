@@ -18,7 +18,7 @@
         <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
         </svg>
-        <span class="font-semibold text-sm">Application Runtime Error</span>
+        <span class="font-semibold text-sm">{{ isRuntimeError ? 'Application Runtime Error' : 'Component Compilation Error' }}</span>
       </div>
 
       <div class="p-3.5 rounded-lg bg-rose-950/60 border border-rose-800/60 text-xs font-mono whitespace-pre-wrap leading-relaxed mb-4 select-text">
@@ -70,6 +70,7 @@ const emit = defineEmits<{
 
 const isLoading = ref(true)
 const error = ref<string | null>(null)
+const isRuntimeError = ref(false)
 const compiledComponent = shallowRef<any>(null)
 
 async function loadComponent() {
@@ -81,6 +82,7 @@ async function loadComponent() {
 
   isLoading.value = true
   error.value = null
+  isRuntimeError.value = false
 
   try {
     const comp = await compileVueSfc({
@@ -99,6 +101,7 @@ async function loadComponent() {
 // Error boundary catching errors in mounted child component
 onErrorCaptured((err: Error, _instance, info: string) => {
   console.error(`[DOMinic Engine] Runtime render error in "${props.appId}":`, err, info)
+  isRuntimeError.value = true
   error.value = `${err.name}: ${err.message}\n${err.stack || ''}\n(Occurred during: ${info})`
   return false // Stop propagation
 })
