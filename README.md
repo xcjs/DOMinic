@@ -36,6 +36,7 @@ the decision record for every foundational choice.
 | --- | --- |
 | [docs/adrs/](docs/adrs/README.md) | Architecture decision records (MADR 4.0) |
 | [docs/agents/use-okf.md](docs/agents/use-okf.md) | OKF v0.2 frontmatter convention for docs |
+| [docs/agents/rubric.md](docs/agents/rubric.md) | Hackathon judging rubric and win strategy |
 | [docs/superpowers/specs/](docs/superpowers/specs/) | Design specs from brainstorming sessions |
 | [docs/superpowers/plans/](docs/superpowers/plans/) | Implementation plans derived from specs |
 
