@@ -86,6 +86,47 @@ among the 5 SDEs rather than blocking commits on custom lint rules.
 Dependency direction is enforced by ESLint import rules once the
 lint toolchain lands; code review rejects slice-to-slice imports.
 
+### As built (2026-09-12)
+
+**Matches the golden path:**
+
+- Slices are vertical directories under `app/features/` (`os`, `chat`,
+  `apps`, `settings`, `shared`), with `srcDir: "app/"` in `nuxt.config.ts:5`.
+- `os` holds the window store (`app/features/os/stores/os.ts:21`); `apps`
+  holds the SFC runner (`app/features/apps/runner/loader.ts:5`).
+- No slice imports another slice; the only cross-directory imports inside
+  `app/features` target `../../shared/vfs`
+  (`app/features/apps/registry/registry.ts:2`). `app/app.vue:3-14` is the
+  sole composition root and wires slices via callbacks (`app/app.vue:123`).
+- Boundaries are held by convention: the pre-commit hook only runs
+  `npm run lint:md` (`.husky/pre-commit:1`) and no ESLint config exists.
+
+**Differs from this record:**
+
+- ADR names the agent slice `app/features/agent` -> main names it
+  `app/features/chat` (`app/features/chat/index.ts:1`).
+- ADR puts the Settings app inside `apps` and the app registry in `os` ->
+  main has a `settings` slice (`app/features/settings/index.ts:1`) and
+  keeps the registry in `app/features/apps/registry/registry.ts:18`.
+- ADR names the kernel `app/shared/` -> main has no such directory; it uses
+  `app/features/shared/`, auto-imported by `imports.dirs`
+  (`nuxt.config.ts:10`).
+- ADR says the kernel holds `DominicApp`, `WindowState`, `AppMetadata` and
+  storage keys -> it holds a localStorage VFS (`app/features/shared/vfs.ts:1`)
+  and a `vue3-sfc-loader` type shim; `WindowState` is a string union at
+  `app/features/os/stores/os.ts:4` (the window record is `OsWindow`, `:6`),
+  the metadata type is `AppMeta` in `app/features/apps/registry/registry.ts:4`,
+  and `DominicApp` is prose (`app/features/chat/prompts/systemPrompt.ts:23`).
+
+**Open question outcome:**
+
+- Resolved as the POC path: the Tailwind Play CDN script is injected in
+  `nuxt.config.ts:32` next to build-time content globs (`nuxt.config.ts:17`).
+- Runtime SFC styles are appended to `document.head` with no host-side
+  isolation, tagged `data-app-id` (`app/features/apps/runner/loader.ts:34`).
+
+Reconciled against main on 2026-09-12; the decision text above is unchanged.
+
 ## Pros and Cons of the Options
 
 ### Slice-local vertical directories

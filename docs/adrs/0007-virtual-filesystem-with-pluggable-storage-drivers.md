@@ -89,6 +89,46 @@ Unit tests run the same VFS suite against each driver; the OS boots
 and restores component source and settings from the VFS after a
 reload.
 
+### As built (2026-09-12)
+
+**Matches the golden path:**
+
+- One localStorage backend with prefixed keys: `VFS_PREFIX` is
+  `'dominic:vfs:'` (`app/features/shared/vfs.ts:1`); a leading slash is
+  stripped by `normalizePath` (`app/features/shared/vfs.ts:7`).
+- `readFile`, `writeFile`, `deleteFile`, `listFiles` are named exports
+  (`app/features/shared/vfs.ts:11`).
+- Settings persist at `system/settings.json`
+  (`app/features/settings/stores/settings.ts:14`); app source at
+  `apps/<id>/index.vue` (`app/app.vue:90`).
+- Boot hydration: `onMounted` runs `settings.hydrate()` then
+  `apps.installed = hydrateRegistry()` (`app/app.vue:29`).
+- Window state is not persisted; `useOsStore` keeps `windows` in a
+  plain `ref` (`app/features/os/stores/os.ts:22`).
+
+**Differs from this record:**
+
+- Async `VirtualFileSystem` interface -> synchronous module functions,
+  no interface or driver registry; `readFile` returns `string | null`
+  (`app/features/shared/vfs.ts:21`).
+- `/apps/<app-id>/manifest.json` per app -> a single `registry.json`
+  holding an `AppMeta[]` (`app/features/apps/registry/registry.ts:14`);
+  no per-app manifest is written to the VFS.
+- Registry reads `/apps/` -> `hydrateRegistry` parses `registry.json`
+  only and never lists the `apps/` directory
+  (`app/features/apps/registry/registry.ts:20`).
+- Unit tests per driver -> no test files exist in the repo.
+
+**Open question outcome:**
+
+- Resolved yes: the `SettingsApp.vue` "System Danger Zone" button calls
+  `settingsStore.resetOs()`
+  (`app/features/settings/components/SettingsApp.vue:161`), which runs
+  `clearVfs()` and reloads (`app/features/settings/stores/settings.ts:64`);
+  `clearVfs` strips every `'dominic:'` key (`app/features/shared/vfs.ts:61`).
+
+Reconciled against main on 2026-09-12; the decision text above is unchanged.
+
 ## Pros and Cons of the Options
 
 ### Single `VirtualFileSystem` interface with driver registry

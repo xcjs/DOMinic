@@ -83,6 +83,47 @@ readable and writable across the 5 SDEs.
 Code review rejects component-private OS state that duplicates a
 store; the devtools Pinia panel shows one store per slice.
 
+### As built (2026-09-12)
+
+**Matches the golden path:**
+
+- `useOsStore` is a setup store (`defineStore("os", () => ...)`) holding
+  `windows`, `focusedId`, an internal `topZ` computed, and per-window
+  minimized/maximized state (`app/features/os/stores/os.ts:21`).
+- `useSettingsStore` holds `provider`, `model`, `apiKey`, and `baseUrl`
+  and is read by `app.vue` and `SettingsApp.vue`
+  (`app/features/settings/stores/settings.ts:16`).
+
+**Differs from this record:**
+
+- Three stores -> four `defineStore` calls: `os`, `apps`, `chat`, and
+  `settings` (`app/features/apps/stores/apps.ts:3`).
+- `useAgentStore` in `app/features/agent/stores/agent.ts` -> no `agent`
+  slice exists; `messages` and `isStreaming` are plain `ref`s inside
+  `useAgentChat` (`app/features/chat/composables/useAgentChat.ts:14`),
+  which reads settings and apps through `UseAgentChatOptions` callbacks
+  wired in `app.vue`, not through stores (`app/app.vue:123`).
+- `useChatStore` (option store, `messages` only) is defined but imported
+  nowhere in `app/` (`app/features/chat/stores/chat.ts:3`).
+- Setup syntax everywhere -> only `os` is a setup store; `chat`, `apps`,
+  and `settings` use option syntax (`state`; only `settings` has `actions`)
+  (`app/features/settings/stores/settings.ts:16`).
+- `useSettingsStore` at `app/features/apps/stores/settings.ts` -> lives at
+  `app/features/settings/stores/settings.ts:16`.
+- Registered apps list in `useOsStore` -> registry state is a module-level
+  `appsState` ref outside Pinia
+  (`app/features/apps/registry/registry.ts:15`); `useAppsStore.installed`
+  is a mirror `app.vue` seeds from `hydrateRegistry()` (`app/app.vue:30`)
+  and reassigns from `listApps()` after each mutation (`app/app.vue:93`).
+
+**Open question outcome:**
+
+- Resolved as recommended: the registry persists to the VFS as `registry.json`
+  (`app/features/apps/registry/registry.ts:14`); `useOsStore.windows` is
+  never persisted; `app.vue` opens only `chat` on mount (`app/app.vue:31`).
+
+Reconciled against main on 2026-09-12; the decision text above is unchanged.
+
 ## Pros and Cons of the Options
 
 ### Pinia, one setup-style store per slice

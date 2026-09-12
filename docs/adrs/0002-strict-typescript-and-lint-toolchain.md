@@ -85,6 +85,46 @@ hackathon sprint without sacrificing core type safety:
 A fresh Nuxt scaffold lands with this exact configuration; a
 deliberate type error and a lint error both fail CI.
 
+### As built (2026-09-12)
+
+**Matches the golden path:**
+
+- `tsconfig.json` enables `strict: true` plus `noUncheckedIndexedAccess`,
+  `noImplicitOverride` and `verbatimModuleSyntax` (`tsconfig.json:4`).
+- `nuxt.config.ts` sets `typescript.strict: true` and `typeCheck: true`, so
+  Nuxt runs `vue-tsc` during dev and build (`nuxt.config.ts:20`).
+- The husky pre-commit hook runs only `npm run lint:md`
+  (`.husky/pre-commit:1`); no `vue-tsc --noEmit` gate exists in the hook, as
+  the POC deferred.
+- `vue-tsc` is a devDependency and `npm run typecheck` runs `nuxt typecheck`
+  on demand (`package.json:12`, `package.json:29`).
+
+**Differs from this record:**
+
+- ADR: ESLint with type-checked typescript-eslint, eslint-plugin-vue and
+  `@nuxt/eslint` -> main has no ESLint at all: no `eslint.config.*`, no
+  `eslint`/`@nuxt/eslint` devDependency, and no `lint` script
+  (`package.json:16`). Only `markdownlint-cli2` is installed
+  (`package.json:24`).
+- ADR Confirmation: "a deliberate type error and a lint error both fail CI"
+  -> CI has a single `markdownlint` job that runs `npm run lint:md`
+  (`.github/workflows/ci.yml:9`, `.github/workflows/ci.yml:24`); no
+  typecheck or ESLint step runs in CI.
+- ADR: pre-commit runs "markdown linting and basic syntax checks" -> the hook
+  runs markdown linting only (`.husky/pre-commit:1`).
+- Markdown rules live in `.markdownlint.jsonc` (80-column `MD013`; headings,
+  tables and code blocks exempt) (`.markdownlint.jsonc:3`).
+
+**Open question outcome:**
+
+- Resolved as the POC recommended: the agent system prompt instructs plain
+  JavaScript `<script setup>` and forbids `lang="ts"`
+  (`app/features/chat/prompts/systemPrompt.ts:26`), so agent output is never
+  type-checked; the host app itself uses `<script setup lang="ts">`
+  (`app/app.vue:1`).
+
+Reconciled against main on 2026-09-12; the decision text above is unchanged.
+
 ## Pros and Cons of the Options
 
 ### ESLint (typescript-eslint + eslint-plugin-vue) + vue-tsc

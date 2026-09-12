@@ -90,6 +90,48 @@ An agent-authored SFC installs from chat, appears in the app
 registry, launches as a window, and survives reload via its VFS
 source.
 
+### As built (2026-09-12)
+
+**Matches the golden path:**
+
+- `DynamicAppRunner` compiles its `sourceCode` prop through `compileVueSfc`,
+  a `vue3-sfc-loader` `loadModule` wrapper, and mounts the result via
+  `<component :is>` (`app/features/apps/runner/loader.ts:42`,
+  `app/features/apps/runner/DynamicAppRunner.vue:48`).
+- `moduleCache` pre-resolves `vue`, `@vueuse/core` and `lucide-vue-next` from
+  host bundles (`app/features/apps/runner/loader.ts:16`).
+- Runtime errors hit `onErrorCaptured` (`DynamicAppRunner.vue:100`, returns
+  `false`); compile errors hit the `catch` in `loadComponent` (line 91). Both
+  show the card whose "Ask Agent to Fix" emits `askFix`; `app.vue` forwards
+  it to `chat.sendMessage` (`app/app.vue:104`).
+- Updates re-mount: `installApp`/`updateApp` bump `sourceVersion[params.id]`,
+  part of the runner's `:key` (`app/app.vue:94`, `app/app.vue:131`).
+
+**Differs from this record:**
+
+- `canvas-confetti` is also in `moduleCache`, and unknown imports are fetched
+  unvetted from `https://esm.sh/<url>?bundle` (`loader.ts:20`, `loader.ts:27`).
+- Agent-only Tailwind classes resolve through the Play CDN script added in
+  `nuxt.config.ts:32`, not the host build's bundle alone.
+- The runner passes `app-id` and `window-id` to the compiled app
+  (`DynamicAppRunner.vue:50`); the prompt contract never mentions them.
+- The error card adds a "Retry" recompile button (`DynamicAppRunner.vue:41`);
+  `askFix` emits `sourceCode` but `app/app.vue:105` sends only id and error.
+- `addStyle` appends a `<style data-app-id>` to `document.head`; nothing removes
+  it on update, unmount or uninstall (`app/features/apps/runner/loader.ts:34`).
+- Fixture path the ADR omits: `installFixture` writes `apps/<id>/index.vue`
+  into VFS and calls `registerApp` (`app/features/apps/fixtures/index.ts:31`);
+  `app/app.vue:43` exposes it as `window.__dominic.installFixture`.
+
+**Open question outcome:**
+
+- Resolved by prompt only: the contract mandates Tailwind utilities and allows
+  `<style scoped>` for keyframes (`app/features/chat/prompts/systemPrompt.ts:33`
+  and `systemPrompt.ts:25`); unscoped styles still inject globally and are
+  never removed (`loader.ts:34`).
+
+Reconciled against main on 2026-09-12; the decision text above is unchanged.
+
 ## Pros and Cons of the Options
 
 ### Runtime-compiled SFC (vue3-sfc-loader), in-process

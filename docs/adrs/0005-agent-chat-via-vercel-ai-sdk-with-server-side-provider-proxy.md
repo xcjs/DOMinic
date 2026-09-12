@@ -89,6 +89,47 @@ low-latency app creation loop:
 A chat round-trip against a configured provider streams token-by-token;
 the server holds no key material after a request completes.
 
+### As built (2026-09-12)
+
+**Matches the golden path:**
+
+- `server/api/chat.post.ts:8` is the Nuxt `/api/chat` route running
+  `streamText` with `install_app`/`update_app` (`server/api/chat.post.ts:67`)
+  on `ai@^4.3.19` (`package.json:35`).
+- The key travels per request from the Settings store (`app/app.vue:123`,
+  `app/features/chat/composables/useAgentChat.ts:88`); tool pills render
+  `Executing`/`Mounted` (`app/features/chat/components/ChatWindow.vue:80`).
+
+**Differs from this record:**
+
+- Keys never at rest on the server -> `server/api/chat.post.ts:27` falls
+  back to `OPENAI_API_KEY`, `ANTHROPIC_API_KEY`, `GEMINI_API_KEY`,
+  `GOOGLE_GENERATIVE_AI_API_KEY` or `DEEPSEEK_API_KEY` when no key is sent.
+- Two curated providers -> `'openai' | 'anthropic' | 'google' | 'deepseek'`
+  (`app/features/chat/types/chat.ts:20`); DeepSeek is `createOpenAI` with a
+  `baseURL` (`server/api/chat.post.ts:51`).
+- GPT-4o / Claude 3.5 Sonnet -> `gpt-5`, `claude-sonnet-5`, `gemini-2.5-pro`,
+  `deepseek-chat` (`server/api/chat.post.ts:46`, `SettingsApp.vue:124`).
+- `result.toDataStreamResponse()` (`server/api/chat.post.ts:86`) is read by a
+  hand-rolled `0:`/`9:`/`e:` prefix parser (`useAgentChat.ts:121`); tools have
+  no `execute`, so `maxSteps: 3` (`server/api/chat.post.ts:83`) never loops;
+  `handleToolCall` (`useAgentChat.ts:166`) runs them client-side.
+- Streaming markdown -> plain `{{ msg.content }}` (`ChatWindow.vue:46`); pills
+  say `Installing Application`/`Updating Application` (`ChatWindow.vue:64`);
+  no confetti fires on install (`app/features/apps/runner/loader.ts:20`).
+- No-provider onboarding -> a 401 `No API key provided for ${provider}...`
+  (`server/api/chat.post.ts:38`) is appended as `*(Error: ...)*` to the reply
+  (`useAgentChat.ts:160`); `hasApiKey` (`useAgentChat.ts:28`) is unused; the
+  key is plain text in `app/features/settings/stores/settings.ts:50`.
+
+**Open question outcome:**
+
+- Metadata half adopted: `buildSystemPrompt` lists each app's `id`, `title`,
+  `icon`, `description` (`app/features/chat/prompts/systemPrompt.ts:9`); no
+  source is ever injected; `update_app` resends `vueSfcCode` (`schemas.ts:33`).
+
+Reconciled against main on 2026-09-12; the decision text above is unchanged.
+
 ## Pros and Cons of the Options
 
 ### Server-side proxy with server-held provider keys
