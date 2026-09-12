@@ -121,14 +121,14 @@ import { useSettingsStore, type LlmProvider } from '../stores/settings'
 const settingsStore = useSettingsStore()
 
 const providers: { id: LlmProvider; name: string; icon: string; defaultModel: string }[] = [
-  { id: 'openai', name: 'OpenAI', icon: '⚡', defaultModel: 'gpt-4o' },
-  { id: 'anthropic', name: 'Anthropic', icon: '🧠', defaultModel: 'claude-3-5-sonnet-20241022' },
-  { id: 'google', name: 'Google', icon: '✨', defaultModel: 'gemini-1.5-pro' },
+  { id: 'openai', name: 'OpenAI', icon: '⚡', defaultModel: 'gpt-5' },
+  { id: 'anthropic', name: 'Anthropic', icon: '🧠', defaultModel: 'claude-sonnet-5' },
+  { id: 'google', name: 'Google', icon: '✨', defaultModel: 'gemini-2.5-pro' },
   { id: 'deepseek', name: 'DeepSeek', icon: '🐋', defaultModel: 'deepseek-chat' }
 ]
 
 const selectedProvider = ref<LlmProvider>('openai')
-const modelInput = ref('gpt-4o')
+const modelInput = ref('gpt-5')
 const apiKeyInput = ref('')
 const baseUrlInput = ref('')
 const showKey = ref(false)
