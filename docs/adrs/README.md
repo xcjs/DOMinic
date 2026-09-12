@@ -37,3 +37,4 @@ them with new ones.
 | --- | --- | --- |
 | [0000](0000-record-architecture-decisions.md) | Record architecture decisions | accepted |
 | [0001](0001-feature-slices-with-domain-driven-organization.md) | Feature slices with domain-driven organization | accepted |
+| [0002](0002-strict-typescript-and-lint-toolchain.md) | Strict TypeScript and lint toolchain | accepted |
