@@ -49,6 +49,10 @@ eslint-plugin-vue, plus `vue-tsc --noEmit`**, because it is the only
 option with mature Vue-aware rules, full type-checking, and a flat
 config that the Nuxt ecosystem (`@nuxt/eslint`) integrates directly.
 
+- Versions pinned to current stable at acceptance: ESLint 10,
+  typescript-eslint 8, eslint-plugin-vue 10, vue-tsc 3, TypeScript 7,
+  `@nuxt/eslint` 1, lint-staged 17, husky 9 (registry-verified on
+  2026-09-12).
 - TypeScript runs with `strict` and `noUncheckedIndexedAccess`.
 - ESLint uses flat config with `recommendedTypeChecked` rules for
   TypeScript and `eslint-plugin-vue` for SFCs.
