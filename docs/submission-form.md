@@ -48,7 +48,7 @@ components compiled at runtime in the browser with vue3-sfc-loader,
 with npm dependencies loaded at runtime via esm.sh, and their sources
 persist to a localStorage-backed virtual filesystem. Window drag,
 focus, minimize, and maximize are built on @vueuse/core. Architecture
-is documented in ten ADRs in the repo.
+is documented in eleven ADRs in the repo.
 
 ## Products & tools used
 
@@ -82,7 +82,7 @@ TODO_YOUTUBE_OR_LOOM_URL
   window manager, taskbar, and drag/focus/minimize/maximize
   (@vueuse/core), server-side `/api/chat` route with multi-provider
   support (OpenAI, Anthropic, Google, DeepSeek) on the Vercel AI SDK,
-  launcher uninstall and source actions, and ten architecture decision
+  launcher uninstall and source actions, and eleven architecture decision
   records.
 - **Michael Vawter** — runtime app engine: in-browser vue3-sfc-loader
   runner, esm.sh dependency resolver, error boundary, VFS over
@@ -107,7 +107,7 @@ Repository: <https://github.com/xcjs/DOMinic>
 
 All work was authored during the hackathon; there is no prior code.
 The team did bring a pre-hackathon plan: judging rubric, demo-path
-beats, and ten ADRs were written as a planning pass on day one and
+beats, and eleven ADRs were written as a planning pass on day one and
 are committed to the repo's history.
 
 ## Social media posts
