@@ -43,8 +43,9 @@ records below for why it is built this way.
 | [docs/agents/rubric.md](docs/agents/rubric.md) | Hackathon judging rubric and win strategy |
 | [docs/agents/demo-path.md](docs/agents/demo-path.md) | The two-minute demo as rubric-mapped beats |
 | [docs/agents/coordination.md](docs/agents/coordination.md) | Multi-agent task coordination over GitHub Issues (`/coordinate`) |
-| [docs/agents/coordination-best-practices.md](docs/agents/coordination-best-practices.md) | Coordination playbook v1 (superseded by v2; kept for the record) |
-| [docs/agents/coordination-best-practices-2.md](docs/agents/coordination-best-practices-2.md) | Coordination playbook v2 — three research answers reconciled; read at session start |
+| [docs/agents/coordination-best-practices.md](docs/agents/coordination-best-practices.md) | Coordination playbook v1 (superseded; kept for the record) |
+| [docs/agents/coordination-best-practices-2.md](docs/agents/coordination-best-practices-2.md) | Coordination playbook v2 (superseded; kept for the record) |
+| [docs/agents/coordination-best-practices-3.md](docs/agents/coordination-best-practices-3.md) | Active coordination playbook — sprint evidence and enforceable invariants |
 | [docs/superpowers/specs/](docs/superpowers/specs/) | Design specs from brainstorming sessions |
 | [docs/superpowers/plans/](docs/superpowers/plans/) | Implementation plans derived from specs |
 

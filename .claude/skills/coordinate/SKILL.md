@@ -11,15 +11,23 @@ Five engineers and their coding agents (Claude Code, Pi, others) are
 editing one repository in the same afternoon. GitHub Issues is the one
 shared memory every agent already has: `gh` is installed, authenticated
 as its human, and works from any shell. This skill turns Issues into a
-task board and a negotiation channel with three primitives:
+task board and a negotiation channel with four primitives:
 
-- **Assignment is the lock.** An issue with an assignee is owned; touch
-  its scope only through the protocol below.
+- **Assignment owns responsibility.** An issue with an assignee has one
+  accountable owner. `status:in-progress` identifies active work; the Git
+  branch and merge conflict remain the code fence.
 - **Labels are the state machine.** `status:*`, `ws:*`, `p0`-`p2`,
   `type:*`, `needs-human`.
 - **Structured comments are the conversation.** Every protocol comment
   starts with a bold verb (`**CLAIM**`, `**PROPOSE**`, ...) plus who and
   when, so any agent can parse the history with `gh --jq`.
+- **Declared invariants are gates.** File scope, contract state, and
+  completion criteria remain mandatory when the current helper cannot yet
+  enforce them automatically.
+
+Read the active
+[v3 playbook](../../../docs/agents/coordination-best-practices-3.md) before
+starting work. It supersedes the sprint-era v1 and v2 playbooks.
 
 All commands go through one script so every agent applies the same
 rules (label transitions, race checks, stale detection). Run it from
@@ -60,33 +68,38 @@ export COORD_AGENT="claude-code/claude-fable-5.1"   # or pi/..., cursor/...
 $COORD sync
 ```
 
-`sync` prints the board, your open claims, stale claims, anything
-marked `needs-human`, and the last few **SYNC** lines from the pinned
-*Coordination hub* issue. Read them, then post your own one-liner:
+`sync` prints the board, your open claims, stale claims, anything marked
+`needs-human`, and the last few **SYNC** lines from the canonical
+*Coordination hub* issue. Bash uses `COORD_HUB` when set and otherwise
+selects the lowest-numbered open issue labelled `hub`. PowerShell currently
+assumes exactly one open `hub` label. Read it, then post a one-liner:
 
 ```bash
 $COORD hub "starting #12 (window drag); nothing blocking"
 ```
 
-Do this before opening files. It is the cheapest way to keep two
-agents from building the same thing.
+Do this before opening files. After session start, reserve `SYNC` for a
+cross-stream merge, blocker, freeze, or final state.
 
 ## Picking up work
 
 1. Choose an unclaimed issue in your workstream (`ws:*`), highest
    priority first. `p0` is the demo golden path: if a `p0` is
    unclaimed and you can do it, take it over anything else.
-2. Claim it with a plan and an ETA:
+2. Claim it with a plan and the current code state. Every claim names a
+   branch, PR URL, or `no-code-yet`:
 
    ```bash
-   $COORD claim 12 --plan "useDraggable on WindowFrame; z-index in useOsStore" --eta 30m
+   $COORD claim 12 --plan "branch: feat/window-drag; useDraggable + z-index" --eta 30m
    ```
 
    If someone else holds it the script refuses; use `propose` to split
    it or `question` to ask. If two agents claim within the same seconds
    the earliest **CLAIM** comment wins and the loser is unassigned
    automatically.
-3. Hold at most two claims at once. Idle claims block teammates.
+3. Keep exactly one owned issue in `status:in-progress` and at most one in
+   `status:blocked`. Other assignments may represent queued responsibility
+   and remain `status:claimed`.
 
 No matching issue? Create one; that is how work becomes visible:
 
@@ -94,20 +107,23 @@ No matching issue? Create one; that is how work becomes visible:
 $COORD new "Window drag + z-index" --ws os-shell --p 0 \
   --files "app/features/os/**" \
   --done "title bar drags;click focuses and raises;no negative offsets" \
-  --depends "#3" --claim
+  --depends "#3"
+$COORD claim 12 --plan "no-code-yet; branch will be feat/window-drag" --eta 30m
 ```
 
-`--files` matters: it is the overlap check. `board` shows files per
-issue, so an agent about to edit `app/shared/contracts.ts` can see who
-else is in there.
+`--files` is mandatory. `board` shows the declared scope so an agent about
+to edit `app/shared/contracts.ts` can find overlaps. The current helpers
+display scope but do not reject overlap; resolve overlap with a recorded
+split or common owner before moving either issue to `in-progress`.
 
 ## While working
 
-- Post a **STATUS** at every milestone or roughly every 30 minutes:
-  `$COORD status 12 "drag works; z-index next"`. A claim with no
-  CLAIM or STATUS comment for 45 minutes is *stale* and anyone may
-  release it (`$COORD release 12 --stale`). During a hackathon a silent
-  agent is usually a crashed one, not a busy one.
+- Post a **STATUS** at milestones and before 20 minutes of silence:
+  `$COORD status 12 "drag works; z-index next"`. In sprint mode, set
+  `COORD_STALE_MIN=30`. At 20 minutes without issue, branch, or linked-PR
+  activity, post a `QUESTION`; only release at 30 minutes if that ping is
+  unanswered. The helper's stale check sees structured issue heartbeats,
+  so the caller must inspect Git activity and verify the recorded ping.
 - Blocked? Say on what and by whom, then move to something else:
   `$COORD block 12 --by "#7" "need the VFS writeFile signature"`.
   When #7 closes, `done` posts a heads-up on every open issue that
@@ -121,23 +137,26 @@ else is in there.
 Cross-workstream seams are where parallel work collides: the
 `install_app` handler (SDE 2) needs the VFS API (SDE 4) and the window
 opener (SDE 1). Do not guess a signature. Propose it on a
-`type:contract` issue and build only after **ACCEPT**:
+`type:contract` issue and record the sprint contract as provisional:
 
 ```bash
 $COORD new "Contract: VFS API used by install_app" --ws persistence --type contract --p 0
 $COORD propose 15 --to @m-vawter "writeFile(path,string):Promise<void>; readFile(path):Promise<string|null>; listFiles(dir):Promise<string[]>"
-# the other side answers with one of:
-$COORD accept 15 "matches useOsStore hydration"
 $COORD counter 15 "listFiles should return {path,size}; the launcher needs size"
-$COORD reject 15 "sync API is fine for the POC; async adds await noise"
+# full asynchronous mode also requires:
+$COORD accept 15 "matches useOsStore hydration"
 ```
 
-`accept` on a contract issue copies the accepted proposal into the
-issue body under **Agreed**, so the contract is readable without
-scrolling comments. After two unresolved rounds (PROPOSE, COUNTER,
-COUNTER) the script adds `needs-human` and mentions the humans
-involved; stop negotiating and let them decide. Two agents arguing
-past that point burn clock without adding information.
+For sprint work, `PROPOSE` must place the exact contract in `## Agreed` as
+*provisional* in the same operation. The current helpers post the proposal
+but do not write that section, so the proposer must edit the issue body
+manually. Agents may proceed inside their own slices. The named seam owner
+must acknowledge before a shared adapter merges. One `COUNTER` is allowed;
+a further disagreement gets `needs-human`.
+
+For asynchronous or multi-day work, require explicit `ACCEPT` before a
+shared contract or adapter merges. `accept` copies the latest proposal into
+`## Agreed`. Never treat silence as acceptance.
 
 The same verbs settle ownership: if you want part of a claimed issue,
 `propose` the split. Never fork the work silently.
@@ -149,9 +168,28 @@ $COORD review 12 --pr https://github.com/xcjs/DOMinic/pull/9   # PR opened
 $COORD done 12 --pr https://github.com/xcjs/DOMinic/pull/9     # PR merged
 ```
 
-Put `Closes #12` in the PR body so GitHub links them. `done` closes the
-issue, posts **DONE**, and notifies every open issue that references
-`#12`. Then `hub` a one-liner and `sync` again.
+Put `Closes #12` in the PR body so GitHub links it. Before `review`, compare
+the PR's changed paths with the union of `## Files` for every linked issue.
+Before `done`, verify every `## Done when` box is checked and the supplied
+PR is merged. The current helpers do not perform those checks; a successful
+command is not evidence that the gates passed.
+
+`done` closes the issue, posts **DONE**, and currently emits compatibility
+`DEP-DONE` notices. Then post a final hub line and `sync` again.
+
+## Automation status
+
+| Invariant | Current behavior |
+| --- | --- |
+| Canonical hub | Bash is deterministic; PowerShell currently requires one open `hub` label |
+| Claim file scope | Displayed by `board`; overlap resolution is manual |
+| Review file scope | Manual comparison against the union of linked issue scopes |
+| Completion | Manual check of criteria and merged PR before `done` |
+| Provisional contract | Manual edit of `## Agreed` after `propose` |
+
+The manual rows are protocol requirements and candidates for helper
+enforcement. See the
+[v3 enforcement rationale](../../../docs/agents/coordination-best-practices-3.md#enforcement-status).
 
 ## Commands
 
@@ -169,9 +207,9 @@ issue, posts **DONE**, and notifies every open issue that references
 | `question N [--to @u] [--human] "text"` / `answer N "text"` | Ask / answer; `--human` adds needs-human |
 | `propose N [--to @u] "text"` / `accept N ["text"]` / `counter N "text"` / `reject N "reason"` | Negotiate |
 | `handoff N --to @user "text"` | Transfer ownership |
-| `review N --pr URL` | Mark in-review |
-| `done N [--pr URL] ["text"]` | Close and notify dependents |
-| `stale` | Claims silent for more than 45 min (`COORD_STALE_MIN`) |
+| `review N --pr URL` | Mark in-review after the caller verifies PR scope |
+| `done N [--pr URL] ["text"]` | Close after the caller verifies criteria and merge state |
+| `stale` | Claims silent longer than `COORD_STALE_MIN` (default 45; sprint 30) |
 | `show N` | Print an issue with its structured comment history |
 
 Every verb, its comment format, and the tie-break rules are specified
@@ -180,13 +218,14 @@ need to parse comments yourself or hit a case not covered above.
 
 ## Working agreements, and why
 
-- **Issue before file.** Unclaimed work is invisible work; two agents
-  will do it twice.
+- **Issue before file.** Unclaimed work is invisible work; two agents will
+  do it twice. A claim without branch/PR/no-code state is incomplete.
 - **Talk in verbs.** Humans can write free text; agents skim by verb.
   The script guarantees the verb line is always there.
-- **Contracts before code across slices.** ADR 0001 keeps slices
-  decoupled, so the seams between them are exactly where a wrong guess
-  costs an hour.
+- **Record contracts before shared code.** ADR 0001 keeps slices decoupled,
+  so the seams between them are exactly where a wrong guess costs an hour.
+- **Verify the diff and the finish.** A declared scope and checklist only
+  protect the team when review and completion compare them with reality.
 - **Escalate early.** `needs-human` is not failure; it is the fastest
   path when two agents lack the context to choose.
 - **Read before you write.** `sync` takes ten seconds. A merge
