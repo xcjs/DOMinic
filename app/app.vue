@@ -8,6 +8,7 @@ import ChatWindow from "./features/chat/components/ChatWindow.vue";
 import SettingsApp from "./features/settings/components/SettingsApp.vue";
 import DynamicAppRunner from "./features/apps/runner/DynamicAppRunner.vue";
 import { getApp, hydrateRegistry, listApps, registerApp, unregisterApp } from "./features/apps/registry";
+import { installFixture } from "./features/apps/fixtures";
 import { readFile, writeFile } from "./features/shared/vfs";
 import { useSettingsStore } from "./features/settings/stores/settings";
 import type { InstallAppParams, UpdateAppParams } from "./features/chat/tools/schemas";
@@ -28,6 +29,27 @@ onMounted(() => {
   settings.hydrate();
   apps.installed = hydrateRegistry();
   openBuiltin('chat');
+
+  if (import.meta.client) {
+    (window as any).__dominicReset = () => {
+      settings.resetOs();
+      window.location.reload();
+    };
+    (window as any).__dominic = {
+      reset: (window as any).__dominicReset,
+      installApp,
+      updateApp,
+      openApp,
+      installFixture: (fixtureId: string) => {
+        const ok = installFixture(fixtureId);
+        if (ok) {
+          apps.installed = listApps();
+          openApp(fixtureId);
+        }
+        return ok;
+      },
+    };
+  }
 });
 
 function openBuiltin(appId: 'chat' | 'settings') {

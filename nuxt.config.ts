@@ -14,7 +14,7 @@ export default defineNuxtConfig({
   // Globs resolve from the project root; the srcDir-relative form is kept as a fallback.
   tailwindcss: {
     config: {
-      content: ["app/**/*.{vue,ts}", "features/**/*.{vue,ts}"],
+      content: ["app/**/*.{vue,ts,txt}", "features/**/*.{vue,ts,txt}"],
     },
   },
   typescript: {
