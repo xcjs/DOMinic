@@ -69,9 +69,20 @@ export function useAgentChat(options: UseAgentChatOptions = {}) {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
+          // Provider-safe history: no seeded welcome turn (Anthropic requires the
+          // first turn to be the user's) and no empty assistant turns (tool-only
+          // replies have no text; Anthropic rejects empty content blocks).
           messages: messages.value
-            .filter((m) => m.role === 'user' || m.role === 'assistant')
-            .map((m) => ({ role: m.role, content: m.content })),
+            .filter((m) => m.id !== 'welcome' && (m.role === 'user' || m.role === 'assistant'))
+            .map((m) => ({
+              role: m.role,
+              content:
+                m.content.trim() ||
+                (m.toolInvocations?.length
+                  ? `(called ${m.toolInvocations.map((t) => t.toolName).join(', ')})`
+                  : '')
+            }))
+            .filter((m) => m.content.length > 0),
           provider: providerConfig.provider,
           model: providerConfig.model,
           apiKey: providerConfig.apiKey,

@@ -5,6 +5,7 @@ export type WindowState = "normal" | "minimized" | "maximized";
 
 export interface OsWindow {
   id: string;
+  appId?: string;
   title: string;
   x: number;
   y: number;
@@ -29,6 +30,7 @@ export const useOsStore = defineStore("os", () => {
     const offset = (windows.value.length % 6) * 28;
     const win: OsWindow = {
       id,
+      appId: init.appId,
       title: init.title,
       x: init.x ?? 120 + offset,
       y: init.y ?? 90 + offset,

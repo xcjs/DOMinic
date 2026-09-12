@@ -167,6 +167,8 @@ function handleSend() {
   sendMessage()
 }
 
+defineExpose({ sendMessage })
+
 // Auto-scroll on new messages or streaming chunks
 watch(
   () => [messages.value.length, messages.value[messages.value.length - 1]?.content],
