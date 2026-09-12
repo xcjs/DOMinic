@@ -40,3 +40,4 @@ them with new ones.
 | [0002](0002-strict-typescript-and-lint-toolchain.md) | Strict TypeScript and lint toolchain | accepted |
 | [0003](0003-pinia-per-domain-stores.md) | Pinia per-domain stores | accepted |
 | [0004](0004-dominic-os-shell-and-taskbar.md) | DOMinic OS shell and taskbar | accepted |
+| [0005](0005-agent-chat-via-vercel-ai-sdk-with-server-side-provider-proxy.md) | Agent chat via Vercel AI SDK with server-side provider proxy | accepted |
