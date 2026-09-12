@@ -29,6 +29,21 @@ anywhere inside the repo:
 COORD="bash .claude/skills/coordinate/scripts/coord.sh"
 ```
 
+On Windows hosts (PowerShell 5.1+), use the PowerShell counterpart —
+it finds `gh.exe` in the standard install dir even when it is not on
+`PATH`:
+
+```powershell
+$COORD = "powershell -File .claude/skills/coordinate/scripts/coord.ps1"
+```
+
+Both scripts share one CLI surface; everything below works with
+either. Set the agent identity the same way:
+
+```powershell
+$env:COORD_AGENT = "claude-code/claude-fable-5.1"   # or pi/..., cursor/...
+```
+
 ## Identity
 
 You act as your human's GitHub account (`gh auth status`). Say which
@@ -38,7 +53,6 @@ session before any command:
 ```bash
 export COORD_AGENT="claude-code/claude-fable-5.1"   # or pi/..., cursor/...
 ```
-
 ## Start of every session
 
 ```bash

@@ -120,5 +120,16 @@ gh issue comment N --body "$(printf '**CLAIM** | agent: pi/1 | human: @you | at:
 gh issue edit N --add-assignee @me --add-label status:claimed --remove-label status:unclaimed
 ```
 
+The same claim in PowerShell 5.1 (watch out: inline `--jq` filters
+with parentheses mangle in double quotes — prefer plain `--json`
+output and `ConvertFrom-Json`):
+
+```powershell
+$hdr = '**CLAIM** | agent: pi/1 | human: @you | at: ' + `
+  (Get-Date).ToUniversalTime().ToString('yyyy-MM-ddTHH:mm:ssZ')
+gh issue comment N --body "$hdr`n`nplan: ..."
+gh issue edit N --add-assignee @me --add-label status:claimed --remove-label status:unclaimed
+```
+
 The labels and the header line are the contract; the script is a
 convenience.
