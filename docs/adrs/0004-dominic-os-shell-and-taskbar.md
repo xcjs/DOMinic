@@ -49,17 +49,41 @@ Chosen option: **desktop-metaphor shell in an `os` slice**, because it
 delivers the OS identity while treating mobile as a first-class
 degradation rather than a separate shell.
 
-- The `os` slice contains the window manager, taskbar, and app
-  registry.
-- The taskbar lists running apps; on narrow viewports it degrades to
-  a bottom-nav-style sheet and windows stack or maximize.
-- Shell chrome (taskbar, window titlebars, desktop surfaces) uses
-  modern transparency and backdrop-blur effects where supported, with
-  opaque fallbacks where they are not.
-- The built-in **Settings** app is the first first-party app on the
-  base app contract; it is the global surface for OS preferences
-  (including LLM provider configuration, ADR 0005).
-- Apps register with the app registry and are launched through it.
+### Hackathon POC (Golden Path)
+
+For the hackathon POC, the desktop shell focuses on delivering a visually
+stunning, reliable desktop-viewport experience (optimized for laptop/demo
+displays):
+
+- **Window Management**: Built using `@vueuse/core` (`useDraggable`) for
+  clean drag handling without custom mouse event listeners. Supports
+  draggable title bars, window focus/z-indexing, minimize to taskbar,
+  maximize/restore, and close.
+- **Taskbar**: Fixed to the bottom of the viewport. Features an App
+  Launcher menu (listing installed apps and first-party utilities), open
+  window badges, an Agent Chat toggle button, and a live clock.
+- **Visual Polish**: Modern dark-mode glassmorphism (`backdrop-blur-md`,
+  subtle borders, drop shadows) and desktop wallpaper support to
+  maximize demo visual impact.
+- **Settings App**: Pre-installed first-party app that allows the user to
+  input and persist their LLM API key (ADR 0005).
+
+### Future / Out of Scope for POC
+
+- Responsive mobile degradation (bottom-navigation sheet, stacked
+  cards, touch-optimized gestures).
+- Advanced window snapping, tiling window manager, or multi-monitor
+  virtual workspaces.
+- Window resize handles from all edges/corners (POC uses maximize/restore
+  and fixed initial sizing).
+
+### Open Questions
+
+- **OPEN QUESTION: Chat Shell Presence**: Should the Agent Chat live as a
+  docked right-hand slide-out drawer or as a standard draggable window?
+  (Recommendation for POC: A draggable OS window with high default
+  z-index and an easy dock icon gives maximum flexibility and showcases
+  the window manager immediately).
 
 ### Confirmation
 

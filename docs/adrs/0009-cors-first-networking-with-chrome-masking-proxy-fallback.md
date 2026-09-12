@@ -48,14 +48,33 @@ to a single generic `/api/proxy` Nuxt server route**, because it
 keeps the fast path direct and confines all CORS workarounds to one
 reviewable server surface.
 
-- A client-side helper composable decides direct vs proxy per
-  request; fallback on failure is automatic and invisible to
-  callers.
-- The proxy rewrites the User-Agent to the latest stable Google
-  Chrome and strips identifying headers (cookies, referer, origin)
-  before forwarding, and streams the response back.
-- The route is generic: no per-service routes, no allowlist to
-  maintain.
+### Hackathon POC (Golden Path)
+
+To avoid complex networking middleware during the hackathon:
+
+- **Direct Fetch by Default**: Components use standard browser `fetch`
+  directly against CORS-enabled public APIs (such as Open-Meteo for
+  weather or CoinGecko for crypto).
+- **Simple Proxy Escape Hatch**: A minimal Nuxt server route
+  `/api/proxy?url=<encoded>` is provided. If an external API lacks
+  CORS headers, the component calls `/api/proxy?url=...`.
+- **Deferred Heuristics**: Automatic trial-and-fallback logic and
+  User-Agent spoofing headers are deferred.
+
+### Future / Out of Scope for POC
+
+- Transparent automatic fallback composable (`useSmartFetch`) that tests
+  CORS and retries behind the scenes.
+- Chrome User-Agent spoofing and header scrubbing engine.
+- SSRF defense filters and IP range blocklists.
+
+### Open Questions
+
+- **OPEN QUESTION: Public Deployment Security**: If DOMinic is hosted
+  publicly for the hackathon presentation (e.g. Vercel), should the proxy
+  block private IP ranges (e.g. `127.0.0.1`, `169.254.169.254`)?
+  (Recommendation: A simple regex disallowing private IPs prevents basic
+  SSRF during judging).
 
 ### Confirmation
 

@@ -51,13 +51,35 @@ each bounded context one home, keep the dependency direction
 enforceable, and produce the smallest, most navigable change sets for
 agent edits.
 
-Each slice lives in `app/features/<slice>/` and owns its
-`components/`, `composables/`, `stores/`, `types/`, and `tests/`. A
-thin `app/shared/` kernel holds cross-slice contracts: shared types,
-interfaces, and utilities. Slices may import from `app/shared/` but
-never from other slices; cross-slice communication flows through
-shared contracts and stores (ADR 0003). Bounded contexts map 1:1 to
-slices.
+### Hackathon POC (Golden Path)
+
+For the hackathon POC, the team implements three core slices:
+
+- `app/features/os`: Window manager, taskbar, desktop canvas, and app
+  registry.
+- `app/features/agent`: Chat dock/drawer, prompt templates, streaming
+  client, and tool execution handlers.
+- `app/features/apps`: Runtime SFC loader engine (`vue3-sfc-loader`) and
+  the built-in Settings app.
+
+A thin `app/shared/` kernel holds minimal contracts: shared TypeScript
+interfaces (`DominicApp`, `WindowState`, `AppMetadata`) and storage
+keys. Slices import from `app/shared/` but avoid cross-slice coupling.
+During the hackathon sprint, boundaries are respected by convention
+among the 5 SDEs rather than blocking commits on custom lint rules.
+
+### Future / Out of Scope for POC
+
+- Automated ESLint import-boundary enforcement rules.
+- Dynamic slice discovery and dynamic micro-frontend packaging.
+- AST-based architecture dependency graphing.
+
+### Open Questions
+
+- **OPEN QUESTION: Shared Styling in Runtime Components**: How should
+  design tokens and Tailwind utility classes be shared between the host
+  OS shell and agent-compiled components without stylesheet pollution?
+  (Current POC path: Inject Tailwind via CDN / global stylesheet).
 
 ### Confirmation
 

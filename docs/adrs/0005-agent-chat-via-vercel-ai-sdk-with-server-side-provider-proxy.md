@@ -52,13 +52,37 @@ because the SDK normalizes every major provider behind one interface,
 streams natively, and the server route keeps provider keys usable
 while never persisting them.
 
-- Users select a provider via the Settings app (ADR 0004) when none
-  is configured; chat surfaces that selection flow instead of an
-  error.
-- Provider API keys are stored browser-side in the VFS (ADR 0007)
-  and sent per-request to `/api/chat`, which uses them for that
-  request only.
-- The route never logs, caches, or stores key material.
+### Hackathon POC (Golden Path)
+
+For the hackathon POC, the chat integration provides a reliable,
+low-latency app creation loop:
+
+- **Nuxt Server Route**: `/api/chat` receives user messages, system
+  prompt context, and the ephemeral `apiKey` passed per-request from the
+  client's Settings store.
+- **Vercel AI SDK**: Uses `streamText` with typed tools (`install_app`,
+  `update_app` defined in ADR 0010). The agent can speak naturally while
+  emitting structured code blocks through tools.
+- **Curated Providers**: Targets OpenAI (GPT-4o) and Anthropic
+  (Claude 3.5 Sonnet) as primary demo engines due to superior Vue SFC
+  generation quality.
+- **Client Chat UI**: Renders streaming markdown text, displays
+  interactive tool execution pills ("Generating App...", "Installing
+  to Desktop..."), and triggers confetti on successful installation.
+
+### Future / Out of Scope for POC
+
+- Automated multi-provider fallback and load balancing.
+- Encrypted local credential vault with master password.
+- Multi-turn autonomous tool loops (agent opening terminal, running tests
+  recursively before presenting app).
+
+### Open Questions
+
+- **OPEN QUESTION: App Context Window**: How much existing app source
+  should be injected into chat prompts? (Recommendation for POC: Inject
+  the metadata of all installed apps in system context; inject full source
+  only when updating a specific target app).
 
 ### Confirmation
 
