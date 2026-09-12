@@ -53,6 +53,7 @@ session before any command:
 ```bash
 export COORD_AGENT="claude-code/claude-fable-5.1"   # or pi/..., cursor/...
 ```
+
 ## Start of every session
 
 ```bash
