@@ -10,7 +10,7 @@
     "generate": "nuxt generate",
     "preview": "nuxt preview",
     "typecheck": "nuxt typecheck",
-    "lint:md": "markdownlint-cli2 \"**/*.md\" \"#node_modules\" \"#.superpowers\"",
+    "lint:md": "markdownlint-cli2 \"**/*.md\" \"#node_modules\" \"#.superpowers\" \"#docs/superpowers\"",
     "prepare": "husky"
   },
   "engines": {
