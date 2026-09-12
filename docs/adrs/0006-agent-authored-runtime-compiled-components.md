@@ -90,3 +90,4 @@ source.
 
 - Related to [ADR 0000](0000-record-architecture-decisions.md)
 - Related to [ADR 0004](0004-dominic-os-shell-and-taskbar.md)
+- Related to [ADR 0007](0007-virtual-filesystem-with-pluggable-storage-drivers.md)
