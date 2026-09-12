@@ -5,7 +5,7 @@ description: Ready-to-paste answers for the AI Tinkerers Columbus "Agents, Every
 tags: [hackathon, submission, form]
 generated: { by: opencode/glm-5.3-flash, at: 2026-09-12T19:20:00Z }
 verified: { by: human:zack, at: 2026-09-12T19:20:00Z }
-stale_after: 2026-09-12T20:00:00Z
+stale_after: 2026-09-13T00:00:00Z
 ---
 
 # Hackathon submission form draft
@@ -78,26 +78,40 @@ TODO_YOUTUBE_OR_LOOM_URL
 
 ## Team contributions
 
-- **Zackary Lowery (Lead)** — Nuxt 4 + Pinia scaffold, OS shell with
-  window manager, taskbar, and drag/focus/minimize/maximize
-  (@vueuse/core), server-side `/api/chat` route with multi-provider
-  support (OpenAI, Anthropic, Google, DeepSeek) on the Vercel AI SDK,
-  launcher uninstall and source actions, and eleven architecture decision
-  records.
-- **Michael Vawter** — runtime app engine: in-browser vue3-sfc-loader
-  runner, esm.sh dependency resolver, error boundary, VFS over
-  localStorage with registry hydration, Settings app, and demo prompt
-  freeze with a fallback pomodoro fixture.
-- **Charles Sullivan** — chat and agent loop: `/api/chat` route,
-  system prompt, tool schemas, ChatWindow UI, useAgentChat
-  composable; plus Tailwind content scanning and Anthropic-safe chat
-  history fixes, and model presets aligned with the chat route
-  defaults.
-- **Brandon Jewell** — docs: hackathon judging rubric and demo-path
-  playbooks, coordination skill for multi-agent work, and README
-  alignment.
-- **Justin Dang** — core app loop wiring (app shell, chat window, and
-  OS store integration) and the window controls drag-handler fix.
+Sourced from the merged pull requests on `main` (author of record):
+
+- **Zackary Lowery (@xcjs, lead)** — architecture decision records
+  0000–0009 and the repo conventions (OKF frontmatter, markdownlint,
+  CI); Nuxt 4 scaffold (#21); OS shell — window manager, taskbar,
+  drag/focus/minimize/maximize (#24); chat runtime deps and current
+  model IDs (#29); launcher Uninstall and View Source (#44); typecheck
+  and build CI (#67); custom OpenAI-compatible provider (#70); review
+  and merge gate all afternoon.
+- **Charles Sullivan (@Sullux)** — hackathon golden paths across the
+  ADRs plus ADR 0010, `NEXT.md`, `QUESTIONS.md` (#2); `/api/chat`
+  streaming, bring-your-own-key, `install_app` / `update_app` tools
+  (#20); runtime engine — in-browser vue3-sfc-loader runner, esm.sh
+  resolver, error boundary (#25); persistence — VFS over localStorage,
+  registry hydration, Settings app, Reset OS (#27); frozen demo prompt
+  and fallback pomodoro fixture (#40); Recover beat verified end to end
+  (#64); the 15:08 rehearsal that proved the core loop.
+- **Brandon (@r0073d-l053r)** — the `/coordinate` protocol, labels,
+  hub, and script that the five agents worked through (#7); current
+  model presets (#39); Tailwind content scan and Anthropic-safe chat
+  history (#42); "As built" reconciliation of ADRs 0001–0010 (#55);
+  hub fix (#57); seeded the integration and rehearsal issues; demo
+  video production.
+- **Justin (@ImNewToC0de)** — wired the core app loop, chat →
+  `install_app` → VFS → windows (#35); window-control click fix (#45);
+  strict typecheck separated from the production bundle (#48); Settings
+  polish (#61); dynamic app style cleanup (#62); current app source in
+  the `update_app` context (#66); reviews.
+- **Michael Vawter (@m-vawter)** — docs and process lane: judging
+  rubric and win strategy (#1), demo path (#3, #4), coordination
+  playbooks v1–v3 with the Q01 research behind them (#18, #26, #68,
+  #71), README quickstart (#28), finish plan (#37), judge-facing
+  walkthrough with screenshots (#53); shell and chat smoke fixes
+  (#63); protocol facilitation and PR reviews.
 
 ## Additional links
 
