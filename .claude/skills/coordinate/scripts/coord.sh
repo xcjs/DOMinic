@@ -70,7 +70,7 @@ files_of() { # issue
     sed -n '/^## Files/,/^## /p' | sed '1d;$d' |
     tr '\r' ' ' | tr '\n' ' ' |
     sed 's/_(none listed)_//g; s/-(none listed)-//g' |
-    tr ';' ',' | tr ',' '\n' | sed 's/^ *//; s/ *$//; s/^\.//; s/ *$//' |
+    tr ';' ',' | tr ',' '\n' | sed 's/^[[:space:]]*//; s/[[:space:]]*$//' |
     grep -v '^$' || true
 }
 

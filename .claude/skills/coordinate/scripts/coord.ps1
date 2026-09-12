@@ -81,7 +81,7 @@ function Files-Of([int]$n) {
   if (-not $m.Success) { return @() }
   $raw = $m.Groups[1].Value -replace "`r", '' -replace "`n", ' '
   $raw = $raw -replace '_\(none listed\)_', '' -replace '-\(none listed\)-', ''
-  @($raw -split ';|,|\s{2,}' | ForEach-Object { $_.Trim(' .') } | Where-Object { $_ })
+  @($raw -split ';|,|\s{2,}' | ForEach-Object { $_.Trim() } | Where-Object { $_ })
 }
 
 # Issue numbers referenced as #N anywhere in a body.
