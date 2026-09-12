@@ -1,0 +1,172 @@
+<template>
+  <div class="h-full w-full flex flex-col items-center justify-center bg-slate-950 text-slate-100 p-6 select-none font-sans relative overflow-hidden">
+    <!-- Synthwave background grid / glow -->
+    <div class="absolute inset-0 bg-[radial-gradient(circle_at_50%_30%,rgba(236,72,153,0.15),transparent_70%)] pointer-events-none"></div>
+    <div class="absolute -bottom-10 inset-x-0 h-40 bg-[linear-gradient(to_bottom,transparent,rgba(168,85,247,0.1))] pointer-events-none"></div>
+
+    <!-- Mode Badge -->
+    <div class="relative z-10 flex gap-2 mb-6">
+      <button
+        type="button"
+        :class="[
+          'px-4 py-1.5 rounded-full text-xs font-semibold tracking-wider uppercase transition-all duration-200',
+          mode === 'work'
+            ? 'bg-gradient-to-r from-pink-500 to-rose-500 text-white shadow-lg shadow-pink-500/30'
+            : 'bg-slate-900 text-slate-400 hover:text-slate-200 border border-slate-800'
+        ]"
+        @click="switchMode('work')"
+      >
+        Focus (25m)
+      </button>
+      <button
+        type="button"
+        :class="[
+          'px-4 py-1.5 rounded-full text-xs font-semibold tracking-wider uppercase transition-all duration-200',
+          mode === 'break'
+            ? 'bg-gradient-to-r from-cyan-500 to-blue-500 text-white shadow-lg shadow-cyan-500/30'
+            : 'bg-slate-900 text-slate-400 hover:text-slate-200 border border-slate-800'
+        ]"
+        @click="switchMode('break')"
+      >
+        Break (5m)
+      </button>
+    </div>
+
+    <!-- Digital Clock Display -->
+    <div class="relative z-10 my-4 text-center">
+      <div class="text-7xl font-mono font-bold tracking-tight bg-gradient-to-r from-pink-400 via-purple-300 to-cyan-400 bg-clip-text text-transparent drop-shadow-[0_0_20px_rgba(236,72,153,0.4)]">
+        {{ formattedTime }}
+      </div>
+      <p class="mt-2 text-xs font-medium text-purple-300/80 tracking-widest uppercase">
+        {{ isRunning ? '⚡ Session in progress' : '⏸️ Paused' }}
+      </p>
+    </div>
+
+    <!-- Controls -->
+    <div class="relative z-10 flex items-center gap-4 mt-8">
+      <button
+        type="button"
+        class="px-6 py-2.5 rounded-xl font-semibold text-sm transition-all duration-200 shadow-md flex items-center gap-2"
+        :class="isRunning
+          ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40 hover:bg-amber-500/30 shadow-amber-500/10'
+          : 'bg-gradient-to-r from-pink-500 to-purple-600 text-white hover:opacity-95 shadow-pink-500/25'"
+        @click="toggleTimer"
+      >
+        {{ isRunning ? 'Pause' : 'Start' }}
+      </button>
+
+      <button
+        type="button"
+        class="px-5 py-2.5 rounded-xl text-sm font-medium bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-800 transition"
+        @click="resetTimer"
+      >
+        Reset
+      </button>
+    </div>
+
+    <!-- Session Count -->
+    <div class="relative z-10 mt-8 text-xs text-slate-500 flex items-center gap-1.5">
+      <span>Completed Sessions:</span>
+      <span class="text-pink-400 font-semibold">{{ sessionsCompleted }}</span>
+    </div>
+  </div>
+</template>
+
+<script>
+import { ref, computed, onUnmounted } from 'vue'
+import confetti from 'canvas-confetti'
+
+export default {
+  name: 'PomodoroTimer',
+  setup() {
+    const WORK_TIME = 25 * 60
+    const BREAK_TIME = 5 * 60
+
+    const mode = ref('work')
+    const timeLeft = ref(WORK_TIME)
+    const isRunning = ref(false)
+    const sessionsCompleted = ref(0)
+    let timerId = null
+
+    const formattedTime = computed(() => {
+      const minutes = Math.floor(timeLeft.value / 60)
+      const seconds = timeLeft.value % 60
+      return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`
+    })
+
+    function triggerCelebration() {
+      if (typeof confetti === 'function') {
+        confetti({
+          particleCount: 80,
+          spread: 70,
+          origin: { y: 0.6 }
+        })
+      }
+    }
+
+    function tick() {
+      if (timeLeft.value > 0) {
+        timeLeft.value--
+      } else {
+        pauseTimer()
+        triggerCelebration()
+        if (mode.value === 'work') {
+          sessionsCompleted.value++
+          switchMode('break')
+        } else {
+          switchMode('work')
+        }
+      }
+    }
+
+    function startTimer() {
+      if (!isRunning.value) {
+        isRunning.value = true
+        timerId = setInterval(tick, 1000)
+      }
+    }
+
+    function pauseTimer() {
+      isRunning.value = false
+      if (timerId) {
+        clearInterval(timerId)
+        timerId = null
+      }
+    }
+
+    function toggleTimer() {
+      if (isRunning.value) {
+        pauseTimer()
+      } else {
+        startTimer()
+      }
+    }
+
+    function resetTimer() {
+      pauseTimer()
+      timeLeft.value = mode.value === 'work' ? WORK_TIME : BREAK_TIME
+    }
+
+    function switchMode(newMode) {
+      pauseTimer()
+      mode.value = newMode
+      timeLeft.value = newMode === 'work' ? WORK_TIME : BREAK_TIME
+    }
+
+    onUnmounted(() => {
+      pauseTimer()
+    })
+
+    return {
+      mode,
+      timeLeft,
+      isRunning,
+      sessionsCompleted,
+      formattedTime,
+      toggleTimer,
+      resetTimer,
+      switchMode
+    }
+  }
+}
+</script>

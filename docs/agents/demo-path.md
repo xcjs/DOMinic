@@ -116,8 +116,10 @@ must work on camera:
 Rehearse one prompt for the core-loop app and keep it verbatim below
 once it works. Never edit it after the first successful rehearsal.
 
-Chosen app: *Pomodoro / focus timer, unless the team decides otherwise.*
-Exact prompt: *to be filled in verbatim.*
+Chosen app: *Pomodoro focus timer.*
+Exact prompt: *"Build a beautiful retro synthwave Pomodoro focus timer with
+25-minute work and 5-minute break cycles, start/pause/reset controls, and
+confetti celebration on finish."*
 
 ## Filming rules — criterion 1 on camera
 
