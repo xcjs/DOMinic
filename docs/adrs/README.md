@@ -46,6 +46,7 @@ them with new ones.
 | [0008](0008-runtime-npm-dependency-loading-via-esm-sh-with-vetting.md) | Runtime NPM dependency loading via esm.sh with vetting | accepted |
 | [0009](0009-cors-first-networking-with-chrome-masking-proxy-fallback.md) | CORS-first networking with Chrome-masking proxy fallback | accepted |
 | [0010](0010-agent-app-interface-and-tool-protocol.md) | Agent app interface and tool protocol | accepted |
+| [0011](0011-node-24-lts-runtime-standard.md) | Node 24 LTS runtime standard | accepted |
 
 ## As-built reconciliation
 

@@ -13,6 +13,9 @@
     "lint:md": "markdownlint-cli2 \"**/*.md\" \"#node_modules\" \"#.superpowers\"",
     "prepare": "husky"
   },
+  "engines": {
+    "node": ">=24.21.0 <25"
+  },
   "devDependencies": {
     "@nuxtjs/tailwindcss": "^6.14.0",
     "@pinia/nuxt": "^0.11.2",
