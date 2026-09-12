@@ -19,6 +19,12 @@ Five engineers and their agents are working the same repository in
 parallel. GitHub Issues is the shared memory every agent already has,
 so it doubles as the task board and the negotiation channel.
 
+Before your first command, read
+[coordination-best-practices.md](coordination-best-practices.md). It
+sets the sprint-minimum verbs and parameters — a 90-minute stale lease,
+one claim per agent, two negotiation rounds — and says when to switch
+back to the full protocol below.
+
 ## The protocol in three lines
 
 - **Assignment is the lock.** An issue with an assignee is owned.
