@@ -110,6 +110,9 @@ Other scripts: `npm run build`, `npm run typecheck`, `npm run lint:md`.
 
 Markdown is linted with markdownlint-cli2 (80-column prose) and
 carries OKF frontmatter.
+Node 24 LTS is the standard runtime — see
+[ADR 0010](docs/adrs/0010-node-24-lts-runtime-standard.md); `nvm use`
+picks it up from the checked-in `.nvmrc`.
 
 ```bash
 npm install

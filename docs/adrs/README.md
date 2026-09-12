@@ -54,3 +54,4 @@ On 2026-09-12 each accepted ADR from 0001 to 0010 gained an
 Outcome. It records, with file references, where the code on `main`
 matches the golden path and where it diverges. The decision text
 itself is unchanged: the record stays a record.
+| [0010](0010-node-24-lts-runtime-standard.md) | Node 24 LTS runtime standard | accepted |
