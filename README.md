@@ -48,6 +48,7 @@ records below for why it is built this way.
 | [docs/agents/coordination-best-practices-3.md](docs/agents/coordination-best-practices-3.md) | Active coordination playbook — sprint evidence and enforceable invariants |
 | [docs/superpowers/specs/](docs/superpowers/specs/) | Design specs from brainstorming sessions |
 | [docs/superpowers/plans/](docs/superpowers/plans/) | Implementation plans derived from specs |
+| [docs/research/](docs/research/README.md) | The Q01 question and its three answers behind the coordination playbooks |
 
 ### Decision highlights
 
