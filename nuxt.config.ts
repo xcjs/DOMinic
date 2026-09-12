@@ -9,6 +9,14 @@ export default defineNuxtConfig({
   imports: {
     dirs: ["features/shared"],
   },
+  // Every component lives under app/features/**, which the module's default
+  // content globs (components/, pages/, layouts/, app.vue, ...) never scan.
+  // Globs resolve from the project root; the srcDir-relative form is kept as a fallback.
+  tailwindcss: {
+    config: {
+      content: ["app/**/*.{vue,ts}", "features/**/*.{vue,ts}"],
+    },
+  },
   typescript: {
     strict: true,
     typeCheck: true,
@@ -19,9 +27,9 @@ export default defineNuxtConfig({
       meta: [
         { name: "viewport", content: "width=device-width, initial-scale=1" },
       ],
-      script: [
-        { src: "https://cdn.tailwindcss.com" },
-      ],
+      // Play CDN so utility classes that only exist in agent-generated SFCs
+      // (never seen at build time) still resolve at runtime.
+      script: [{ src: "https://cdn.tailwindcss.com" }],
     },
   },
 });
