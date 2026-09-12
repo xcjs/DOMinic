@@ -44,3 +44,4 @@ them with new ones.
 | [0006](0006-agent-authored-runtime-compiled-components.md) | Agent-authored runtime-compiled components | accepted |
 | [0007](0007-virtual-filesystem-with-pluggable-storage-drivers.md) | Virtual filesystem with pluggable storage drivers | accepted |
 | [0008](0008-runtime-npm-dependency-loading-via-esm-sh-with-vetting.md) | Runtime NPM dependency loading via esm.sh with vetting | accepted |
+| [0009](0009-cors-first-networking-with-chrome-masking-proxy-fallback.md) | CORS-first networking with Chrome-masking proxy fallback | accepted |
