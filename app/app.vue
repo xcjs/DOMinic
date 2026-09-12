@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, ref, type ComponentPublicInstance } from "vue";
+import { onMounted, reactive, ref, type ComponentPublicInstance } from "vue";
 import { useOsStore } from "./features/os/stores/os";
 import { useAppsStore } from "./features/apps/stores/apps";
 import WindowFrame from "./features/os/components/WindowFrame.vue";
@@ -17,6 +17,7 @@ const apps = useAppsStore();
 const settings = useSettingsStore();
 const chat = ref<InstanceType<typeof ChatWindow> | null>(null);
 const now = ref<string | null>(null);
+const sourceVersion = reactive<Record<string, number>>({});
 
 onMounted(() => {
   const tick = () => {
@@ -45,12 +46,14 @@ function installApp(params: InstallAppParams) {
   writeFile(entry, params.vueSfcCode);
   registerApp({ id: params.id, title: params.title, icon: params.icon, description: params.description, entry });
   apps.installed = listApps();
+  sourceVersion[params.id] = Date.now();
 }
 
 function updateApp(params: UpdateAppParams) {
   const app = getApp(params.id);
   if (!app) throw new Error(`App "${params.id}" is not installed`);
   writeFile(app.entry, params.vueSfcCode);
+  sourceVersion[params.id] = Date.now();
 }
 
 function askFix(payload: { appId: string; error: string }) {
@@ -74,7 +77,14 @@ function setChat(instance: Element | ComponentPublicInstance | null) {
     <WindowFrame v-for="win in os.windows" :key="win.id" :win="win">
       <ChatWindow v-if="win.appId === 'chat'" :ref="setChat" :options="{ getProviderConfig: () => settings, getInstalledApps: () => apps.installed, onInstallApp: installApp, onUpdateApp: updateApp, onOpenWindow: openApp }" />
       <SettingsApp v-else-if="win.appId === 'settings'" />
-      <DynamicAppRunner v-else-if="win.appId && getApp(win.appId)" :app-id="win.appId" :window-id="win.id" :source-code="readFile(getApp(win.appId)?.entry || '') || ''" @ask-fix="askFix" />
+      <DynamicAppRunner
+        v-else-if="win.appId && getApp(win.appId)"
+        :key="win.id + ':' + (sourceVersion[win.appId] ?? 0)"
+        :app-id="win.appId"
+        :window-id="win.id"
+        :source-code="readFile(getApp(win.appId)?.entry || '') || ''"
+        @ask-fix="askFix"
+      />
       <p v-else class="text-sm text-slate-400">{{ win.title }}</p>
     </WindowFrame>
 
