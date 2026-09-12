@@ -6,11 +6,18 @@
 
 ## Technical Story
 
-The DOMinic project needs a lightweight, durable way to record significant architecture and tooling decisions so that future contributors understand not just *what* was decided, but *why*.
+The DOMinic project needs a lightweight, durable way to record
+significant architecture and tooling decisions so that future
+contributors understand not just *what* was decided, but *why*.
 
 ## Context and Problem Statement
 
-Projects accumulate decisions that are cheap to revisit but expensive to re-litigate without context: which libraries to use, which patterns to follow, which conventions to adopt. Tribal knowledge and chat history do not survive team changes. We need a practice for capturing decisions in a format that lives with the code.
+Projects accumulate decisions that are cheap to revisit but
+expensive to re-litigate without context: which libraries to
+use, which patterns to follow, which conventions to adopt.
+Tribal knowledge and chat history do not survive team changes.
+We need a practice for capturing decisions in a format that
+lives with the code.
 
 ## Decision Drivers
 
@@ -27,13 +34,21 @@ Projects accumulate decisions that are cheap to revisit but expensive to re-liti
 
 ## Decision Outcome
 
-Chosen option: **MADR 4.0**, because it keeps Nygard's strengths (plain markdown, short documents) while adding structure that improves quality: explicit decision drivers, considered options with pros/cons, and a decision outcome with consequences. It is widely adopted and works well in code review and pull requests.
+Chosen option: **MADR 4.0**, because it keeps Nygard's
+strengths (plain markdown, short documents) while adding
+structure that improves quality: explicit decision drivers,
+considered options with pros/cons, and a decision outcome
+with consequences. It is widely adopted and works well in
+code review and pull requests.
 
-Decisions are recorded in this directory (`docs/adrs/`), numbered sequentially starting at 0001 for real decisions (0000 is this meta-ADR), with kebab-case file names.
+Decisions are recorded in this directory (`docs/adrs/`),
+numbered sequentially starting at 0001 for real decisions
+(0000 is this meta-ADR), with kebab-case file names.
 
 ### Confirmation
 
-Practice confirmed for the start of the project; revisit if the format proves too heavyweight for small decisions.
+Practice confirmed for the start of the project; revisit if
+the format proves too heavyweight for small decisions.
 
 ## Pros and Cons of the Options
 

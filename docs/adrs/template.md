@@ -10,7 +10,8 @@
 
 ## Context and Problem Statement
 
-{describe the context and problem statement in plain language, e.g. using free form / two to three sentences or a list}
+{describe the context and problem statement in plain language, e.g.
+using free form / two to three sentences or a list}
 
 ## Decision Drivers
 
@@ -26,7 +27,9 @@
 
 ## Decision Outcome
 
-Chosen option: **{option N}**, because {justification, e.g. only option that meets the decision drivers | which forces and concerns are resolved}.
+Chosen option: **{option N}**, because {justification, e.g. only option
+that meets the decision drivers | which forces and concerns are
+resolved}.
 
 <!-- This is an optional element. Feel free to remove it. -->
 ### Confirmation

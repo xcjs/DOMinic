@@ -1,10 +1,17 @@
 # ADR Scaffold Implementation Plan
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+> **For agentic workers:** REQUIRED SUB-SKILL: Use
+> superpowers:subagent-driven-development (recommended) or
+> superpowers:executing-plans to implement this plan
+> task-by-task. Steps use checkbox (`- [ ]`) syntax for
+> tracking.
 
 **Goal:** Create a MADR 4.0 ADR scaffold (meta-ADR, template, README) in `docs/adrs/`.
 
-**Architecture:** Documentation-only deliverable — three standalone markdown files with no tooling. Conventions (numbering, naming, status lifecycle) are defined in the README and demonstrated by ADR-0000.
+**Architecture:** Documentation-only deliverable — three
+standalone markdown files with no tooling. Conventions
+(numbering, naming, status lifecycle) are defined in the
+README and demonstrated by ADR-0000.
 
 **Tech Stack:** Markdown only.
 
@@ -17,16 +24,21 @@
 - Status values: `proposed`, `accepted`, `superseded`, `deprecated`.
 - Today's date for the meta-ADR: 2026-09-12.
 - No build tooling, no config files (no adr-tools, no markdownlint).
-- Note for executors: this workspace is **not a git repository**. Before any commit step, ask the user whether to run `git init`; if declined, skip all commit steps.
+- Note for executors: this workspace is **not a git
+  repository**. Before any commit step, ask the user
+  whether to run `git init`; if declined, skip all
+  commit steps.
 
 ---
 
 ### Task 1: Meta-ADR `0000-record-architecture-decisions.md`
 
 **Files:**
+
 - Create: `docs/adrs/0000-record-architecture-decisions.md`
 
 **Interfaces:**
+
 - Consumes: nothing.
 - Produces: the canonical ADR-0000 referenced by the README index in Task 3.
 
@@ -96,22 +108,31 @@ Practice confirmed for the start of the project; revisit if the format proves to
 
 - [ ] **Step 2: Verify**
 
-Read the file back and confirm: table renders with a `Status` cell of `accepted`, date is `2026-09-12`, and all headings listed above are present.
+Read the file back and confirm: table renders with a
+`Status` cell of `accepted`, date is `2026-09-12`, and
+all headings listed above are present.
 
 - [ ] **Step 3: Commit**
 
-If the user approved `git init`: `git add docs/adrs/0000-record-architecture-decisions.md && git commit -m "docs: add ADR 0000 (record architecture decisions)"`. Otherwise skip.
+If the user approved `git init`: `git add
+docs/adrs/0000-record-architecture-decisions.md && git commit
+-m "docs: add ADR 0000 (record architecture decisions)"`.
+Otherwise skip.
 
 ---
 
 ### Task 2: MADR Template `template.md`
 
 **Files:**
+
 - Create: `docs/adrs/template.md`
 
 **Interfaces:**
+
 - Consumes: nothing.
-- Produces: the template referenced by the README workflow in Task 3. Its placeholder fields (`{...}`) are the intentional deliverable.
+- Produces: the template referenced by the README workflow in
+  Task 3. Its placeholder fields (`{...}`) are the
+  intentional deliverable.
 
 - [ ] **Step 1: Create the file with this exact content**
 
@@ -173,20 +194,25 @@ Chosen option: **{option N}**, because {justification, e.g. only option that mee
 
 - [ ] **Step 2: Verify**
 
-Read the file back and confirm: the `{...}` placeholders are present exactly as above, all MADR section headings exist, and the pros/cons table uses ✅/❌ bullets.
+Read the file back and confirm: the `{...}` placeholders are
+present exactly as above, all MADR section headings exist,
+and the pros/cons table uses ✅/❌ bullets.
 
 - [ ] **Step 3: Commit**
 
-If the user approved `git init`: `git add docs/adrs/template.md && git commit -m "docs: add MADR ADR template"`. Otherwise skip.
+If the user approved `git init`: `git add docs/adrs/template.md && git
+commit -m "docs: add MADR ADR template"`. Otherwise skip.
 
 ---
 
 ### Task 3: README with Conventions
 
 **Files:**
+
 - Create: `docs/adrs/README.md`
 
 **Interfaces:**
+
 - Consumes: file names from Tasks 1–2 (`0000-record-architecture-decisions.md`, `template.md`).
 - Produces: the index and conventions for all future ADRs.
 
@@ -227,8 +253,12 @@ A short markdown document that captures one decision: the context that forced it
 
 - [ ] **Step 2: Verify**
 
-Read the file back and confirm: the index row links to `0000-record-architecture-decisions.md` (created in Task 1), the workflow references `template.md` (created in Task 2), and status values match the Global Constraints.
+Read the file back and confirm: the index row links to
+`0000-record-architecture-decisions.md` (created in Task 1), the workflow
+references `template.md` (created in Task 2), and status values match the
+Global Constraints.
 
 - [ ] **Step 3: Commit**
 
-If the user approved `git init`: `git add docs/adrs/README.md && git commit -m "docs: add ADR conventions README"`. Otherwise skip.
+If the user approved `git init`: `git add docs/adrs/README.md && git
+commit -m "docs: add ADR conventions README"`. Otherwise skip.
