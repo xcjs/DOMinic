@@ -65,7 +65,9 @@ function Labels-Of([int]$n) {
 }
 
 function Assignees-Of([int]$n) {
-  @(Get-IssueJson $n assignees).assignees | ForEach-Object { $_.login }
+  $j = Get-IssueJson $n assignees
+  if ($null -eq $j.assignees -or $j.assignees.Count -eq 0) { return @() }
+  @($j.assignees | ForEach-Object { $_.login })
 }
 
 function Has-Label([int]$n, [string]$label) {
