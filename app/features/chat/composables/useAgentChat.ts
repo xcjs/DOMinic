@@ -2,12 +2,44 @@ import { ref, computed } from 'vue'
 import type { ChatMessage, ToolInvocation, ProviderConfig } from '../types/chat'
 import type { InstallAppParams, UpdateAppParams } from '../tools/schemas'
 
+interface InstalledApp {
+  id: string
+  title: string
+  icon?: string
+  description?: string
+}
+
 export interface UseAgentChatOptions {
   getProviderConfig?: () => ProviderConfig | null
-  getInstalledApps?: () => Array<{ id: string; title: string; icon?: string; description?: string }>
+  getInstalledApps?: () => InstalledApp[]
+  getAppSource?: (id: string) => string | null | undefined
   onInstallApp?: (params: InstallAppParams) => Promise<boolean | void> | boolean | void
   onUpdateApp?: (params: UpdateAppParams) => Promise<boolean | void> | boolean | void
   onOpenWindow?: (appId: string) => void
+}
+
+function appReferencedBy(message: string, apps: InstalledApp[], lastAppId: string | null): InstalledApp | undefined {
+  const normalizedMessage = message.toLocaleLowerCase()
+  const directlyNamed = apps.find((app) =>
+    normalizedMessage.includes(app.id.toLocaleLowerCase()) ||
+    normalizedMessage.includes(app.title.toLocaleLowerCase())
+  )
+
+  if (directlyNamed) return directlyNamed
+
+  const requestsNewApp = /\b(build|create|generate|install)\b/.test(normalizedMessage) ||
+    /\bmake(?:\s+me)?\s+(?:a|an)\b/.test(normalizedMessage)
+
+  return requestsNewApp ? undefined : apps.find((app) => app.id === lastAppId)
+}
+
+function withAppSource(message: string, app: InstalledApp | undefined, getAppSource?: (id: string) => string | null | undefined): string {
+  if (!app || !getAppSource) return message
+
+  const source = getAppSource(app.id)
+  if (!source?.trim()) return message
+
+  return `${message}\n\n--- Current source for installed app id: ${app.id} ---\n\`\`\`vue\n${source}\n\`\`\`\n--- End current source ---`
 }
 
 function parseStreamError(data: string): string {
@@ -39,6 +71,7 @@ export function useAgentChat(options: UseAgentChatOptions = {}) {
   const input = ref('')
   const isStreaming = ref(false)
   const error = ref<string | null>(null)
+  const lastAppId = ref<string | null>(null)
 
   const hasApiKey = computed(() => {
     const config = options.getProviderConfig?.()
@@ -79,6 +112,8 @@ export function useAgentChat(options: UseAgentChatOptions = {}) {
         apiKey: ''
       }
       const installedApps = options.getInstalledApps?.() || []
+      const appWithSource = appReferencedBy(content, installedApps, lastAppId.value)
+      const requestContent = withAppSource(content, appWithSource, options.getAppSource)
 
       const response = await fetch('/api/chat', {
         method: 'POST',
@@ -92,7 +127,7 @@ export function useAgentChat(options: UseAgentChatOptions = {}) {
             .map((m) => ({
               role: m.role,
               content:
-                m.content.trim() ||
+                (m.id === userMessage.id ? requestContent : m.content.trim()) ||
                 (m.toolInvocations?.length
                   ? `(called ${m.toolInvocations.map((t) => t.toolName).join(', ')})`
                   : '')
@@ -189,6 +224,7 @@ export function useAgentChat(options: UseAgentChatOptions = {}) {
       try {
         const params = invocation.args as InstallAppParams
         await options.onInstallApp?.(params)
+        lastAppId.value = params.id
         options.onOpenWindow?.(params.id)
         invocation.state = 'result'
         invocation.result = { success: true, message: `Installed and launched "${params.title}"` }
@@ -200,6 +236,7 @@ export function useAgentChat(options: UseAgentChatOptions = {}) {
       try {
         const params = invocation.args as UpdateAppParams
         await options.onUpdateApp?.(params)
+        lastAppId.value = params.id
         invocation.state = 'result'
         invocation.result = { success: true, message: `Updated "${params.id}"` }
       } catch (err: any) {

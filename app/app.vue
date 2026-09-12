@@ -76,6 +76,11 @@ function updateApp(params: UpdateAppParams) {
   sourceVersion[params.id] = Date.now();
 }
 
+function getAppSource(id: string) {
+  const app = getApp(id);
+  return app ? readFile(app.entry) : null;
+}
+
 function askFix(payload: { appId: string; error: string; sourceCode?: string }) {
   const chatWin = os.windows.find((w) => w.appId === 'chat');
   if (chatWin) {
@@ -86,13 +91,9 @@ function askFix(payload: { appId: string; error: string; sourceCode?: string }) 
 
   const app = getApp(payload.appId);
   const title = app?.title || payload.appId;
-  const currentSource = payload.sourceCode || (app ? readFile(app.entry) : '') || '';
-  const sourceContext = currentSource
-    ? `\n\nCurrent source code of ${payload.appId}:\n\`\`\`vue\n${currentSource}\n\`\`\``
-    : '';
 
   chat.value?.sendMessage(
-    `The app "${title}" (id: "${payload.appId}") encountered an error:\n${payload.error}\n\nPlease fix the bug and update the app using update_app.${sourceContext}`
+    `The app "${title}" (id: "${payload.appId}") encountered an error:\n${payload.error}\n\nPlease fix the bug and update the app using update_app.`
   );
 }
 
@@ -162,7 +163,7 @@ onMounted(() => {
     </div>
 
     <WindowFrame v-for="win in os.windows" :key="win.id" :win="win">
-      <ChatWindow v-if="win.appId === 'chat'" :ref="setChat" :options="{ getProviderConfig: () => settings, getInstalledApps: () => apps.installed, onInstallApp: installApp, onUpdateApp: updateApp, onOpenWindow: openApp }" />
+      <ChatWindow v-if="win.appId === 'chat'" :ref="setChat" :options="{ getProviderConfig: () => settings, getInstalledApps: () => apps.installed, getAppSource, onInstallApp: installApp, onUpdateApp: updateApp, onOpenWindow: openApp }" />
       <SettingsApp v-else-if="win.appId === 'settings'" />
       <pre
         v-else-if="win.appId?.startsWith('source:')"
