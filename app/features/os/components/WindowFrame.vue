@@ -50,10 +50,10 @@ function onPointerUp(event: PointerEvent): void {
 
 <template>
   <section
+    v-show="!win.minimized"
     class="absolute flex flex-col overflow-hidden rounded-lg border border-white/10 bg-slate-900/95 shadow-2xl backdrop-blur"
     :class="store.focusedId === win.id ? 'ring-2 ring-indigo-400' : ''"
     :style="style"
-    :hidden="win.minimized"
     @pointerdown="store.focusWindow(win.id)"
   >
     <header
@@ -64,7 +64,7 @@ function onPointerUp(event: PointerEvent): void {
       @pointerup="onPointerUp"
     >
       <span class="truncate text-xs font-medium text-slate-200">{{ win.title }}</span>
-      <span class="flex items-center gap-1">
+      <span class="flex items-center gap-1" @pointerdown.stop>
         <button
           class="flex h-5 w-5 items-center justify-center rounded text-slate-400 hover:bg-white/10 hover:text-slate-100"
           aria-label="Minimize"
