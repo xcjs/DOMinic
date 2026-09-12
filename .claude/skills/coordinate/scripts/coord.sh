@@ -73,8 +73,10 @@ set_status() { # issue status
 }
 
 hub_number() {
-  gh issue list --repo "$REPO" --label hub --state open --limit 1 \
-    --json number --jq '.[0].number // empty'
+  # COORD_HUB pins the hub; otherwise the lowest-numbered open hub issue wins
+  # (a later dashboard issue may also carry the label).
+  if [ -n "${COORD_HUB:-}" ]; then echo "$COORD_HUB"; return; fi
+  gh issue list --repo "$REPO" --label hub --state open --limit 20     --json number --jq '[.[].number] | min // empty'
 }
 
 # Age in minutes since the last heartbeat verb on an issue; 999999 if none.
