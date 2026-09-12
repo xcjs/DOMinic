@@ -1,8 +1,7 @@
-import { streamText } from 'ai'
+import { streamText, tool } from 'ai'
 import { createOpenAI } from '@ai-sdk/openai'
 import { createAnthropic } from '@ai-sdk/anthropic'
 import { createGoogleGenerativeAI } from '@ai-sdk/google'
-import { z } from 'zod'
 import { buildSystemPrompt } from '../../app/features/chat/prompts/systemPrompt'
 import { installAppSchema, updateAppSchema } from '../../app/features/chat/tools/schemas'
 
@@ -70,19 +69,18 @@ export default defineEventHandler(async (event) => {
     system,
     messages,
     tools: {
-      install_app: {
+      install_app: tool({
         description:
           'Install and launch a new application in DOMinic OS. Provide complete Vue 3 SFC code with <template> and <script setup>.',
-        parameters: installAppSchema
-      },
-      update_app: {
+        inputSchema: installAppSchema
+      }),
+      update_app: tool({
         description:
           'Update the source code of an existing installed application in DOMinic OS.',
-        parameters: updateAppSchema
-      }
-    },
-    maxSteps: 3
+        inputSchema: updateAppSchema
+      })
+    }
   })
 
-  return result.toDataStreamResponse()
+  return (result as any).toDataStreamResponse?.() || result.toTextStreamResponse()
 })
