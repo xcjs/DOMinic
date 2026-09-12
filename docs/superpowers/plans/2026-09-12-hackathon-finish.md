@@ -93,11 +93,10 @@ video link and social post, #69 script enforcement, NEXT.md items.
 
 - [x] **Step 1:** Mount the shell in `app.vue`; Agent Chat as a
   floating window (Q1.1); Settings pre-installed.
-- [x] **Step 2:** `install_app` writes `/apps/<id>/index.vue` and
-  `manifest.json`, registers the app, opens its window, and shows the
-  installation badge and confetti (ADR 0010 lifecycle).
-- [x] **Step 3:** Boot hydration re-registers installed apps from
-  `/apps/` into the launcher and taskbar (ADR 0007).
+- [x] **Step 2:** `install_app` writes `apps/<id>/index.vue`, persists
+  its metadata through the app registry, and opens its window.
+- [x] **Step 3:** Boot hydration restores the persisted app registry into
+  the launcher and taskbar (ADR 0007).
 - [x] **Step 4:** `update_app` replaces the source and re-renders the
   open window (Q2.2 context injection).
 - [x] **Step 5:** The error boundary's "Ask Agent to Fix" posts the
