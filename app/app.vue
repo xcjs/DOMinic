@@ -21,38 +21,6 @@ const chat = ref<InstanceType<typeof ChatWindow> | null>(null);
 const now = ref<string | null>(null);
 const sourceVersion = reactive<Record<string, number>>({});
 
-onMounted(() => {
-  const tick = () => {
-    now.value = new Date().toLocaleTimeString();
-  };
-  tick();
-  setInterval(tick, 1000);
-  settings.hydrate();
-  apps.installed = hydrateRegistry();
-  openBuiltin('chat');
-
-  if (import.meta.client) {
-    (window as any).__dominicReset = () => {
-      settings.resetOs();
-      window.location.reload();
-    };
-    (window as any).__dominic = {
-      reset: (window as any).__dominicReset,
-      installApp,
-      updateApp,
-      openApp,
-      installFixture: (fixtureId: string) => {
-        const ok = installFixture(fixtureId);
-        if (ok) {
-          apps.installed = listApps();
-          openApp(fixtureId);
-        }
-        return ok;
-      },
-    };
-  }
-});
-
 function openBuiltin(appId: 'chat' | 'settings') {
   if (os.windows.some((win) => win.appId === appId)) return;
   os.openWindow({ appId, title: appId === 'chat' ? 'Agent Chat' : 'Settings', width: appId === 'chat' ? 520 : 480, height: 560 });
@@ -108,13 +76,80 @@ function updateApp(params: UpdateAppParams) {
   sourceVersion[params.id] = Date.now();
 }
 
-function askFix(payload: { appId: string; error: string }) {
-  chat.value?.sendMessage(`The app ${payload.appId} encountered an error: ${payload.error}. Please fix it.`);
+function askFix(payload: { appId: string; error: string; sourceCode?: string }) {
+  const chatWin = os.windows.find((w) => w.appId === 'chat');
+  if (chatWin) {
+    os.focusWindow(chatWin.id);
+  } else {
+    openBuiltin('chat');
+  }
+
+  const app = getApp(payload.appId);
+  const title = app?.title || payload.appId;
+  const currentSource = payload.sourceCode || (app ? readFile(app.entry) : '') || '';
+  const sourceContext = currentSource
+    ? `\n\nCurrent source code of ${payload.appId}:\n\`\`\`vue\n${currentSource}\n\`\`\``
+    : '';
+
+  chat.value?.sendMessage(
+    `The app "${title}" (id: "${payload.appId}") encountered an error:\n${payload.error}\n\nPlease fix the bug and update the app using update_app.${sourceContext}`
+  );
 }
 
 function setChat(instance: Element | ComponentPublicInstance | null) {
   chat.value = instance as InstanceType<typeof ChatWindow> | null;
 }
+
+onMounted(() => {
+  const tick = () => {
+    now.value = new Date().toLocaleTimeString();
+  };
+  tick();
+  setInterval(tick, 1000);
+  settings.hydrate();
+  apps.installed = hydrateRegistry();
+  openBuiltin('chat');
+
+  if (import.meta.client) {
+    (window as any).__dominicReset = () => {
+      settings.resetOs();
+      window.location.reload();
+    };
+    (window as any).__dominic = {
+      reset: (window as any).__dominicReset,
+      installApp,
+      updateApp,
+      openApp,
+      installFixture: (fixtureId: string) => {
+        const ok = installFixture(fixtureId);
+        if (ok) {
+          apps.installed = listApps();
+          openApp(fixtureId);
+        }
+        return ok;
+      },
+      injectBrokenApp: (type: 'compile' | 'runtime' = 'compile') => {
+        const id = 'broken-app';
+        const title = type === 'compile' ? 'Broken (Syntax Error)' : 'Broken (Runtime Crash)';
+        const brokenCode =
+          type === 'compile'
+            ? `<template>\n  <div class="p-6 text-rose-300 font-sans">\n    <h2 class="text-xl font-bold">Syntax Error Component</h2>\n  </div>\n</template>\n<` + `script setup>\n// Deliberate compile error: unexpected token\nconst invalid = ;\n<` + `/script>`
+            : `<template>\n  <div class="p-6 text-rose-300 font-sans">\n    <h2 class="text-xl font-bold">Runtime Crash Component</h2>\n  </div>\n</template>\n<` + `script setup>\nimport { onMounted } from 'vue'\nonMounted(() => {\n  throw new Error('Simulated runtime exception inside onMounted()')\n})\n<` + `/script>`;
+        writeFile(`apps/${id}/index.vue`, brokenCode);
+        registerApp({
+          id,
+          title,
+          icon: 'AlertTriangle',
+          description: 'Test fixture with deliberate error for testing recovery',
+          entry: `apps/${id}/index.vue`,
+        });
+        apps.installed = listApps();
+        sourceVersion[id] = Date.now();
+        openApp(id);
+      },
+    };
+  }
+});
 </script>
 
 <template>
