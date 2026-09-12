@@ -1,10 +1,11 @@
 ---
 type: playbook
 title: Coordination Best Practices v2 — Sprint Minimum and Full Protocol
-description: Supersedes coordination-best-practices.md. Reconciles three research answers to Q01 into one sprint-minimum protocol (six verbs, a two-stage lease, declare-then-proceed on seams, file-glob ownership) and the full protocol to switch back to.
+description: Historical sprint playbook, superseded by coordination-best-practices-3.md.
 tags: [agents, coordination, process, hackathon, research]
-status: active
+status: superseded
 supersedes: coordination-best-practices.md
+superseded_by: coordination-best-practices-3.md
 generated: { by: claude-code/claude-fable-5.1, at: 2026-09-12T18:45:00Z }
 sources:
   - id: q01-answer-1
@@ -26,12 +27,17 @@ sources:
 
 # Coordination best practices v2 — sprint minimum and full protocol
 
-Supersedes [coordination-best-practices.md](coordination-best-practices.md),
-which is kept for the record. Three independent research answers to
-the same question (Q01) agree on the shape and disagree on the numbers;
-this document is the reconciliation, with every override stated. Read
-it in four minutes at session start. Sprint rules apply until
-**16:00 ET**; the full protocol applies afterwards.
+> **Historical record:** This playbook is superseded by
+> [coordination-best-practices-3.md](coordination-best-practices-3.md).
+> V3 is the active guidance and defines the file-scope, completion, and
+> canonical-hub invariants. This document preserves the rules used during
+> the 2026-09-12 sprint; do not use it as the session-start protocol.
+
+This document superseded
+[coordination-best-practices.md](coordination-best-practices.md), which is
+also kept for the record. Three independent research answers to the same
+question (Q01) agreed on the shape and disagreed on the numbers. The text
+below records the reconciliation used during the sprint.
 
 ## Why Issues at all
 
