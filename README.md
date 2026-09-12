@@ -124,3 +124,11 @@ npm run lint:md
 A pre-commit hook runs the lint automatically; write with the
 conventions in [docs/agents/use-okf.md](docs/agents/use-okf.md) and
 [docs/adrs/template.md](docs/adrs/template.md).
+
+## License
+
+DOMinic is licensed under the
+[GNU Affero General Public License v3.0 or later](LICENSE)
+(AGPL-3.0-or-later). Since DOMinic is a network-run application,
+section 13 of the AGPL requires that users interacting with it over a
+network are offered the corresponding source.
