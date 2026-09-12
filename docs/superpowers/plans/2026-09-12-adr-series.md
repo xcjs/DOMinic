@@ -5,6 +5,9 @@
 > superpowers:executing-plans to implement this plan task-by-task.
 > Steps use checkbox (`- [ ]`) syntax for tracking.
 
+**Status (2026-09-12, 14:55 ET):** complete — every step below is
+checked off; all deliverables are on `main`.
+
 **Goal:** Author nine accepted Architecture Decision Records
 (ADRs 0001â€“0009) in `docs/adrs/`, one per architectural pillar of the
 DOMinic browser OS, using the repo's MADR 4.0 template plus OKF v0.2
@@ -97,7 +100,7 @@ markdownlint-cli2 (MD013 line_length 80), husky pre-commit
 - Produces: ADR 0001 file; README index row; Links section in
   `0001` that Tasks 3 and 4 will extend with one reciprocal line each.
 
-- [ ] **Step 1: Create ADR 0001 with this exact content**
+- [x] **Step 1: Create ADR 0001 with this exact content**
 
 ````markdown
 ---
@@ -193,7 +196,7 @@ lint toolchain lands; code review rejects slice-to-slice imports.
 - Related to [ADR 0000](0000-record-architecture-decisions.md)
 ````
 
-- [ ] **Step 2: Append the index row to `docs/adrs/README.md`**
+- [x] **Step 2: Append the index row to `docs/adrs/README.md`**
 
 Add this as the last row of the Index table (after the 0000 row):
 
@@ -201,12 +204,12 @@ Add this as the last row of the Index table (after the 0000 row):
 | [0001](0001-feature-slices-with-domain-driven-organization.md) | Feature slices with domain-driven organization | accepted |
 ```
 
-- [ ] **Step 3: Verify**
+- [x] **Step 3: Verify**
 
 Run: `npm run lint:md`
 Expected: exit 0, no errors (pre-commit will run this too).
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```powershell
 git add docs/adrs/0001-feature-slices-with-domain-driven-organization.md docs/adrs/README.md
@@ -227,7 +230,7 @@ git commit -m "docs: add ADR 0001 feature slices with domain-driven organization
 - Consumes: ADR 0001 (enforces slice dependency direction).
 - Produces: ADR 0002 file; README index row.
 
-- [ ] **Step 1: Create ADR 0002 with this exact content**
+- [x] **Step 1: Create ADR 0002 with this exact content**
 
 ````markdown
 ---
@@ -320,7 +323,7 @@ deliberate type error and a lint error both fail CI.
 - Related to [ADR 0001](0001-feature-slices-with-domain-driven-organization.md)
 ````
 
-- [ ] **Step 2: Append the index row to `docs/adrs/README.md`**
+- [x] **Step 2: Append the index row to `docs/adrs/README.md`**
 
 Add this as the last row of the Index table:
 
@@ -328,12 +331,12 @@ Add this as the last row of the Index table:
 | [0002](0002-strict-typescript-and-lint-toolchain.md) | Strict TypeScript and lint toolchain | accepted |
 ```
 
-- [ ] **Step 3: Verify**
+- [x] **Step 3: Verify**
 
 Run: `npm run lint:md`
 Expected: exit 0, no errors.
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```powershell
 git add docs/adrs/0002-strict-typescript-and-lint-toolchain.md docs/adrs/README.md
@@ -357,7 +360,7 @@ git commit -m "docs: add ADR 0002 strict TypeScript and lint toolchain"
 - Produces: ADR 0003 file; README index row; reciprocal link from ADR
   0001's Links section.
 
-- [ ] **Step 1: Create ADR 0003 with this exact content**
+- [x] **Step 1: Create ADR 0003 with this exact content**
 
 ````markdown
 ---
@@ -448,7 +451,7 @@ store; the devtools Pinia panel shows one store per slice.
 - Related to [ADR 0001](0001-feature-slices-with-domain-driven-organization.md)
 ````
 
-- [ ] **Step 2: Append the index row to `docs/adrs/README.md`**
+- [x] **Step 2: Append the index row to `docs/adrs/README.md`**
 
 Add this as the last row of the Index table:
 
@@ -456,7 +459,7 @@ Add this as the last row of the Index table:
 | [0003](0003-pinia-per-domain-stores.md) | Pinia per-domain stores | accepted |
 ```
 
-- [ ] **Step 3: Add reciprocal link in ADR 0001's Links section**
+- [x] **Step 3: Add reciprocal link in ADR 0001's Links section**
 
 In `docs/adrs/0001-feature-slices-with-domain-driven-organization.md`,
 the Links section currently ends with:
@@ -472,12 +475,12 @@ Change it to:
 - Related to [ADR 0003](0003-pinia-per-domain-stores.md)
 ```
 
-- [ ] **Step 4: Verify**
+- [x] **Step 4: Verify**
 
 Run: `npm run lint:md`
 Expected: exit 0, no errors.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```powershell
 git add docs/adrs/0003-pinia-per-domain-stores.md docs/adrs/README.md docs/adrs/0001-feature-slices-with-domain-driven-organization.md
@@ -501,7 +504,7 @@ git commit -m "docs: add ADR 0003 Pinia per-domain stores"
 - Produces: ADR 0004 file; README index row; reciprocal link from ADR
   0001's Links section (now two added lines there).
 
-- [ ] **Step 1: Create ADR 0004 with this exact content**
+- [x] **Step 1: Create ADR 0004 with this exact content**
 
 ````markdown
 ---
@@ -597,7 +600,7 @@ and the Settings app launchable.
 - Related to [ADR 0001](0001-feature-slices-with-domain-driven-organization.md)
 ````
 
-- [ ] **Step 2: Append the index row to `docs/adrs/README.md`**
+- [x] **Step 2: Append the index row to `docs/adrs/README.md`**
 
 Add this as the last row of the Index table:
 
@@ -605,7 +608,7 @@ Add this as the last row of the Index table:
 | [0004](0004-dominic-os-shell-and-taskbar.md) | DOMinic OS shell and taskbar | accepted |
 ```
 
-- [ ] **Step 3: Add reciprocal link in ADR 0001's Links section**
+- [x] **Step 3: Add reciprocal link in ADR 0001's Links section**
 
 In `docs/adrs/0001-feature-slices-with-domain-driven-organization.md`,
 the Links section currently ends with:
@@ -623,12 +626,12 @@ Change it to:
 - Related to [ADR 0004](0004-dominic-os-shell-and-taskbar.md)
 ```
 
-- [ ] **Step 4: Verify**
+- [x] **Step 4: Verify**
 
 Run: `npm run lint:md`
 Expected: exit 0, no errors.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```powershell
 git add docs/adrs/0004-dominic-os-shell-and-taskbar.md docs/adrs/README.md docs/adrs/0001-feature-slices-with-domain-driven-organization.md
@@ -655,7 +658,7 @@ git commit -m "docs: add ADR 0004 DOMinic OS shell and taskbar"
   Task 7, not here â€” this ADR links only to ADRs that exist at its
   commit time.)
 
-- [ ] **Step 1: Create ADR 0005 with this exact content**
+- [x] **Step 1: Create ADR 0005 with this exact content**
 
 ````markdown
 ---
@@ -755,7 +758,7 @@ the server holds no key material after a request completes.
 - Related to [ADR 0004](0004-dominic-os-shell-and-taskbar.md)
 ````
 
-- [ ] **Step 2: Append the index row to `docs/adrs/README.md`**
+- [x] **Step 2: Append the index row to `docs/adrs/README.md`**
 
 Add this as the last row of the Index table:
 
@@ -763,7 +766,7 @@ Add this as the last row of the Index table:
 | [0005](0005-agent-chat-via-vercel-ai-sdk-with-server-side-provider-proxy.md) | Agent chat via Vercel AI SDK with server-side provider proxy | accepted |
 ```
 
-- [ ] **Step 3: Add reciprocal link in ADR 0004's Links section**
+- [x] **Step 3: Add reciprocal link in ADR 0004's Links section**
 
 In `docs/adrs/0004-dominic-os-shell-and-taskbar.md`, the Links
 section currently ends with:
@@ -781,12 +784,12 @@ Change it to:
 - Related to [ADR 0005](0005-agent-chat-via-vercel-ai-sdk-with-server-side-provider-proxy.md)
 ```
 
-- [ ] **Step 4: Verify**
+- [x] **Step 4: Verify**
 
 Run: `npm run lint:md`
 Expected: exit 0, no errors.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```powershell
 git add docs/adrs/0005-agent-chat-via-vercel-ai-sdk-with-server-side-provider-proxy.md docs/adrs/README.md docs/adrs/0004-dominic-os-shell-and-taskbar.md
@@ -814,7 +817,7 @@ git commit -m "docs: add ADR 0005 agent chat via Vercel AI SDK"
   0004's Links section (now two added lines there). (Reciprocal
   back-links from ADRs 0007 and 0008 are added by Tasks 7 and 8.)
 
-- [ ] **Step 1: Create ADR 0006 with this exact content**
+- [x] **Step 1: Create ADR 0006 with this exact content**
 
 ````markdown
 ---
@@ -911,7 +914,7 @@ source.
 - Related to [ADR 0004](0004-dominic-os-shell-and-taskbar.md)
 ````
 
-- [ ] **Step 2: Append the index row to `docs/adrs/README.md`**
+- [x] **Step 2: Append the index row to `docs/adrs/README.md`**
 
 Add this as the last row of the Index table:
 
@@ -919,7 +922,7 @@ Add this as the last row of the Index table:
 | [0006](0006-agent-authored-runtime-compiled-components.md) | Agent-authored runtime-compiled components | accepted |
 ```
 
-- [ ] **Step 3: Add reciprocal link in ADR 0004's Links section**
+- [x] **Step 3: Add reciprocal link in ADR 0004's Links section**
 
 In `docs/adrs/0004-dominic-os-shell-and-taskbar.md`, the Links
 section currently ends with:
@@ -939,12 +942,12 @@ Change it to:
 - Related to [ADR 0006](0006-agent-authored-runtime-compiled-components.md)
 ```
 
-- [ ] **Step 4: Verify**
+- [x] **Step 4: Verify**
 
 Run: `npm run lint:md`
 Expected: exit 0, no errors.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```powershell
 git add docs/adrs/0006-agent-authored-runtime-compiled-components.md docs/adrs/README.md docs/adrs/0004-dominic-os-shell-and-taskbar.md
@@ -972,7 +975,7 @@ git commit -m "docs: add ADR 0006 runtime-compiled components"
 - Produces: ADR 0007 file; README index row; reciprocal links from
   ADRs 0005 and 0006 Links sections.
 
-- [ ] **Step 1: Create ADR 0007 with this exact content**
+- [x] **Step 1: Create ADR 0007 with this exact content**
 
 ````markdown
 ---
@@ -1064,7 +1067,7 @@ reload.
 - Related to [ADR 0006](0006-agent-authored-runtime-compiled-components.md)
 ````
 
-- [ ] **Step 2: Append the index row to `docs/adrs/README.md`**
+- [x] **Step 2: Append the index row to `docs/adrs/README.md`**
 
 Add this as the last row of the Index table:
 
@@ -1072,7 +1075,7 @@ Add this as the last row of the Index table:
 | [0007](0007-virtual-filesystem-with-pluggable-storage-drivers.md) | Virtual filesystem with pluggable storage drivers | accepted |
 ```
 
-- [ ] **Step 3: Add reciprocal link in ADR 0005's Links section**
+- [x] **Step 3: Add reciprocal link in ADR 0005's Links section**
 
 In
 `docs/adrs/0005-agent-chat-via-vercel-ai-sdk-with-server-side-provider-proxy.md`,
@@ -1089,7 +1092,7 @@ Change it to:
 - Related to [ADR 0007](0007-virtual-filesystem-with-pluggable-storage-drivers.md)
 ```
 
-- [ ] **Step 4: Add reciprocal link in ADR 0006's Links section**
+- [x] **Step 4: Add reciprocal link in ADR 0006's Links section**
 
 In
 `docs/adrs/0006-agent-authored-runtime-compiled-components.md`, the
@@ -1117,12 +1120,12 @@ from the VFS side), so ADR 0007's Links section becomes:
 - Related to [ADR 0006](0006-agent-authored-runtime-compiled-components.md)
 ```
 
-- [ ] **Step 5: Verify**
+- [x] **Step 5: Verify**
 
 Run: `npm run lint:md`
 Expected: exit 0, no errors.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```powershell
 git add docs/adrs/0007-virtual-filesystem-with-pluggable-storage-drivers.md docs/adrs/0005-agent-chat-via-vercel-ai-sdk-with-server-side-provider-proxy.md docs/adrs/0006-agent-authored-runtime-compiled-components.md docs/adrs/README.md
@@ -1150,7 +1153,7 @@ git commit -m "docs: add ADR 0007 virtual filesystem with pluggable storage driv
 - Produces: ADR 0008 file; README index row; reciprocal links from
   ADRs 0006 and 0007 Links sections.
 
-- [ ] **Step 1: Create ADR 0008 with this exact content**
+- [x] **Step 1: Create ADR 0008 with this exact content**
 
 ````markdown
 ---
@@ -1247,7 +1250,7 @@ failing the vetting gate is refused with its reasons surfaced.
 - Related to [ADR 0007](0007-virtual-filesystem-with-pluggable-storage-drivers.md)
 ````
 
-- [ ] **Step 2: Append the index row to `docs/adrs/README.md`**
+- [x] **Step 2: Append the index row to `docs/adrs/README.md`**
 
 Add this as the last row of the Index table:
 
@@ -1255,7 +1258,7 @@ Add this as the last row of the Index table:
 | [0008](0008-runtime-npm-dependency-loading-via-esm-sh-with-vetting.md) | Runtime NPM dependency loading via esm.sh with vetting | accepted |
 ```
 
-- [ ] **Step 3: Add reciprocal link in ADR 0006's Links section**
+- [x] **Step 3: Add reciprocal link in ADR 0006's Links section**
 
 In
 `docs/adrs/0006-agent-authored-runtime-compiled-components.md`, the
@@ -1274,7 +1277,7 @@ Change it to:
 - Related to [ADR 0008](0008-runtime-npm-dependency-loading-via-esm-sh-with-vetting.md)
 ```
 
-- [ ] **Step 4: Add reciprocal link in ADR 0007's Links section**
+- [x] **Step 4: Add reciprocal link in ADR 0007's Links section**
 
 In
 `docs/adrs/0007-virtual-filesystem-with-pluggable-storage-drivers.md`,
@@ -1293,12 +1296,12 @@ Change it to:
 - Related to [ADR 0008](0008-runtime-npm-dependency-loading-via-esm-sh-with-vetting.md)
 ```
 
-- [ ] **Step 5: Verify**
+- [x] **Step 5: Verify**
 
 Run: `npm run lint:md`
 Expected: exit 0, no errors.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```powershell
 git add docs/adrs/0008-runtime-npm-dependency-loading-via-esm-sh-with-vetting.md docs/adrs/0006-agent-authored-runtime-compiled-components.md docs/adrs/0007-virtual-filesystem-with-pluggable-storage-drivers.md docs/adrs/README.md
@@ -1320,7 +1323,7 @@ git commit -m "docs: add ADR 0008 esm.sh dependency loading with vetting"
 - Consumes: ADR 0004 (os slice hosts the client helper composable).
 - Produces: ADR 0009 file; README index row; final ADR of the series.
 
-- [ ] **Step 1: Create ADR 0009 with this exact content**
+- [x] **Step 1: Create ADR 0009 with this exact content**
 
 ````markdown
 ---
@@ -1413,7 +1416,7 @@ a CORS-blocking endpoint transparently returns content through
 - Related to [ADR 0004](0004-dominic-os-shell-and-taskbar.md)
 ````
 
-- [ ] **Step 2: Append the index row to `docs/adrs/README.md`**
+- [x] **Step 2: Append the index row to `docs/adrs/README.md`**
 
 Add this as the last row of the Index table:
 
@@ -1421,12 +1424,12 @@ Add this as the last row of the Index table:
 | [0009](0009-cors-first-networking-with-chrome-masking-proxy-fallback.md) | CORS-first networking with Chrome-masking proxy fallback | accepted |
 ```
 
-- [ ] **Step 3: Verify**
+- [x] **Step 3: Verify**
 
 Run: `npm run lint:md`
 Expected: exit 0, no errors.
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```powershell
 git add docs/adrs/0009-cors-first-networking-with-chrome-masking-proxy-fallback.md docs/adrs/README.md
@@ -1446,7 +1449,7 @@ git commit -m "docs: add ADR 0009 CORS-first networking with proxy fallback"
 - Consumes: all nine ADRs from Tasks 1â€“9.
 - Produces: verification evidence for the spec's Verification section.
 
-- [ ] **Step 1: Verify file set**
+- [x] **Step 1: Verify file set**
 
 ```powershell
 Get-ChildItem docs/adrs -Filter "0*.md" | Select-Object -ExpandProperty Name
@@ -1468,7 +1471,7 @@ ADRs, in order):
 0009-cors-first-networking-with-chrome-masking-proxy-fallback.md
 ```
 
-- [ ] **Step 2: Verify frontmatter, statuses, and cross-links**
+- [x] **Step 2: Verify frontmatter, statuses, and cross-links**
 
 ```powershell
 Select-String -Path docs/adrs/000*.md -Pattern '^status: accepted$' | Measure-Object | Select-Object -ExpandProperty Count
@@ -1490,7 +1493,7 @@ $targets | Where-Object { -not (Test-Path "docs/adrs/$_") }
 Expected: empty output (no dead links). `template.md` links are not
 matched by this pattern, so no false positives are expected.
 
-- [ ] **Step 3: Verify MADR section coverage per file**
+- [x] **Step 3: Verify MADR section coverage per file**
 
 ```powershell
 $sections = '## Technical Story','## Context and Problem Statement','## Decision Drivers','## Considered Options','## Decision Outcome','## Pros and Cons of the Options','## Links'
@@ -1503,12 +1506,12 @@ foreach ($f in (Get-ChildItem docs/adrs -Filter "000[1-9]*.md")) {
 
 Expected: no output â€” every ADR contains every MADR section.
 
-- [ ] **Step 4: Run full lint**
+- [x] **Step 4: Run full lint**
 
 Run: `npm run lint:md`
 Expected: exit 0, zero errors across the whole repo.
 
-- [ ] **Step 5: Final commit (only if Steps 1â€“4 required fixes)**
+- [x] **Step 5: Final commit (only if Steps 1â€“4 required fixes)**
 
 If any verification step above forced a fix, commit it:
 
