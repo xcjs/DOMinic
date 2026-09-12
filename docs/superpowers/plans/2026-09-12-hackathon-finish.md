@@ -23,9 +23,11 @@ coordination.
 **Spec:** `docs/agents/demo-path.md` (beats and cut order),
 `docs/agents/rubric.md` (scoring and submission gates).
 
-**Status at 14:56 ET:** shell (#24), deps (#29) and README (#28) merged
-while this was written — Task 1 is done. `app/app.vue` is still the boot
-placeholder; #30 is the critical path. 64 minutes remain.
+**Closing status, 16:40 ET:** Tasks 1–4 done (loop wired in #35/#63,
+rehearsed 15:08, prompt frozen and fixture shipped in #40, launcher
+actions in #44, duplicate #31 closed). Form submitted by Zack before
+16:30; video with Brandon (#9). v3 playbook merged (#68). Remaining:
+video link and social post, #69 script enforcement, NEXT.md items.
 
 ## Global Constraints
 
@@ -46,10 +48,10 @@ placeholder; #30 is the critical path. 64 minutes remain.
 | By | Milestone | Task |
 | --- | --- | --- |
 | 14:55 ✅ | PR #24 (shell) and PR #29 (deps, model IDs) merged | 1 |
-| 15:20 | Core loop runs end to end on `main` | 2 |
-| 15:30 | Prompt rehearsed three times and frozen; footage recorded | 3, 5 |
-| 15:45 | Video rendered; public link live | 5 |
-| 15:55 | All five gates submitted in the portal | 6 |
+| 16:05 ✅ | Core loop runs end to end on `main` (#35; smoke fixes #63) | 2 |
+| 15:08 ✅ / ⏳ | Prompt rehearsed and frozen (#40, merged 16:31); footage with Brandon | 3, 5 |
+| ⏳ | Video — produced by Brandon (#9 handed off 16:29) | 5 |
+| 16:2x ✅ | Form submitted by Zack; video link and social post to follow | 6 |
 
 ---
 
@@ -89,18 +91,18 @@ placeholder; #30 is the critical path. 64 minutes remain.
   registry → window opens → survives reload → update_app changes it in
   place.
 
-- [ ] **Step 1:** Mount the shell in `app.vue`; Agent Chat as a
+- [x] **Step 1:** Mount the shell in `app.vue`; Agent Chat as a
   floating window (Q1.1); Settings pre-installed.
-- [ ] **Step 2:** `install_app` writes `/apps/<id>/index.vue` and
+- [x] **Step 2:** `install_app` writes `/apps/<id>/index.vue` and
   `manifest.json`, registers the app, opens its window, and shows the
   installation badge and confetti (ADR 0010 lifecycle).
-- [ ] **Step 3:** Boot hydration re-registers installed apps from
+- [x] **Step 3:** Boot hydration re-registers installed apps from
   `/apps/` into the launcher and taskbar (ADR 0007).
-- [ ] **Step 4:** `update_app` replaces the source and re-renders the
+- [x] **Step 4:** `update_app` replaces the source and re-renders the
   open window (Q2.2 context injection).
-- [ ] **Step 5:** The error boundary's "Ask Agent to Fix" posts the
+- [x] **Step 5:** The error boundary's "Ask Agent to Fix" posts the
   trace back into the chat (ADR 0006).
-- [ ] **Step 6:** Small PR per step where possible; merge to `main`;
+- [x] **Step 6:** Small PR per step where possible; merge to `main`;
   boot `main` and run the loop once — that is the integration
   checkpoint.
 
@@ -110,11 +112,11 @@ placeholder; #30 is the critical path. 64 minutes remain.
 
 **Files:** `docs/agents/demo-path.md`.
 
-- [ ] **Step 1:** Choose the core-loop app — pomodoro / focus timer
+- [x] **Step 1:** Choose the core-loop app — pomodoro / focus timer
   unless it misbehaves; kanban is the alternate (Q5.1, `demo-path.md`).
-- [ ] **Step 2:** Run the exact prompt three times on `main`; it must
+- [x] **Step 2:** Run the exact prompt three times on `main`; it must
   install, open, survive a reload, and take one `update_app` change.
-- [ ] **Step 3:** Post the frozen prompt and app name on #32; ws:docs
+- [x] **Step 3:** Post the frozen prompt and app name on #32; ws:docs
   commits them into `demo-path.md` ("Chosen app", "Exact prompt") and
   never edits them again.
 
@@ -122,11 +124,11 @@ placeholder; #30 is the critical path. 64 minutes remain.
 
 **Owner:** whoever is free. **Issues:** #33, #34, PR #31.
 
-- [ ] **Step 1:** #33 — ship the pre-generated pomodoro fixture as the
+- [x] **Step 1:** #33 — ship the pre-generated pomodoro fixture as the
   Persist-beat fallback (it was agent-authored; the narration says so).
-- [ ] **Step 2:** #34 — Uninstall and View Source in the launcher
+- [x] **Step 2:** #34 — Uninstall and View Source in the launcher
   (Control beat, criterion 4).
-- [ ] **Step 3:** Close PR #31 (duplicates merged #27) or fold its
+- [x] **Step 3:** Close PR #31 (duplicates merged #27) or fold its
   deltas into #30.
 
 ### Task 5: Record, wrap, render, publish (#9)
@@ -161,23 +163,23 @@ placeholder; #30 is the critical path. 64 minutes remain.
 (`~/DFIM/DOMinic-research/submission/2026-09-12-submission-drafts.md`).
 
 - [x] **Step 1:** Merge PR #28 (README quickstart) — merged 14:54.
-- [ ] **Step 2:** At freeze, open one tiny PR adding the sentence that
-  states exactly what runs in the video and what is deferred to
-  `NEXT.md`.
+- [x] **Step 2:** Superseded — `docs/JUDGES.md` (#53, README first row)
+  carries what runs and what is deferred; no README sentence needed.
 - [ ] **Step 3:** Fill the draft's blanks: demo-app name, the "what
   runs" line, the video link, confirmed sponsor handles.
 - [ ] **Step 4:** Publish the social post with sponsor tags.
-- [ ] **Step 5:** Submit title, description, repo, video link, and the
-  post in the portal before 15:55. Post DONE on #8, #9, #10.
+- [x] **Step 5:** Form submitted by @xcjs (title, description, repo)
+  before 16:30; video link and post follow via #9. #8 closed; #10 stays
+  open until the link is in.
 
 ### Task 7: After 16:00 — operations
 
 **Owner:** ws:docs; Brandon for the skill.
 
-- [ ] **Step 1:** Restore the full protocol — the "Full" column in
-  `coordination-best-practices-2.md`.
-- [ ] **Step 2:** Merge #19 replies into `coordination-best-practices-3.md`;
-  close #19 and #6.
+- [x] **Step 1:** Superseded by v3 (#68), which sets the post-sprint
+  rules from the retrospective.
+- [x] **Step 2:** v3 merged in #68 (retrospective-based); #19 kept open
+  for late feedback; #6 closed with the skill.
 - [ ] **Step 3:** Brandon: script defaults proposed on #6 (two-stage
   lease, one claim, two rounds, ping before release); fix the
   SKILL.md and protocol.md cap contradiction and the comment matcher.
