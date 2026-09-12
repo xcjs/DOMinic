@@ -9,8 +9,21 @@ export interface LoadAppOptions {
   appId?: string
 }
 
+/** Remove runtime CSS previously injected for a dynamic application. */
+export function removeAppStyles(appId: string): void {
+  if (typeof document === 'undefined') return
+
+  document.querySelectorAll<HTMLStyleElement>('style[data-app-id]').forEach((style) => {
+    if (style.dataset.appId === appId) style.remove()
+  })
+}
+
 export async function compileVueSfc(options: LoadAppOptions): Promise<any> {
   const { sourceCode, appId = 'dynamic-app' } = options
+
+  // vue3-sfc-loader calls addStyle for every compile. Clear the prior source's
+  // rules first so edits and retries replace CSS instead of leaking stale rules.
+  removeAppStyles(appId)
 
   const sfcOptions = {
     moduleCache: {

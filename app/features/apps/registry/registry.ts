@@ -1,5 +1,6 @@
 import { ref } from 'vue'
 import { readFile, writeFile, deleteFile } from '../../shared/vfs'
+import { removeAppStyles } from '../runner/loader'
 
 export interface AppMeta {
   id: string
@@ -68,6 +69,7 @@ export function registerApp(meta: AppMeta): void {
 
 export function unregisterApp(id: string): void {
   if (!isHydrated) hydrateRegistry()
+  removeAppStyles(id)
   const app = appsState.value.find((a) => a.id === id)
   if (app?.entry) {
     deleteFile(app.entry)
