@@ -89,3 +89,4 @@ lint toolchain lands; code review rejects slice-to-slice imports.
 ## Links
 
 - Related to [ADR 0000](0000-record-architecture-decisions.md)
+- Related to [ADR 0003](0003-pinia-per-domain-stores.md)
