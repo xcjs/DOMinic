@@ -1,0 +1,49 @@
+<template>
+  <div class="h-full w-full flex flex-col items-center justify-center bg-gradient-to-br from-sky-900 via-slate-900 to-slate-950 text-slate-100 p-6 font-sans relative overflow-hidden">
+    <div class="absolute -top-10 -right-10 w-40 h-40 rounded-full bg-amber-300/20 blur-2xl pointer-events-none"></div>
+    <h2 class="text-xs uppercase tracking-[0.3em] text-sky-300 mb-3">Today in Columbus</h2>
+    <div class="text-7xl font-bold tracking-tight drop-shadow-[0_0_20px_rgba(56,189,248,0.4)]">{{ forecast.temperature }}°</div>
+    <p class="text-sky-200/90 mt-2 text-sm">{{ forecast.summary }}</p>
+    <div class="mt-6 grid grid-cols-3 gap-3 w-full max-w-xs text-center">
+      <div v-for="h in forecast.hourly" :key="h.label" class="rounded-lg bg-white/5 border border-white/10 py-2">
+        <div class="text-[10px] uppercase text-slate-400">{{ h.label }}</div>
+        <div class="text-lg font-semibold">{{ h.temp }}°</div>
+      </div>
+    </div>
+    <button
+      type="button"
+      class="mt-6 px-4 py-1.5 rounded-lg text-xs bg-sky-500/20 border border-sky-400/40 text-sky-200 hover:bg-sky-500/30 transition"
+      @click="refresh"
+    >
+      Refresh
+    </button>
+  </div>
+</template>
+
+<script>
+import { reactive } from 'vue'
+
+export default {
+  name: 'WeatherWidget',
+  setup() {
+    // FIX: start from a default forecast so the first render never reads null.
+    const forecast = reactive({
+      temperature: 72,
+      summary: 'Sunny with a light breeze',
+      hourly: [
+        { label: '3 pm', temp: 74 },
+        { label: '6 pm', temp: 69 },
+        { label: '9 pm', temp: 61 }
+      ]
+    })
+
+    function refresh() {
+      const delta = Math.round(Math.random() * 6 - 3)
+      forecast.temperature = 72 + delta
+      forecast.hourly = forecast.hourly.map((h) => ({ ...h, temp: h.temp + delta }))
+    }
+
+    return { forecast, refresh }
+  }
+}
+</script>

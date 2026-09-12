@@ -1,6 +1,8 @@
 import { ref, computed } from 'vue'
 import type { ChatMessage, ToolInvocation, ProviderConfig } from '../types/chat'
 import type { InstallAppParams, UpdateAppParams } from '../tools/schemas'
+import { isDemoMode } from '../demo/demoMode'
+import { createDemoChatResponse } from '../demo/demoAgent'
 
 export interface UseAgentChatOptions {
   getProviderConfig?: () => ProviderConfig | null
@@ -42,7 +44,7 @@ export function useAgentChat(options: UseAgentChatOptions = {}) {
 
   const hasApiKey = computed(() => {
     const config = options.getProviderConfig?.()
-    return !!config?.apiKey
+    return isDemoMode(config) || !!config?.apiKey
   })
 
   async function sendMessage(text?: string) {
@@ -80,7 +82,11 @@ export function useAgentChat(options: UseAgentChatOptions = {}) {
       }
       const installedApps = options.getInstalledApps?.() || []
 
-      const response = await fetch('/api/chat', {
+      // Demo mode (opt-in, offline): a scripted agent streams the same
+      // data-stream protocol, so everything below this line is unchanged.
+      const response = isDemoMode(providerConfig)
+        ? createDemoChatResponse(content, installedApps)
+        : await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

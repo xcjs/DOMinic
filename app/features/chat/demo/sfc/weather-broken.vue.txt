@@ -1,0 +1,22 @@
+<template>
+  <div class="h-full w-full flex flex-col items-center justify-center bg-gradient-to-br from-sky-900 to-slate-950 text-slate-100 p-6 font-sans">
+    <h2 class="text-xs uppercase tracking-[0.3em] text-sky-300 mb-3">Today in Columbus</h2>
+    <div class="text-7xl font-bold">{{ temperature }}°</div>
+    <p class="text-sky-200/80 mt-2 text-sm">{{ summary }}</p>
+  </div>
+</template>
+
+<script>
+import { ref } from 'vue'
+
+export default {
+  name: 'WeatherWidget',
+  setup() {
+    // BUG: the forecast is read before it has loaded, so this throws on mount.
+    const forecast = null
+    const temperature = ref(forecast.temperature)
+    const summary = ref(forecast.summary)
+    return { temperature, summary }
+  }
+}
+</script>

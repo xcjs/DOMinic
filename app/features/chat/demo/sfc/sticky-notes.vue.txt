@@ -1,0 +1,85 @@
+<template>
+  <div class="h-full w-full flex flex-col bg-amber-50 text-slate-800 p-4 font-sans">
+    <div class="flex items-center gap-2 mb-3">
+      <input
+        v-model="draft"
+        type="text"
+        placeholder="Jot a note and press Enter..."
+        class="flex-1 rounded-lg border border-amber-300 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400"
+        @keyup.enter="addNote"
+      />
+      <button
+        type="button"
+        class="px-3 py-2 rounded-lg bg-amber-400 hover:bg-amber-500 text-slate-900 text-sm font-semibold transition"
+        @click="addNote"
+      >
+        Add
+      </button>
+    </div>
+    <div class="flex-1 overflow-y-auto grid grid-cols-2 gap-3 content-start">
+      <div
+        v-for="note in notes"
+        :key="note.id"
+        class="relative rounded-md bg-yellow-200 shadow-md p-3 text-sm min-h-[80px]"
+      >
+        <button
+          type="button"
+          class="absolute top-1 right-2 text-xs text-slate-500 hover:text-rose-600"
+          @click="removeNote(note.id)"
+        >
+          x
+        </button>
+        <p class="whitespace-pre-wrap pr-4">{{ note.text }}</p>
+      </div>
+      <p v-if="notes.length === 0" class="col-span-2 text-center text-xs text-amber-700/70 mt-10">
+        No notes yet. Notes are saved in the DOMinic virtual filesystem.
+      </p>
+    </div>
+  </div>
+</template>
+
+<script>
+import { ref, watch } from 'vue'
+
+const STORAGE_KEY = 'dominic:vfs:apps/sticky-notes/notes.json'
+
+export default {
+  name: 'StickyNotes',
+  setup() {
+    const draft = ref('')
+    const notes = ref([])
+
+    try {
+      const raw = window.localStorage.getItem(STORAGE_KEY)
+      if (raw) notes.value = JSON.parse(raw)
+    } catch (err) {
+      notes.value = []
+    }
+
+    watch(
+      notes,
+      (value) => {
+        try {
+          window.localStorage.setItem(STORAGE_KEY, JSON.stringify(value))
+        } catch (err) {
+          // ignore storage errors
+        }
+      },
+      { deep: true }
+    )
+
+    function addNote() {
+      const text = draft.value.trim()
+      if (!text) return
+      notes.value.unshift({ id: Date.now(), text })
+      draft.value = ''
+    }
+
+    function removeNote(id) {
+      notes.value = notes.value.filter((n) => n.id !== id)
+    }
+
+    return { draft, notes, addNote, removeNote }
+  }
+}
+</script>

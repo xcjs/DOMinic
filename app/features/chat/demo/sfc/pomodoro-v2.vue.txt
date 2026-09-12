@@ -1,0 +1,223 @@
+<template>
+  <div class="h-full w-full flex flex-col items-center justify-center bg-[#0b0418] text-slate-100 p-6 select-none font-sans relative overflow-hidden">
+    <!-- Synthwave v2: neon glow + retro sun + perspective grid floor -->
+    <div class="absolute inset-0 bg-[radial-gradient(circle_at_50%_20%,rgba(255,0,153,0.28),transparent_60%)] pointer-events-none"></div>
+    <div class="absolute left-1/2 top-[14%] -translate-x-1/2 w-40 h-40 rounded-full bg-[linear-gradient(to_bottom,#ffb347,#ff2d95_60%,#7a00ff)] opacity-50 pointer-events-none"></div>
+    <div class="absolute inset-x-0 bottom-0 h-1/2 bg-[linear-gradient(rgba(0,255,255,0.18)_1px,transparent_1px),linear-gradient(90deg,rgba(0,255,255,0.18)_1px,transparent_1px)] bg-[size:40px_40px] [transform:perspective(300px)_rotateX(60deg)] origin-bottom pointer-events-none"></div>
+
+    <!-- Title + version badge -->
+    <div class="relative z-10 flex items-center gap-3 mb-5">
+      <h2 class="text-sm font-black tracking-[0.35em] uppercase text-cyan-300 drop-shadow-[0_0_8px_rgba(34,211,238,0.9)]">Pomodoro</h2>
+      <span class="px-2 py-0.5 rounded text-[10px] font-bold tracking-widest uppercase bg-fuchsia-500/20 text-fuchsia-300 border border-fuchsia-400/60 shadow-[0_0_12px_rgba(217,70,239,0.6)]">Synthwave v2</span>
+    </div>
+
+    <!-- Mode Badge -->
+    <div class="relative z-10 flex gap-2 mb-6">
+      <button
+        type="button"
+        :class="[
+          'px-4 py-1.5 rounded-full text-xs font-semibold tracking-wider uppercase transition-all duration-200',
+          mode === 'work'
+            ? 'bg-gradient-to-r from-fuchsia-500 to-pink-500 text-white shadow-lg shadow-fuchsia-500/40'
+            : 'bg-slate-900/70 text-slate-400 hover:text-slate-200 border border-fuchsia-900/60'
+        ]"
+        @click="switchMode('work')"
+      >
+        Focus 25:00
+      </button>
+      <button
+        type="button"
+        :class="[
+          'px-4 py-1.5 rounded-full text-xs font-semibold tracking-wider uppercase transition-all duration-200',
+          mode === 'break'
+            ? 'bg-gradient-to-r from-cyan-400 to-sky-500 text-slate-950 shadow-lg shadow-cyan-400/40'
+            : 'bg-slate-900/70 text-slate-400 hover:text-slate-200 border border-cyan-900/60'
+        ]"
+        @click="switchMode('break')"
+      >
+        Break 05:00
+      </button>
+    </div>
+
+    <!-- Digital Clock Display -->
+    <div class="relative z-10 my-4 text-center">
+      <div class="text-7xl font-mono font-bold tracking-tight bg-gradient-to-b from-yellow-200 via-fuchsia-400 to-cyan-300 bg-clip-text text-transparent drop-shadow-[0_0_24px_rgba(255,45,149,0.7)]">
+        {{ formattedTime }}
+      </div>
+      <p class="mt-2 text-xs font-medium text-cyan-200/80 tracking-widest uppercase">
+        {{ isRunning ? 'Session in progress' : 'Paused' }}
+      </p>
+    </div>
+
+    <!-- Controls -->
+    <div class="relative z-10 flex items-center gap-4 mt-8">
+      <button
+        type="button"
+        class="px-6 py-2.5 rounded-xl font-semibold text-sm transition-all duration-200 shadow-md flex items-center gap-2"
+        :class="isRunning
+          ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40 hover:bg-amber-500/30 shadow-amber-500/10'
+          : 'bg-gradient-to-r from-fuchsia-600 to-cyan-500 text-white hover:opacity-95 shadow-fuchsia-500/40'"
+        @click="toggleTimer"
+      >
+        {{ isRunning ? 'Pause' : 'Start' }}
+      </button>
+
+      <button
+        type="button"
+        class="px-5 py-2.5 rounded-xl text-sm font-medium bg-slate-900/70 hover:bg-slate-800 text-slate-300 border border-slate-800 transition"
+        @click="resetTimer"
+      >
+        Reset
+      </button>
+    </div>
+
+    <!-- Session Count -->
+    <div class="relative z-10 mt-8 text-xs text-slate-400 flex items-center gap-1.5">
+      <span>Completed Sessions:</span>
+      <span class="text-cyan-300 font-semibold">{{ sessionsCompleted }}</span>
+    </div>
+
+    <!-- Self-contained DOM / CSS celebration burst -->
+    <div v-if="showCelebration" class="absolute inset-0 pointer-events-none z-50 overflow-hidden">
+      <div
+        v-for="p in particles"
+        :key="p.id"
+        class="absolute rounded-sm transition-all duration-1000 ease-out"
+        :style="{
+          left: p.x + '%',
+          top: p.y + '%',
+          width: p.size + 'px',
+          height: (p.size * 1.5) + 'px',
+          backgroundColor: p.color,
+          transform: 'rotate(' + p.rotation + 'deg)',
+          opacity: p.opacity
+        }"
+      />
+    </div>
+  </div>
+</template>
+
+<script>
+import { ref, computed, onUnmounted } from 'vue'
+
+export default {
+  name: 'PomodoroTimerV2',
+  setup() {
+    const WORK_TIME = 25 * 60
+    const BREAK_TIME = 5 * 60
+
+    const mode = ref('work')
+    const timeLeft = ref(WORK_TIME)
+    const isRunning = ref(false)
+    const sessionsCompleted = ref(0)
+    const showCelebration = ref(false)
+    const particles = ref([])
+    let timerId = null
+
+    const formattedTime = computed(() => {
+      const minutes = Math.floor(timeLeft.value / 60)
+      const seconds = timeLeft.value % 60
+      return String(minutes).padStart(2, '0') + ':' + String(seconds).padStart(2, '0')
+    })
+
+    function triggerCelebration() {
+      const colors = ['#ff2d95', '#7a00ff', '#00e5ff', '#ffb347', '#f5f5f5']
+      const items = []
+      for (let i = 0; i < 56; i++) {
+        items.push({
+          id: i,
+          x: 10 + Math.random() * 80,
+          y: -5,
+          targetY: 60 + Math.random() * 40,
+          size: 6 + Math.random() * 8,
+          color: colors[Math.floor(Math.random() * colors.length)],
+          rotation: Math.random() * 360,
+          opacity: 1
+        })
+      }
+      particles.value = items
+      showCelebration.value = true
+
+      setTimeout(() => {
+        particles.value = particles.value.map((p) => ({
+          ...p,
+          y: p.targetY,
+          rotation: p.rotation + 360,
+          opacity: 0
+        }))
+      }, 30)
+
+      setTimeout(() => {
+        showCelebration.value = false
+        particles.value = []
+      }, 1200)
+    }
+
+    function tick() {
+      if (timeLeft.value > 0) {
+        timeLeft.value--
+      } else {
+        pauseTimer()
+        triggerCelebration()
+        if (mode.value === 'work') {
+          sessionsCompleted.value++
+          switchMode('break')
+        } else {
+          switchMode('work')
+        }
+      }
+    }
+
+    function startTimer() {
+      if (!isRunning.value) {
+        isRunning.value = true
+        timerId = setInterval(tick, 1000)
+      }
+    }
+
+    function pauseTimer() {
+      isRunning.value = false
+      if (timerId) {
+        clearInterval(timerId)
+        timerId = null
+      }
+    }
+
+    function toggleTimer() {
+      if (isRunning.value) {
+        pauseTimer()
+      } else {
+        startTimer()
+      }
+    }
+
+    function resetTimer() {
+      pauseTimer()
+      timeLeft.value = mode.value === 'work' ? WORK_TIME : BREAK_TIME
+    }
+
+    function switchMode(newMode) {
+      pauseTimer()
+      mode.value = newMode
+      timeLeft.value = newMode === 'work' ? WORK_TIME : BREAK_TIME
+    }
+
+    onUnmounted(() => {
+      pauseTimer()
+    })
+
+    return {
+      mode,
+      timeLeft,
+      isRunning,
+      sessionsCompleted,
+      formattedTime,
+      showCelebration,
+      particles,
+      toggleTimer,
+      resetTimer,
+      switchMode
+    }
+  }
+}
+</script>

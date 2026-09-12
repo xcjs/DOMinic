@@ -12,6 +12,7 @@ import { installFixture } from "./features/apps/fixtures";
 import { readFile, writeFile } from "./features/shared/vfs";
 import { useSettingsStore } from "./features/settings/stores/settings";
 import type { InstallAppParams, UpdateAppParams } from "./features/chat/tools/schemas";
+import { DEMO_API_KEY, syncDemoModeFromUrl } from "./features/chat/demo/demoMode";
 
 const os = useOsStore();
 const apps = useAppsStore();
@@ -31,6 +32,15 @@ onMounted(() => {
   openBuiltin('chat');
 
   if (import.meta.client) {
+    // Opt-in demo mode (?demo=1): offline scripted agent plus a seeded,
+    // clearly fake provider key so the Settings beat has something on screen.
+    if (syncDemoModeFromUrl()) {
+      console.info('[DOMinic] Demo mode is on (offline scripted agent). Use ?demo=0 to turn it off.');
+      if (!settings.apiKey) {
+        settings.saveSettings({ provider: 'openai', model: 'gpt-5', apiKey: DEMO_API_KEY });
+      }
+    }
+
     (window as any).__dominicReset = () => {
       settings.resetOs();
       window.location.reload();
@@ -107,7 +117,8 @@ function updateApp(params: UpdateAppParams) {
 }
 
 function askFix(payload: { appId: string; error: string }) {
-  chat.value?.sendMessage(`The app ${payload.appId} encountered an error: ${payload.error}. Please fix it.`);
+  const firstLine = payload.error.split('\n')[0]?.trim() || payload.error;
+  chat.value?.sendMessage(`The app ${payload.appId} encountered an error: ${firstLine}. Please fix it.`);
 }
 
 function setChat(instance: Element | ComponentPublicInstance | null) {
