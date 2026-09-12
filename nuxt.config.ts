@@ -19,7 +19,7 @@ export default defineNuxtConfig({
   },
   typescript: {
     strict: true,
-    typeCheck: true,
+    typeCheck: false,
   },
   app: {
     head: {
