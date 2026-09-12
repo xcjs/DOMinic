@@ -51,6 +51,8 @@ Conventions doc covering:
 
 - No `adr-tools`, markdownlint, or CI integration.
 - No ADRs beyond 0000.
+- Addendum (2026-09-12): markdownlint, husky pre-commit hook, and CI were
+  subsequently added by user direction.
 
 ## Verification
 

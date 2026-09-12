@@ -28,6 +28,9 @@ README and demonstrated by ADR-0000.
   repository**. Before any commit step, ask the user
   whether to run `git init`; if declined, skip all
   commit steps.
+- Addendum (2026-09-12): markdownlint (80-col prose), husky pre-commit
+  hook, and GitHub Actions CI were added by user direction after this
+  plan was written.
 
 ---
 

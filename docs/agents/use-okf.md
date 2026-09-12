@@ -35,7 +35,8 @@ verbatim (preformatted to preserve the source exactly). The canonical
 home is
 [GoogleCloudPlatform/open-knowledge-format](https://github.com/GoogleCloudPlatform/open-knowledge-format).
 
-````markdown# Open Knowledge Format (OKF)
+````markdown
+# Open Knowledge Format (OKF)
 
 **Version 0.2**
 
