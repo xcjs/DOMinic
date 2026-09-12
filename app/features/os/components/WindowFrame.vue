@@ -68,6 +68,7 @@ function onPointerUp(event: PointerEvent): void {
         <button
           class="flex h-5 w-5 items-center justify-center rounded text-slate-400 hover:bg-white/10 hover:text-slate-100"
           aria-label="Minimize"
+          @pointerdown.stop="store.focusWindow(win.id)"
           @click.stop="store.toggleMinimize(win.id)"
         >
           &minus;
@@ -75,6 +76,7 @@ function onPointerUp(event: PointerEvent): void {
         <button
           class="flex h-5 w-5 items-center justify-center rounded text-slate-400 hover:bg-white/10 hover:text-slate-100"
           aria-label="Maximize"
+          @pointerdown.stop="store.focusWindow(win.id)"
           @click.stop="store.toggleMaximize(win.id)"
         >
           &#9633;
@@ -82,6 +84,7 @@ function onPointerUp(event: PointerEvent): void {
         <button
           class="flex h-5 w-5 items-center justify-center rounded text-slate-400 hover:bg-red-500/80 hover:text-white"
           aria-label="Close"
+          @pointerdown.stop="store.focusWindow(win.id)"
           @click.stop="store.closeWindow(win.id)"
         >
           &times;
