@@ -86,8 +86,11 @@ Frontmatter: unchanged (description already covers triggering conditions).
 1. **Retrieval test (writing-skills TDD for reference skills):**
    - RED: dispatch a fresh-context subagent in a temp workspace copy where
      the four playbook docs are deleted but SKILL.md is unmerged; ask it to
-     answer four questions (stale-claim ladder, completion gate for `done`,
-     contract acceptance rule, `needs-human` escalation). Record gaps.
+     answer five gap-targeted questions (sprint stale ladder, multi-day
+     stale ladder, open-PR fix rule, `needs-human` timeout, kernel-file
+     one-writer rule). Scenarios target known gaps of the current skill,
+     since completion-gate and contract-acceptance rules are already
+     covered there. Record gaps.
    - GREEN: same scenarios against the merged SKILL.md; answers must be
      correct and sourced from the skill.
 2. **Link check:** grep the repo for the deleted paths; every remaining
