@@ -25,9 +25,10 @@ task board and a negotiation channel with four primitives:
   completion criteria remain mandatory when the current helper cannot yet
   enforce them automatically.
 
-Read the active
-[v3 playbook](../../../docs/agents/coordination-best-practices-3.md) before
-starting work. It supersedes the sprint-era v1 and v2 playbooks.
+The parameters, working agreements, integration cadence, and failure
+signals in this file are the operating guidance;
+[references/protocol.md](references/protocol.md) carries the wire format
+and the MUST-level invariants behind the commands.
 
 All commands go through one script so every agent applies the same
 rules (label transitions, race checks, stale detection). Run it from
@@ -132,6 +133,17 @@ split or common owner before moving either issue to `in-progress`.
   `QUESTIONS.md`)? `$COORD question 12 --human "..."` adds
   `needs-human`; humans skim that label.
 
+## Parameters — sprint and full modes
+
+| Parameter | Sprint | Full / async (multi-day) | Why |
+| --- | --- | --- | --- |
+| Stale ladder | Ping at 20 minutes without issue, branch, or linked-PR activity; release 10 minutes after the unanswered ping (`COORD_STALE_MIN=30`) | Six-hour warning, three-hour grace during active workdays; pause stale release overnight | Releasing without a recorded ping destroys trust in the board; minute-scale values do not survive sleep |
+| Claims | Exactly one `status:in-progress`, at most one `status:blocked`; queued responsibility stays `status:claimed` | Same | Assignments may also represent queued ownership, so WIP is read from status, not assignment count |
+| Negotiation | One `COUNTER`, then `needs-human` | Same | Loops burn clock; escalation resolves faster than re-arguing |
+| Contracts | `PROPOSE` must produce the exact provisional contract under `## Agreed` in the same operation; silence never accepts; the seam owner acknowledges before shared adapter code merges | Explicit `ACCEPT` before a shared contract or adapter merges | Silent auto-accept produced no shared understanding; a written record is faster and safer |
+| Heartbeat | On state change; a STATUS inside 20 minutes when working outside GitHub | Event-driven STATUS with a 60-minute active-work ceiling | GitHub secondary limits (80 content-creates/min) bite before the hourly cap |
+| Dependency updates | Fold into a STATUS; the board derives dependency state | Batch into a dashboard; never one comment per dependent issue | Per-issue dependency comments spam the board |
+
 ## Negotiating: interfaces, splits, disputes
 
 Cross-workstream seams are where parallel work collides: the
@@ -161,6 +173,25 @@ shared contract or adapter merges. `accept` copies the latest proposal into
 The same verbs settle ownership: if you want part of a claimed issue,
 `propose` the split. Never fork the work silently.
 
+## Written down versus said aloud
+
+The test: *would an agent that was not in the room produce wrong code
+without this?* If yes, write it on the issue before the conversation
+ends. Must be written: seam interfaces, `## Done when` criteria, files
+ownership and changes to it, blockers and what unblocks them, any
+decision an absent agent must honour. Can stay spoken: nudges, merge
+timing, coffee. Humans talk freely — the ledger exists so absent agents
+stay correct.
+
+## Escalation and board hygiene
+
+- `needs-human` unanswered for 10 minutes: post the reversible
+  assumption you are proceeding on and continue. Escalation re-escalates;
+  it does not block forever. Say the one-liner aloud too when the humans
+  are two feet away.
+- Read the board at most once per minute, event-driven — never poll in a
+  loop — and honour `retry-after` on rate-limit errors.
+
 ## Finishing
 
 ```bash
@@ -177,6 +208,27 @@ command is not evidence that the gates passed.
 `done` closes the issue, posts **DONE**, and currently emits compatibility
 `DEP-DONE` notices. Then post a final hub line and `sync` again.
 
+## Integration cadence
+
+- Branch per issue; small PRs into `main`; **verify by booting `main`**,
+  not by reading the board. "Looks coordinated" is not a state.
+- Never push a follow-up commit to an open PR — the owner merges within
+  minutes and the commit strands. Open a new PR instead.
+- Kernel files (`app/shared/**`, the stores) have one writer. Everyone
+  else proposes on the contract issue; stub the interface early so
+  dependents build against the stub.
+- Single-purpose PRs: one purpose and one declared file union — line
+  counts are a poor boundary. If one PR closes several issues, its body
+  must list each issue and the union of their scopes; never let a
+  convenience PR become an integration bucket.
+- Request an independent review as soon as the PR opens. In a deadline
+  sprint, rotate a review captain every 15 minutes. Any eligible
+  non-author merges after required checks and approvals; do not queue
+  every merge behind the repository owner. If policy requires two
+  approvals, request both immediately.
+- Freeze new features early enough to leave one full review-and-rebase
+  cycle. Independent review caught real breakages; never remove it.
+
 ## Automation status
 
 | Invariant | Current behavior |
@@ -188,8 +240,7 @@ command is not evidence that the gates passed.
 | Provisional contract | Manual edit of `## Agreed` after `propose` |
 
 The manual rows are protocol requirements and candidates for helper
-enforcement. See the
-[v3 enforcement rationale](../../../docs/agents/coordination-best-practices-3.md#enforcement-status).
+enforcement.
 
 ## Commands
 
@@ -232,6 +283,18 @@ need to parse comments yourself or hit a case not covered above.
   conflict on `useOsStore` takes twenty minutes.
 - **Reference the ADRs.** When a contract changes an architectural
   decision, say so and link the ADR; if it sticks it becomes ADR 0011.
+
+## Failure signals on the board
+
+| Signal | Failure | Response |
+| --- | --- | --- |
+| Comments rising while merged PRs stay flat | Protocol theater | Stop coordinating; ship |
+| A PR touches a kernel file with no linked contract | Guessed interface | PROPOSE the seam; the PR waits for the provisional `## Agreed` |
+| `status:claimed` with no commits or comments for 20 minutes | Ghost lock | QUESTION at 20; `release --stale` at 30 |
+| One login on two active claims | Over-claiming | Release one |
+| DONE with unchecked `## Done when` boxes | Premature done | Reopen; merge first |
+| "As we discussed" with no issue link | Board talk substituting for the ledger | Write the decision on the issue |
+| 429s in an agent's log | Rate-limit storm | One board read per minute; honour `retry-after` |
 
 ## Labels
 
