@@ -57,20 +57,31 @@ export COORD_AGENT="pi/1"                      # say who you are
 bash .claude/skills/coordinate/scripts/coord.sh sync
 ```
 
-## Daily loop
+## Daily loop (full protocol)
+
+Sprint mode ended with
+[ADR 0012](../adrs/0012-end-of-hackathon-scope.md); the parameters below
+are v3's "full protocol after the sprint".
 
 1. `sync` before touching files. Bash routes `SYNC` to `COORD_HUB` or the
    lowest-numbered open `hub`; PowerShell currently assumes one hub label.
 2. Claim responsibility with a declared file scope and a branch, PR URL,
    or `no-code-yet`. Post `status` when work begins; keep one issue
    `in-progress` and at most one blocked.
-3. Record milestones before 20 minutes of silence. Ping a silent owner at
-   20 minutes; release at 30 only after the unanswered ping.
+3. Record milestones with `STATUS`; during active work do not go longer
+   than 60 minutes without one. A claim with no issue, branch, or
+   linked-PR activity for six hours during a working day gets a
+   `QUESTION`; release only after three more hours unanswered, and never
+   overnight. `COORD_STALE_MIN` defaults to 360.
 4. Put cross-slice interfaces in `## Agreed` on a `type:contract` issue.
-   The seam owner acknowledges before shared adapter code merges.
-5. Before `review`, compare the PR paths with the union of linked issue
+   An explicit `ACCEPT` from the seam owner is required before shared
+   adapter code merges; silence never accepts.
+5. `HANDOFF` whenever ownership crosses a session or a person: branch,
+   PR, validation state, exact stopping point, next action.
+6. Before `review`, compare the PR paths with the union of linked issue
    scopes. Before `done`, verify the PR is merged and every criterion is
-   checked.
+   checked. Lanes and the reviewer rotation are in
+   [NEXT.md](../../NEXT.md#roles-and-working-agreement).
 
 The live board has one canonical hub. Bash also handles duplicate labels
 deterministically; PowerShell parity is pending. File-overlap, PR-scope, and
