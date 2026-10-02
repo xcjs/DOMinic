@@ -8,6 +8,12 @@ The active operating guidance is
 [coordination best practices v3](../../../../docs/agents/coordination-best-practices-3.md).
 V1 and v2 of the playbook are historical records.
 
+Since [ADR 0012](../../../../docs/adrs/0012-end-of-hackathon-scope.md)
+the active mode is the full protocol for multi-day work: a six-hour
+warning and three-hour grace (`COORD_STALE_MIN` default 360), explicit
+`ACCEPT` before a shared contract merges, and `HANDOFF` across sessions.
+Sprint-mode values below are kept for the record.
+
 ## Comment header
 
 Every protocol comment begins with one header line, then a blank line,

@@ -29,7 +29,8 @@ first-party software.
   virtual filesystem and loading npm dependencies from a vetted ESM
   CDN.
 
-Application code is landing on `main` throughout the hackathon. See
+The hackathon proof of concept shipped the whole core loop; the project
+now follows the sequenced roadmap in [NEXT.md](NEXT.md). See
 [Running DOMinic](#running-dominic) to start it, and the decision
 records below for why it is built this way.
 
@@ -39,8 +40,8 @@ records below for why it is built this way.
 | --- | --- |
 | [docs/JUDGES.md](docs/JUDGES.md) | **Judges start here:** five-minute tour of the demo, the code behind it, and what is deferred |
 | [docs/adrs/](docs/adrs/README.md) | Architecture decision records (MADR 4.0) |
-| [NEXT.md](NEXT.md) | Post-hackathon roadmap & deferred architecture |
-| [QUESTIONS.md](QUESTIONS.md) | Open technical decisions for the hackathon team |
+| [NEXT.md](NEXT.md) | Sequenced roadmap, collaborator lanes, and the issue -> PR -> merge loop |
+| [QUESTIONS.md](QUESTIONS.md) | Open questions register with post-hackathon outcomes |
 | [docs/agents/use-okf.md](docs/agents/use-okf.md) | OKF v0.2 frontmatter convention for docs |
 | [docs/agents/rubric.md](docs/agents/rubric.md) | Hackathon judging rubric and win strategy |
 | [docs/agents/demo-path.md](docs/agents/demo-path.md) | The two-minute demo as rubric-mapped beats |
@@ -54,8 +55,9 @@ records below for why it is built this way.
 
 ### Decision highlights
 
-The accepted ADR series establishes the platform's foundations with an
-explicit **Hackathon POC Golden Path** in each record:
+The accepted ADR series establishes the platform's foundations. Each
+record carries a hackathon golden path (historical since ADR 0012) and
+an as-built reconciliation:
 
 - [0001](docs/adrs/0001-feature-slices-with-domain-driven-organization.md)
   Feature slices with domain-driven organization
@@ -77,23 +79,18 @@ explicit **Hackathon POC Golden Path** in each record:
   CORS-first networking with Chrome-masking proxy fallback
 - [0010](docs/adrs/0010-agent-app-interface-and-tool-protocol.md)
   Agent app interface and tool protocol
+- [0011](docs/adrs/0011-node-24-lts-runtime-standard.md)
+  Node 24 LTS runtime standard
+- [0012](docs/adrs/0012-end-of-hackathon-scope.md)
+  End of the hackathon scope
 
-## Hackathon POC: Team Workstreams
+## Roles
 
-To deliver a working, high-impact POC within a few hours, the 5-engineer
-team divides into clear, parallel workstreams:
-
-1. **SDE 1 (OS Shell & Window Manager)**: Desktop wallpaper, taskbar,
-   window frames with drag/minimize/maximize/close via `@vueuse/core`.
-2. **SDE 2 (Agent Chat & Tool Calling)**: `/api/chat` route, streaming UI,
-   system prompt, and `install_app` / `update_app` tool execution.
-3. **SDE 3 (Runtime App Engine)**: In-process `vue3-sfc-loader` wrapper,
-   Tailwind styling, and error boundary with auto-fix reporting.
-4. **SDE 4 (Persistence & App Registry)**: Lightweight VFS over
-   `localStorage`, app registry hydration, and Settings persistence.
-5. **SDE 5 (Integration, Polish & Curated Demos)**: Built-in Settings app,
-   demo showcase apps (synthwave pomodoro, crypto ticker), and visual
-   polish.
+Development continues part-time with a lane per collaborator - the
+paths they own, their roadmap steps, and a reviewer rotation - defined
+in [NEXT.md](NEXT.md#roles-and-working-agreement). The hackathon's
+five workstreams are recorded in the git history and in
+[docs/submission-form.md](docs/submission-form.md).
 
 ## Running DOMinic
 
