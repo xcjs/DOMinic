@@ -85,8 +85,8 @@ cross-stream merge, blocker, freeze, or final state.
 ## Picking up work
 
 1. Choose an unclaimed issue in your workstream (`ws:*`), highest
-   priority first. `p0` is the demo golden path: if a `p0` is
-   unclaimed and you can do it, take it over anything else.
+   priority first. `p0` is the critical path of the current roadmap
+   phase: if a `p0` is unclaimed and you can do it, take it first.
 2. Claim it with a plan and the current code state. Every claim names a
    branch, PR URL, or `no-code-yet`:
 
@@ -119,12 +119,15 @@ split or common owner before moving either issue to `in-progress`.
 
 ## While working
 
-- Post a **STATUS** at milestones and before 20 minutes of silence:
-  `$COORD status 12 "drag works; z-index next"`. In sprint mode, set
-  `COORD_STALE_MIN=30`. At 20 minutes without issue, branch, or linked-PR
-  activity, post a `QUESTION`; only release at 30 minutes if that ping is
-  unanswered. The helper's stale check sees structured issue heartbeats,
-  so the caller must inspect Git activity and verify the recorded ping.
+- Post a **STATUS** at milestones, and during active work never go
+  longer than 60 minutes without one:
+  `$COORD status 12 "drag works; z-index next"`. The full protocol is
+  active (ADR 0012): a claim with no issue, branch, or linked-PR activity
+  for six hours of a working day gets a `QUESTION`; release only after
+  three more hours unanswered, never overnight. `COORD_STALE_MIN`
+  defaults to 360. The helper's stale check sees structured issue
+  heartbeats, so the caller must inspect Git activity and verify the
+  recorded ping.
 - Blocked? Say on what and by whom, then move to something else:
   `$COORD block 12 --by "#7" "need the VFS writeFile signature"`.
   When #7 closes, `done` posts a heads-up on every open issue that
@@ -146,29 +149,27 @@ split or common owner before moving either issue to `in-progress`.
 
 ## Negotiating: interfaces, splits, disputes
 
-Cross-workstream seams are where parallel work collides: the
-`install_app` handler (SDE 2) needs the VFS API (SDE 4) and the window
-opener (SDE 1). Do not guess a signature. Propose it on a
-`type:contract` issue and record the sprint contract as provisional:
+Cross-lane seams are where parallel work collides: the `install_app`
+handler (chat lane) needs the VFS API (persistence lane) and the window
+opener (shell lane). Do not guess a signature. Propose it on a
+`type:contract` issue and record the contract in `## Agreed`:
 
 ```bash
 $COORD new "Contract: VFS API used by install_app" --ws persistence --type contract --p 0
 $COORD propose 15 --to @m-vawter "writeFile(path,string):Promise<void>; readFile(path):Promise<string|null>; listFiles(dir):Promise<string[]>"
 $COORD counter 15 "listFiles should return {path,size}; the launcher needs size"
-# full asynchronous mode also requires:
+# required before a shared adapter merges:
 $COORD accept 15 "matches useOsStore hydration"
 ```
 
-For sprint work, `PROPOSE` must place the exact contract in `## Agreed` as
-*provisional* in the same operation. The current helpers post the proposal
-but do not write that section, so the proposer must edit the issue body
-manually. Agents may proceed inside their own slices. The named seam owner
-must acknowledge before a shared adapter merges. One `COUNTER` is allowed;
-a further disagreement gets `needs-human`.
-
-For asynchronous or multi-day work, require explicit `ACCEPT` before a
-shared contract or adapter merges. `accept` copies the latest proposal into
-`## Agreed`. Never treat silence as acceptance.
+`PROPOSE` places the exact contract in `## Agreed` as *provisional*. The
+current helpers post the proposal but do not write that section, so the
+proposer edits the issue body. Agents may proceed inside their own slices,
+but a shared adapter merges only after the seam owner's explicit `ACCEPT`;
+`accept` copies the latest proposal into `## Agreed`. Never treat silence
+as acceptance. One `COUNTER` is allowed; a further disagreement gets
+`needs-human`. (Sprint mode, now historical, let an acknowledgment stand
+in for `ACCEPT`; see ADR 0012.)
 
 The same verbs settle ownership: if you want part of a claimed issue,
 `propose` the split. Never fork the work silently.
@@ -260,7 +261,7 @@ enforcement.
 | `handoff N --to @user "text"` | Transfer ownership |
 | `review N --pr URL` | Mark in-review after the caller verifies PR scope |
 | `done N [--pr URL] ["text"]` | Close after the caller verifies criteria and merge state |
-| `stale` | Claims silent longer than `COORD_STALE_MIN` (default 45; sprint 30) |
+| `stale` | Claims silent longer than `COORD_STALE_MIN` (default 360 = six hours; sprint mode used 30) |
 | `show N` | Print an issue with its structured comment history |
 
 Every verb, its comment format, and the tie-break rules are specified

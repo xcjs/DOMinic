@@ -8,7 +8,7 @@ $ErrorActionPreference = 'Stop'
 
 $REPO      = if ($env:COORD_REPO)      { $env:COORD_REPO }      else { 'xcjs/DOMinic' }
 $AGENT     = if ($env:COORD_AGENT)     { $env:COORD_AGENT }     else { 'unknown-agent' }
-$STALE_MIN = if ($env:COORD_STALE_MIN) { [int]$env:COORD_STALE_MIN } else { 45 }
+$STALE_MIN = if ($env:COORD_STALE_MIN) { [int]$env:COORD_STALE_MIN } else { 360 }  # full protocol: six hours (ADR 0012)
 $HUB_TITLE = 'Coordination hub'
 $STATUSES  = @('unclaimed', 'claimed', 'in-progress', 'blocked', 'in-review')
 $HEARTBEAT = '^\*\*(CLAIM|STATUS|UNBLOCKED|HANDOFF)\*\*'
@@ -199,19 +199,19 @@ Commands:
 function Cmd-Setup {
   Note "labels on $REPO"
   $rows = @(
-    'ws:os-shell|1d76db|SDE 1 - window manager, taskbar, desktop',
-    'ws:agent-chat|5319e7|SDE 2 - /api/chat, streaming UI, tool execution',
-    'ws:runtime-engine|e99695|SDE 3 - vue3-sfc-loader runner, error boundary',
-    'ws:persistence|0e8a16|SDE 4 - VFS, registry hydration, settings',
-    'ws:integration|fbca04|SDE 5 - Settings app, demo apps, polish',
-    'ws:docs|c5def5|ADRs, README, submission writing',
+    'ws:os-shell|1d76db|Shell lane - window manager, taskbar, desktop',
+    'ws:agent-chat|5319e7|Chat lane - /api/chat, streaming UI, tool execution',
+    'ws:runtime-engine|e99695|Runtime lane - SFC runner, loader, error boundary',
+    'ws:persistence|0e8a16|Persistence lane - VFS, registry, settings store',
+    'ws:integration|fbca04|Integration lane - app.vue wiring, product loop, polish',
+    'ws:docs|c5def5|Docs and process - ADRs, README, playbooks, tests',
     'status:unclaimed|ededed|Nobody owns this yet - claim it',
     'status:claimed|c2e0c6|Assigned; work not started',
     'status:in-progress|0e8a16|Actively being worked',
     'status:blocked|b60205|Waiting on another issue or person',
     'status:in-review|fbca04|PR open, needs review',
-    'p0|b60205|On the demo golden path - must ship',
-    'p1|d93f0b|Important, not demo-critical',
+    'p0|b60205|Critical path of the current roadmap phase',
+    'p1|d93f0b|Important, not on the critical path',
     'p2|fef2c0|Nice to have',
     'type:task|0075ca|A unit of work',
     'type:contract|5319e7|Interface agreement between workstreams',

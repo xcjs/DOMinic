@@ -1,7 +1,7 @@
 ---
 type: Open Questions Register
 title: DOMinic Open Questions and Decisions
-description: Register of open questions, trade-offs, and engineering choices for the hackathon team.
+description: Register of the hackathon's open questions and POC recommendations, with their post-hackathon outcomes.
 tags: [questions, team, planning]
 generated: { by: agent/pi, at: 2026-09-12T00:00:00Z }
 verified: { by: human:charles, at: 2026-09-12T00:00:00Z }
@@ -9,9 +9,26 @@ verified: { by: human:charles, at: 2026-09-12T00:00:00Z }
 
 # DOMinic: Open Questions Register
 
-This document tracks open technical and UX questions for the 5-engineer
-team during hackathon development. Each item includes current options and
-a recommended path for the Proof of Concept.
+This document records the open technical and UX questions the team faced
+on hackathon day, each with its options and the path recommended for the
+proof of concept. The hackathon scoping ended with
+[ADR 0012](docs/adrs/0012-end-of-hackathon-scope.md); the table below
+gives each recommendation's outcome, and the questions are kept as
+written. New questions go to issues, not here.
+
+## Outcomes after the hackathon
+
+| Question | POC recommendation | Outcome |
+| --- | --- | --- |
+| Q1.1 chat presence | Floating window | Implemented; stays |
+| Q1.2 window clamping | Clamp title bars to the viewport | Implemented in `WindowFrame.vue`; stays |
+| Q2.1 default model | Claude 3.5 Sonnet or GPT-4o | Superseded: defaults are `claude-sonnet-5` / `gpt-5` / `gemini-2.5-pro`, chosen in Settings; a custom OpenAI-compatible provider was added (PR #70) |
+| Q2.2 app context injection | Metadata list; full source on update | Implemented (PR #66): the referenced app's source is injected on update |
+| Q3.1 script syntax | Plain JavaScript `<script setup>` | Implemented; stays |
+| Q3.2 error boundary UX | `onErrorCaptured` + "Ask Agent to Fix" | Implemented (PR #64); bounded auto-heal is roadmap step 2.2 |
+| Q4.1 window persistence | Installed apps only | Reopened: roadmap step 2.5 persists window state once the VFS is IndexedDB-backed |
+| Q4.2 cache reset | "Reset OS" button | Implemented in Settings; stays |
+| Q5.1 demo apps | Pomodoro, dashboard, kanban | No longer applicable; the Pomodoro fixture remains as a test fixture |
 
 ---
 
