@@ -170,6 +170,18 @@ log_coord "$d" "$log" accept 2 >/dev/null
 expect_absent "C stranger PROPOSE never recorded [RED today]" "EVIL CONTRACT" "$(cat "$log")"
 expect_contains "C trusted PROPOSE is the recorded one [RED today]" "GOOD CONTRACT" "$(cat "$log")"
 
+# C second run: reorder PROPOSEs (EVIL first, GOOD last). The candidate list
+# must stay trusted-only regardless of order; the recorded text must still be
+# GOOD. (Guards a gate that whitelists a fixed position instead of authors.)
+jq -cn --slurpfile cm "$WORK/c-cmts.jsonlines" \
+  '$cm | reverse | {number:2, title:"t", labels:[{name:"type:contract"}], body:"base body",
+    author:{login:"goodagent"}, author_association:"COLLABORATOR", assignees:[], comments:.}' >"$d/issue-2.json"
+log="$WORK/c2-log"
+: >"$log"
+log_coord "$d" "$log" accept 2 >/dev/null
+expect_absent "C run 2 reordered: stranger PROPOSE never recorded" "EVIL CONTRACT" "$(cat "$log")"
+expect_contains "C run 2 reordered: trusted PROPOSE is the recorded one" "GOOD CONTRACT" "$(cat "$log")"
+
 # --------------------------------------------------------------------------
 # D: board must list only trusted issues. issues-open.jsonlines holds trusted
 # #10 (COLLABORATOR) and stranger #11 (NONE) with DISTINCT titles so the
@@ -223,9 +235,13 @@ d="$(newdir F)"
 pr: example/rc/pull/9' goodagent 2020-01-01T00:30:00Z COLLABORATOR
 } >"$d/comments-5.jsonlines"
 printf '100\n' >"$d/comments-5.jsonlines.page2"
-jq -cn '{number:5, title:"t", labels:[{name:"status:in-progress"}],
-  assignees:[{login:"goodagent"}], body:"x", author:{login:"goodagent"},
-  author_association:"COLLABORATOR", comments:[]}' >"$d/issue-5.json"
+# One gh-shape STATUS so today's `done 5` prurl-scan jq gets a string (not
+# null) and dies only for the real RED reason (no page=2 fetch). No pr: link.
+ghc '**STATUS** | agent: a | human: @a | at: 2020-01-01T00:00:00Z' goodagent 2020-01-01T00:00:00Z >"$d/f-ghc.jsonl"
+jq -cn --slurpfile cm "$d/f-ghc.jsonl" \
+  '{number:5, title:"t", labels:[{name:"status:in-progress"}],
+    assignees:[{login:"goodagent"}], body:"x", author:{login:"goodagent"},
+    author_association:"COLLABORATOR", comments:$cm}' >"$d/issue-5.json"
 jq -cn '{"state":"OPEN", "merged":false, "mergedAt":null}' >"$d/pr-9.json"
 printf '[]\n' >"$d/issues-open.jsonlines"
 log="$WORK/f-log"
