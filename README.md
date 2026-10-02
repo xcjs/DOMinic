@@ -44,10 +44,7 @@ records below for why it is built this way.
 | [docs/agents/use-okf.md](docs/agents/use-okf.md) | OKF v0.2 frontmatter convention for docs |
 | [docs/agents/rubric.md](docs/agents/rubric.md) | Hackathon judging rubric and win strategy |
 | [docs/agents/demo-path.md](docs/agents/demo-path.md) | The two-minute demo as rubric-mapped beats |
-| [docs/agents/coordination.md](docs/agents/coordination.md) | Multi-agent task coordination over GitHub Issues (`/coordinate`) |
-| [docs/agents/coordination-best-practices.md](docs/agents/coordination-best-practices.md) | Coordination playbook v1 (superseded; kept for the record) |
-| [docs/agents/coordination-best-practices-2.md](docs/agents/coordination-best-practices-2.md) | Coordination playbook v2 (superseded; kept for the record) |
-| [docs/agents/coordination-best-practices-3.md](docs/agents/coordination-best-practices-3.md) | Active coordination playbook — sprint evidence and enforceable invariants |
+| [.claude/skills/coordinate/SKILL.md](.claude/skills/coordinate/SKILL.md) | Multi-agent task coordination over GitHub Issues (`/coordinate`): protocol, parameters, working agreements |
 | [docs/superpowers/specs/](docs/superpowers/specs/) | Design specs from brainstorming sessions |
 | [docs/superpowers/plans/](docs/superpowers/plans/) | Implementation plans derived from specs |
 | [docs/research/](docs/research/README.md) | The Q01 question and its three answers behind the coordination playbooks |

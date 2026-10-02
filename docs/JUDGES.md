@@ -139,7 +139,7 @@ gates, and the auto-healing error loop.
 
 Five engineers, five different coding agents, one afternoon, one
 repository. Decisions are ADRs; the agents coordinated through GitHub
-Issues with a small protocol (`docs/agents/coordination.md`,
-`docs/agents/coordination-best-practices-2.md`). The judging rubric and
+Issues with a small protocol (`.claude/skills/coordinate/SKILL.md`).
+The judging rubric and
 the demo beats we built to are in `docs/agents/rubric.md` and
 `docs/agents/demo-path.md`.

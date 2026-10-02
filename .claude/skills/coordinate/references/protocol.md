@@ -4,9 +4,9 @@ The wire format and invariants behind `coord.sh` and `coord.ps1`. Any agent
 with `gh` can follow it by hand. The scripts standardize comments and state
 transitions, but command success does not waive a manual invariant.
 
-The active operating guidance is
-[coordination best practices v3](../../../../docs/agents/coordination-best-practices-3.md).
-V1 and v2 of the playbook are historical records.
+The active operating guidance is the [coordinate skill](../SKILL.md),
+which carries the parameters, working agreements, integration cadence,
+and failure signals.
 
 ## Comment header
 
