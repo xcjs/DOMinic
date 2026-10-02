@@ -211,15 +211,17 @@ expect_contains "E show on stranger issue refused (coord: message) [RED today]" 
 # --------------------------------------------------------------------------
 # F: comment reads must paginate; page-2 trusted events must be ingested.
 # comments-5.jsonlines: 131 REST comments; .page2 marker "100" -> page 1 =
-# lines 1-100 (trusted STATUS heartbeats), page 2 = lines 101-131: 1 stranger
-# STATUS poison at the head, 29 trusted STATUS, and the ONLY REVIEW comment
-# carrying "pr: example/rc/pull/9" (trusted goodagent). issue-5.json (today's
-# gh-shape source) has comments:[] and no pr: link, so `done 5` (no --pr)
-# sees no PR; today it even dies in the prurl-scan jq on the empty result
-# (set -e abort). GREEN: gate paginates REST comments, finds the page-2 pr:,
-# checks pr-9.json (OPEN) -> done refuses: "PR #9 is not merged yet".
-# Assertions: (1) "not merged yet" in output [RED: absent]; (2) stub log
-# shows a page=2 REST fetch [RED: zero page=2 calls - single-page ingest].
+# lines 1-100 (trusted STATUS heartbeats, 2h old), page 2 = lines 101-131:
+# 1 stranger STATUS poison at the head, then 29 trusted STATUS at NOW (the
+# only fresh heartbeats). issues-open.jsonlines gives issue #5 ONLY page-1
+# content (gh shape), mirroring a single-page read.
+# RED today: `stale` ingests only page 1 -> issue #5 reads "silent" -> listed;
+#            stub log shows ZERO page=2 fetches (single-page ingest).
+# GREEN: the gate paginates REST comments -> fresh page-2 heartbeat ingested
+#        -> #5 absent from stale AND the log contains page=2.
+# (Built on `stale` rather than `done`: today's `done` prurl-scan jq crashes
+#  on issues with no pr: comment - `last` on an empty array is null and
+#  `capture(null)` type-errors - an unrelated pre-existing bug.)
 # --------------------------------------------------------------------------
 d="$(newdir F)"
 {
@@ -228,26 +230,26 @@ d="$(newdir F)"
   done
   c '**STATUS** | agent: evil | human: @evil | at: 2020-01-01T00:00:00Z' stranger1 2020-01-01T00:00:00Z NONE
   for _ in $(seq 1 29); do
-    c '**STATUS** | agent: a | human: @a | at: 2020-01-01T01:00:00Z' goodagent 2020-01-01T01:00:00Z COLLABORATOR
+    c '**STATUS** | agent: a | human: @a | at: '"$(date -u +%Y-%m-%dT%H:%M:%SZ)" goodagent "$(date -u +%Y-%m-%dT%H:%M:%SZ)" COLLABORATOR
   done
-  c '**REVIEW** | agent: a | human: @a | at: 2020-01-01T00:30:00Z
-
-pr: example/rc/pull/9' goodagent 2020-01-01T00:30:00Z COLLABORATOR
 } >"$d/comments-5.jsonlines"
 printf '100\n' >"$d/comments-5.jsonlines.page2"
-# One gh-shape STATUS so today's `done 5` prurl-scan jq gets a string (not
-# null) and dies only for the real RED reason (no page=2 fetch). No pr: link.
-ghc '**STATUS** | agent: a | human: @a | at: 2020-01-01T00:00:00Z' goodagent 2020-01-01T00:00:00Z >"$d/f-ghc.jsonl"
+# gh-shape issue-5.json mirrors page 1 ONLY (what a single-page read sees).
+{
+  for _ in $(seq 1 100); do
+    ghc '**STATUS** | agent: a | human: @a | at: 2020-01-01T00:00:00Z' goodagent 2020-01-01T00:00:00Z
+  done
+} >"$d/f-ghc.jsonl"
 jq -cn --slurpfile cm "$d/f-ghc.jsonl" \
   '{number:5, title:"t", labels:[{name:"status:in-progress"}],
     assignees:[{login:"goodagent"}], body:"x", author:{login:"goodagent"},
     author_association:"COLLABORATOR", comments:$cm}' >"$d/issue-5.json"
-jq -cn '{"state":"OPEN", "merged":false, "mergedAt":null}' >"$d/pr-9.json"
-printf '[]\n' >"$d/issues-open.jsonlines"
+jq -cn --slurpfile i "$d/issue-5.json" \
+  '$i[0] | {number, title, assignees, labels, body, comments}' >"$d/issues-open.jsonlines"
 log="$WORK/f-log"
 : >"$log"
-out="$(log_coord "$d" "$log" done 5)"
-expect_contains "F page-2 trusted pr: found (done checks PR merge state) [RED today]" "not merged yet" "$out"
+out="$(log_coord "$d" "$log" stale)"
+expect_absent "F page-2 trusted heartbeat ingested (issue not stale) [RED today]" "#5" "$out"
 if grep -q "page=2" "$log"; then
   echo "PASS: F fetched comments page 2"
 else
