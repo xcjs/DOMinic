@@ -24,14 +24,20 @@ export default defineNuxtConfig({
   // Baseline Content Security Policy (issue #81), enforced by Nitro headers
   // so it applies in dev and in the built server. Sources mirror the
   // as-built data flow:
-  // - script-src: the app bundle ('self'), runtime npm deps compiled from
-  //   esm.sh by the app runner (ADR 0008), the Tailwind Play CDN, and
-  //   'unsafe-eval' — vue3-sfc-loader (ADR 0006) evaluates agent-authored
-  //   SFCs with new Function/eval. The eval concession is deliberate and
-  //   scheduled for removal by the sandbox/vetting work in NEXT.md.
+  // - script-src: the app bundle ('self'), Nuxt's inline boot scripts
+  //   ('unsafe-inline'; tightening to nonces/hashes rides with the
+  //   sandbox work in NEXT.md step 1.4, decision D1), runtime npm deps
+  //   compiled from esm.sh by the app runner (ADR 0008), the Tailwind
+  //   Play CDN, and 'unsafe-eval' — vue3-sfc-loader (ADR 0006) evaluates
+  //   agent-authored SFCs with new Function/eval. The eval concession is
+  //   deliberate and scheduled for removal by the same sandbox work.
   // - connect-src: 'self' covers /api/chat; provider traffic is server-side
   //   (ADR 0005), so provider hosts are not reachable from the browser and
-  //   are intentionally absent. esm.sh serves dependency fetches.
+  //   are intentionally absent. esm.sh serves dependency fetches. Note the
+  //   baseline therefore also constrains agent-authored apps: direct
+  //   fetch() to third-party CORS APIs (ADR 0009 direct-first) and remote
+  //   images do not pass until the sandbox work rewrites app networking
+  //   through the approved channels (esm.sh deps, /api/chat proxying).
   // - style-src: 'unsafe-inline' is required by dynamic app style injection
   //   (sfc-loader addStyle) and Tailwind Play CDN runtime styles.
   routeRules: {
@@ -39,7 +45,7 @@ export default defineNuxtConfig({
       headers: {
         "Content-Security-Policy":
           "default-src 'self'; " +
-          "script-src 'self' 'unsafe-eval' https://esm.sh https://cdn.tailwindcss.com; " +
+          "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://esm.sh https://cdn.tailwindcss.com; " +
           "style-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com; " +
           "img-src 'self' data:; " +
           "font-src 'self' data:; " +
