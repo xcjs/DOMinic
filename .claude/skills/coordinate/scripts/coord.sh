@@ -307,7 +307,8 @@ cmd_claim() {
     their="$(files_of "$o")"
     [ -n "$their" ] || continue
     clash="$(printf '%s\n' "$scope" | sort -u | while IFS= read -r p; do
-      printf '%s\n' "$their" | grep -qxF -- "$p" && echo "$p"
+      # if/fi, not &&: a final non-match must not leave status 1 for set -e to trip on.
+      if printf '%s\n' "$their" | grep -qxF -- "$p"; then echo "$p"; fi
     done)"
     [ -n "$clash" ] || continue
     if gh issue view "$o" --repo "$REPO" --json body --jq '.body // ""' | grep -q '^split:'; then
