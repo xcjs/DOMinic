@@ -2,7 +2,7 @@
   "roadmap": "NEXT.md",
   "vault": "vault",
   "coordinate": ".claude/skills/coordinate/scripts",
-  "issueTitlePrefix": "[{id}] ",
+  "issueTitlePrefix": "{id} ",
   "branchPrefix": "step/",
   "sequentialPhases": [1],
   "parallel": { "3.1": 1 },

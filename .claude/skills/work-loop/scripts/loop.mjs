@@ -26,7 +26,7 @@ const DEFAULTS = {
   vault: 'vault',
   repo: '',                       // owner/name; empty = ask gh
   coordinate: '.claude/skills/coordinate/scripts',
-  issueTitlePrefix: '[{id}] ',
+  issueTitlePrefix: '{id} ',        // matches the hand-seeded convention "0.1 Title"
   branchPrefix: 'step/',
   sequentialPhases: [1],          // steps in these phases unlock in order
   parallel: { '3.1': 1 },         // step -> earliest phase it may start in
@@ -167,7 +167,8 @@ function issueIndex() {
     '--json', 'number,title,state,labels,assignees,url,closedAt') || []
   const byStep = new Map()
   for (const it of list) {
-    const m = it.title.match(/^\[(\d+\.\d+)\]/)
+    // Accept "0.1 Title", "[0.1] Title", and "0.1: Title" so hand-seeded issues match.
+    const m = it.title.match(/^\[?(\d+\.\d+)\]?[\s:]/)
     if (!m) continue
     const prev = byStep.get(m[1])
     if (!prev || (prev.state === 'CLOSED' && it.state === 'OPEN')) byStep.set(m[1], it)
