@@ -485,7 +485,7 @@ cmd_done() {
   prurl="${OPT_pr:-}"
   if [ -z "$prurl" ]; then
     prurl="$(gh issue view "$N" --repo "$REPO" --json comments --jq \
-      '[.comments[] | select(.body|test("pr: \\S+/pull/\\d+"))] | last | .body | capture("pr: (?<u>\\S+/pull/\\d+)").u // empty')"
+      '[.comments[] | select(.body|test("pr: \\S+/pull/\\d+"))] | last | select(. != null) | .body | capture("pr: (?<u>\\S+/pull/\\d+)").u')"
   fi
   if [ -n "$prurl" ]; then
     [[ "$prurl" =~ /pull/([0-9]+) ]] || die "cannot parse a PR number from: $prurl"
