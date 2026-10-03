@@ -28,8 +28,12 @@ watch(
 );
 
 const snapZone = ref<SnapZone | null>(null);
+const armed = ref(false);
+const downPoint = ref<{ x: number; y: number } | null>(null);
 const TASKBAR = 48;
 const EDGE = 24; // px from a viewport edge that activates a snap zone
+const TOP = 6; // thin maximize trigger near the screen edge, Windows-style
+const ARM = 8; // travel px that arms zones; below it, clicks are jitter
 
 const style = computed(() => {
   if (props.win.state === "maximized") {
@@ -58,9 +62,8 @@ function zoneAt(pointerX: number, pointerY: number): SnapZone | null {
   const vh = window.innerHeight;
   const atLeft = pointerX <= EDGE;
   const atRight = pointerX >= vw - EDGE;
-  const atTop = pointerY <= EDGE;
+  const atTop = pointerY <= TOP;
   const atBottom = pointerY >= vh - TASKBAR - EDGE - 8;
-  const upperHalf = pointerY < (vh - TASKBAR) / 2;
   if (atTop && atLeft) return "tl";
   if (atTop && atRight) return "tr";
   if (atBottom && atLeft) return "bl";
@@ -103,6 +106,8 @@ function onPointerDown(event: PointerEvent): void {
   if (isPhone.value) return;
   store.focusWindow(props.win.id);
   dragging.value = true;
+  armed.value = false;
+  downPoint.value = { x: event.clientX, y: event.clientY };
   (event.currentTarget as HTMLElement).setPointerCapture(event.pointerId);
 }
 
@@ -111,6 +116,14 @@ function onPointerMove(event: PointerEvent): void {
     // A single move while holding the grab affords unsnapping, but the
     // real restore happens on the first move after a snapped state.
     return;
+  }
+  if (!armed.value) {
+    const start = downPoint.value;
+    if (!start) return;
+    const dx = Math.abs(event.clientX - start.x);
+    const dy = Math.abs(event.clientY - start.y);
+    if (dx < ARM && dy < ARM) return; // click jitter guard
+    armed.value = true;
   }
   if (props.win.preSnap) {
     store.unsnapWindow(props.win.id);
@@ -126,6 +139,8 @@ function onPointerMove(event: PointerEvent): void {
 
 function onPointerUp(event: PointerEvent): void {
   dragging.value = false;
+  armed.value = false;
+  downPoint.value = null;
   const zone = snapZone.value;
   snapZone.value = null;
   if (zone) {

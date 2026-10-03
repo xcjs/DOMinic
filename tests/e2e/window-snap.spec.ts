@@ -87,3 +87,61 @@ test('drag to edges snaps halves, corners, top; drag away restores', async ({ pa
     expect(box!.height).toBe(vh)
   })
 })
+
+test('snapped windows ignore in-band grabs and jitter', async ({ page }) => {
+  await openDesktop(page)
+  await dragTitleTo(page, 4, 400) // snap the left half first
+
+  const win = page
+    .locator('section')
+    .filter({ has: page.locator('header').getByText('Agent Chat', { exact: true }) })
+
+  await test.step('a sideways drag inside the top band never maximizes', async () => {
+    // A left-snapped header (y 4-40) starts near the top band; a small
+    // sideways drag must unsnap-restore and follow the pointer, never
+    // maximize (the regression m-vawter measured).
+    const handle = win.locator('header')
+    const box = await handle.boundingBox()
+    await page.mouse.move(box!.x + box!.width / 2, box!.y + box!.height / 2)
+    await page.mouse.down()
+    await page.mouse.move(box!.x + box!.width / 2 + 40, box!.y + box!.height / 2 + 1, {
+      steps: 4,
+    })
+    await page.mouse.up()
+
+    const after = await win.boundingBox()
+    expect(after!.width).toBe(520) // pre-snap width, not 1280
+    expect(after!.height).toBe(560)
+    expect(after!.x).not.toBe(0) // no longer snapped
+  })
+
+  await test.step('a 1px jitter click keeps the snap', async () => {
+    const before = await win.boundingBox()
+    const handle = win.locator('header')
+    const box = await handle.boundingBox()
+    await page.mouse.move(box!.x + box!.width / 2, box!.y + box!.height / 2)
+    await page.mouse.down()
+    await page.mouse.move(box!.x + box!.width / 2 + 1, box!.y + box!.height / 2, { steps: 2 })
+    await page.mouse.up()
+
+    const after = await win.boundingBox()
+    expect(after!.x).toBe(before!.x)
+    expect(after!.width).toBe(before!.width)
+  })
+
+  await test.step('dragging away restores the pre-snap rect including y', async () => {
+    const handle = win.locator('header')
+    const box = await handle.boundingBox()
+    await page.mouse.move(box!.x + box!.width / 2, box!.y + box!.height / 2)
+    await page.mouse.down()
+    await page.mouse.move(box!.x + box!.width / 2 + 200, box!.y + 200, { steps: 6 })
+    await page.mouse.up()
+
+    const after = await win.boundingBox()
+    expect(after!.width).toBe(520)
+    expect(after!.height).toBe(560)
+    // Pre-snap y (382 here) + pointer travel delta: the preSnap.y=0 bug
+    // m-vawter measured would land near y=200 instead of y=582.
+    expect(after!.y).toBeGreaterThan(500)
+  })
+})
