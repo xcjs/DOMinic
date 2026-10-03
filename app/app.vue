@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, reactive, ref, type ComponentPublicInstance } from "vue";
+import { nextTick, onMounted, reactive, ref, type ComponentPublicInstance } from "vue";
 import { useOsStore } from "./features/os/stores/os";
 import { useAppsStore } from "./features/apps/stores/apps";
 import WindowFrame from "./features/os/components/WindowFrame.vue";
@@ -81,12 +81,14 @@ function getAppSource(id: string) {
   return app ? readFile(app.entry) : null;
 }
 
-function askFix(payload: { appId: string; error: string; sourceCode?: string }) {
+async function askFix(payload: { appId: string; error: string; sourceCode?: string }) {
   const chatWin = os.windows.find((w) => w.appId === 'chat');
   if (chatWin) {
     os.focusWindow(chatWin.id);
   } else {
     openBuiltin('chat');
+    // The chat window mounts on the next render; wait for its ref before sending.
+    await nextTick();
   }
 
   const app = getApp(payload.appId);
