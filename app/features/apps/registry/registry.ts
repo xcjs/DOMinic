@@ -16,6 +16,18 @@ const REGISTRY_PATH = 'registry.json'
 const appsState = ref<AppMeta[]>([])
 let isHydrated = false
 
+// Notifies reactive consumers (the apps Pinia store getter) that registry
+// state changed. Hydration, register and unregister all bump it.
+const listeners: Array<() => void> = []
+
+export function onRegistryChange(fn: () => void): void {
+  listeners.push(fn)
+}
+
+function notify(): void {
+  for (const fn of listeners) fn()
+}
+
 export function hydrateRegistry(): AppMeta[] {
   try {
     const raw = readFile(REGISTRY_PATH)
@@ -24,6 +36,7 @@ export function hydrateRegistry(): AppMeta[] {
       if (Array.isArray(parsed)) {
         appsState.value = parsed
         isHydrated = true
+        notify()
         return appsState.value
       }
     }
@@ -65,6 +78,7 @@ export function registerApp(meta: AppMeta): void {
   }
 
   persist()
+  notify()
 }
 
 export function unregisterApp(id: string): void {
@@ -76,6 +90,7 @@ export function unregisterApp(id: string): void {
   }
   appsState.value = appsState.value.filter((a) => a.id !== id)
   persist()
+  notify()
 }
 
 export function listApps(): AppMeta[] {

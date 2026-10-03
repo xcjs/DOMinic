@@ -8,7 +8,7 @@ import ChatWindow from "./features/chat/components/ChatWindow.vue";
 import SettingsApp from "./features/settings/components/SettingsApp.vue";
 import DynamicAppRunner from "./features/apps/runner/DynamicAppRunner.vue";
 import { removeAppStyles } from "./features/apps/runner/loader";
-import { getApp, hydrateRegistry, listApps, registerApp, unregisterApp } from "./features/apps/registry";
+import { getApp, hydrateRegistry, registerApp, unregisterApp } from "./features/apps/registry";
 import { installFixture } from "./features/apps/fixtures";
 import { readFile, writeFile } from "./features/shared/vfs";
 import { useSettingsStore } from "./features/settings/stores/settings";
@@ -45,7 +45,6 @@ function uninstallApp(appId: string) {
     os.closeWindow(win.id);
   }
   unregisterApp(appId);
-  apps.installed = listApps();
   delete sourceVersion[appId];
 }
 
@@ -64,7 +63,6 @@ function installApp(params: InstallAppParams) {
   const entry = `apps/${params.id}/index.vue`;
   writeFile(entry, params.vueSfcCode);
   registerApp({ id: params.id, title: params.title, icon: params.icon, description: params.description, entry });
-  apps.installed = listApps();
   sourceVersion[params.id] = Date.now();
 }
 
@@ -108,7 +106,7 @@ onMounted(() => {
   tick();
   setInterval(tick, 1000);
   settings.hydrate();
-  apps.installed = hydrateRegistry();
+  hydrateRegistry();
   openBuiltin('chat');
 
   if (import.meta.client) {
@@ -124,7 +122,6 @@ onMounted(() => {
       installFixture: (fixtureId: string) => {
         const ok = installFixture(fixtureId);
         if (ok) {
-          apps.installed = listApps();
           openApp(fixtureId);
         }
         return ok;
@@ -144,7 +141,6 @@ onMounted(() => {
           description: 'Test fixture with deliberate error for testing recovery',
           entry: `apps/${id}/index.vue`,
         });
-        apps.installed = listApps();
         sourceVersion[id] = Date.now();
         openApp(id);
       },
