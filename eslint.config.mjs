@@ -58,7 +58,9 @@ export default tseslint.config(
     files: ["**/*.{js,mjs,cjs,ts,mts,cts}"],
     languageOptions: {
       parserOptions: {
-        projectService: true,
+        projectService: {
+          allowDefaultProject: ["playwright.config.ts"],
+        },
         extraFileExtensions: [".vue"],
       },
     },
