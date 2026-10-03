@@ -124,13 +124,14 @@ does not establish a manual invariant.
 1. **Claim race.** Among the current assignees, the author of the
    earliest `CLAIM` comment keeps the issue. The script checks two
    seconds after assigning and backs the loser off with a `RELEASE`.
-2. **Stale claim.** In sprint mode, ping at 20 minutes without visible
-   issue, branch, or linked-PR activity. Set `COORD_STALE_MIN=30`, and use
-   `release N --stale` only after the ping remains unanswered for 10 more
-   minutes. The helper checks structured issue heartbeats only; the caller
-   verifies Git activity and the ping. Multi-day work uses a six-hour
-   warning plus three-hour grace during active workdays.
-3. **Negotiation cap.** Active sprint protocol permits one `COUNTER`, then
+2. **Stale claim.** Ping at 20 minutes without visible issue, branch, or
+   linked-PR activity only when sprint mode is explicitly re-enabled
+   (`COORD_STALE_MIN=30`), and use `release N --stale` only after the ping
+   remains unanswered for 10 more minutes. The helper checks structured
+   issue heartbeats only; the caller verifies Git activity and the ping.
+   Multi-day work uses a six-hour warning plus three-hour grace during
+   active workdays.
+3. **Negotiation cap.** The protocol permits one `COUNTER`, then
    adds `needs-human`. Current helpers automatically escalate on the fourth
    `PROPOSE`/`COUNTER` for compatibility, so agents must stop earlier.
 4. **Who decides `needs-human`.** The humans of the agents involved.

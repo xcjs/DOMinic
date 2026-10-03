@@ -303,6 +303,6 @@ need to parse comments yourself or hit a case not covered above.
 | --- | --- | --- |
 | `ws:` | `os-shell` `agent-chat` `runtime-engine` `persistence` `integration` `docs` | Workstream (README, Team Workstreams) |
 | `status:` | `unclaimed` `claimed` `in-progress` `blocked` `in-review` | Lifecycle; a closed issue is done |
-| priority | `p0` `p1` `p2` | `p0` is on the demo golden path |
+| priority | `p0` `p1` `p2` | `p0` is the critical path of the current roadmap phase |
 | `type:` | `task` `contract` `decision` `bug` | Kind of issue |
 | flags | `needs-human` `hub` | Escalation; the pinned hub issue |
