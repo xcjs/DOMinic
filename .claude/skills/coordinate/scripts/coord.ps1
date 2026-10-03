@@ -1,7 +1,7 @@
 # coord.ps1 - multi-agent coordination over GitHub Issues via the gh CLI.
 # Protocol: ../SKILL.md and ../references/protocol.md
 # Usage:    powershell -File .claude/skills/coordinate/scripts/coord.ps1 <command> [args]
-# Env:      COORD_AGENT (who you are), COORD_REPO, COORD_HUB, COORD_STALE_MIN
+# Env:      COORD_AGENT (who you are), COORD_HUMAN, COORD_REPO, COORD_HUB, COORD_STALE_MIN
 # Windows counterpart of coord.sh; use this on Windows hosts.
 
 $ErrorActionPreference = 'Stop'
@@ -33,6 +33,8 @@ else {
 & $GH auth status *> $null
 if ($LASTEXITCODE -ne 0) { Die 'gh is not authenticated; run: gh auth login' }
 $ME = (& $GH api user | ConvertFrom-Json).login
+# An agent with its own GitHub account signs for its human; defaults to the account itself.
+$HUMAN = if ($env:COORD_HUMAN) { $env:COORD_HUMAN } else { $ME }
 
 function Gh {
   & $GH @args
@@ -47,7 +49,7 @@ function Parse-Iso([string]$s) {
 }
 
 function Header([string]$verb) {
-  '**{0}** | agent: {1} | human: @{2} | at: {3}' -f $verb, $AGENT, $ME, (Now)
+  '**{0}** | agent: {1} | human: @{2} | at: {3}' -f $verb, $AGENT, $HUMAN, (Now)
 }
 
 function Comment([int]$issue, [string]$verb, [string]$body) {
@@ -168,7 +170,7 @@ function Usage {
   @'
 coord.ps1 - multi-agent coordination over GitHub Issues via the gh CLI.
 Protocol: SKILL.md and references/protocol.md
-Env:      COORD_AGENT (who you are), COORD_REPO, COORD_HUB, COORD_STALE_MIN
+Env:      COORD_AGENT (who you are), COORD_HUMAN, COORD_REPO, COORD_HUB, COORD_STALE_MIN
 
 Commands:
   setup                                  labels + pinned hub issue (idempotent)
@@ -516,7 +518,7 @@ function Cmd-Accept([object[]]$argv) {
     if ($props.Count -eq 0) { Note 'no proposal found to record'; return }
     $proposal = (@($props[-1].body -split "`r?`n") | Select-Object -Skip 2) -join "`n"
     $body = $j.body
-    & $GH issue edit $N --repo $REPO --body "$body`n`n## Agreed`n_(accepted by @$ME via $AGENT at $(Now))_`n`n$proposal" *> $null
+    & $GH issue edit $N --repo $REPO --body "$body`n`n## Agreed`n_(accepted by @$HUMAN via $AGENT at $(Now))_`n`n$proposal" *> $null
     if ($LASTEXITCODE -ne 0) { Die "failed to record contract on #$N" }
     "#$N contract recorded under ## Agreed" | Write-Output
   }
