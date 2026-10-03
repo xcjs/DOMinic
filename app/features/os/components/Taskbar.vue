@@ -2,6 +2,8 @@
 import { Code2, Trash2 } from "lucide-vue-next";
 import { useOsStore } from "../stores/os";
 
+defineOptions({ name: "OsTaskbar" });
+
 const store = useOsStore();
 const props = defineProps<{
   apps: { id: string; title: string; icon: string }[];

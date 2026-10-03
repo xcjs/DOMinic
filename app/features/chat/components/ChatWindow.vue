@@ -3,7 +3,10 @@
     <!-- Sub-header / status bar -->
     <div class="flex items-center justify-between px-4 py-2 border-b border-slate-800/80 bg-slate-900/60 text-xs text-slate-400">
       <div class="flex items-center space-x-2">
-        <span class="inline-block w-2 h-2 rounded-full" :class="isStreaming ? 'bg-amber-400 animate-pulse' : 'bg-emerald-400'" />
+        <span
+          class="inline-block w-2 h-2 rounded-full"
+          :class="isStreaming ? 'bg-amber-400 animate-pulse' : 'bg-emerald-400'"
+        />
         <span>{{ isStreaming ? 'Synthesizing...' : 'DOMinic Kernel Ready' }}</span>
       </div>
       <div class="flex items-center space-x-3">
@@ -56,8 +59,14 @@
               class="flex items-center justify-between p-2.5 rounded-lg bg-slate-950/70 border border-slate-800 text-xs"
             >
               <div class="flex items-center space-x-2">
-                <span v-if="tool.state === 'call'" class="animate-spin text-blue-400">⚙️</span>
-                <span v-else class="text-emerald-400">✅</span>
+                <span
+                  v-if="tool.state === 'call'"
+                  class="animate-spin text-blue-400"
+                >⚙️</span>
+                <span
+                  v-else
+                  class="text-emerald-400"
+                >✅</span>
 
                 <div class="flex flex-col">
                   <span class="font-medium text-slate-200">
@@ -85,16 +94,31 @@
       </div>
 
       <!-- Streaming thinking indicator -->
-      <div v-if="isStreaming" class="flex items-center space-x-2 text-xs text-slate-500 italic">
-        <span class="inline-block w-1.5 h-1.5 rounded-full bg-slate-500 animate-bounce" style="animation-delay: 0ms" />
-        <span class="inline-block w-1.5 h-1.5 rounded-full bg-slate-500 animate-bounce" style="animation-delay: 150ms" />
-        <span class="inline-block w-1.5 h-1.5 rounded-full bg-slate-500 animate-bounce" style="animation-delay: 300ms" />
+      <div
+        v-if="isStreaming"
+        class="flex items-center space-x-2 text-xs text-slate-500 italic"
+      >
+        <span
+          class="inline-block w-1.5 h-1.5 rounded-full bg-slate-500 animate-bounce"
+          style="animation-delay: 0ms"
+        />
+        <span
+          class="inline-block w-1.5 h-1.5 rounded-full bg-slate-500 animate-bounce"
+          style="animation-delay: 150ms"
+        />
+        <span
+          class="inline-block w-1.5 h-1.5 rounded-full bg-slate-500 animate-bounce"
+          style="animation-delay: 300ms"
+        />
         <span>Authoring code...</span>
       </div>
     </div>
 
     <!-- Quick Demo Suggestion Chips -->
-    <div v-if="messages.length <= 2" class="px-4 pb-2 flex flex-wrap gap-1.5">
+    <div
+      v-if="messages.length <= 2"
+      class="px-4 pb-2 flex flex-wrap gap-1.5"
+    >
       <button
         v-for="suggestion in suggestions"
         :key="suggestion.label"
@@ -107,14 +131,17 @@
 
     <!-- Input Footer -->
     <div class="p-3 border-t border-slate-800/80 bg-slate-900/40">
-      <form class="flex items-center space-x-2" @submit.prevent="handleSend">
+      <form
+        class="flex items-center space-x-2"
+        @submit.prevent="handleSend"
+      >
         <input
           v-model="input"
           type="text"
           placeholder="Ask DOMinic to build an app (e.g. 'Build a pomodoro timer')..."
           :disabled="isStreaming"
           class="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 disabled:opacity-50"
-        />
+        >
 
         <button
           type="submit"
@@ -142,7 +169,6 @@ const {
   messages,
   input,
   isStreaming,
-  error,
   sendMessage,
   clearHistory
 } = useAgentChat(props.options)

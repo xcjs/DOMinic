@@ -15,8 +15,31 @@
       class="flex-1 flex flex-col p-6 overflow-y-auto bg-rose-950/20 text-rose-200"
     >
       <div class="flex items-center space-x-2 text-rose-400 mb-3">
-        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          class="w-5 h-5"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <circle
+            cx="12"
+            cy="12"
+            r="10"
+          /><line
+            x1="12"
+            y1="8"
+            x2="12"
+            y2="12"
+          /><line
+            x1="12"
+            y1="16"
+            x2="12.01"
+            y2="16"
+          />
         </svg>
         <span class="font-semibold text-sm">{{ isRuntimeError ? 'Application Runtime Error' : 'Component Compilation Error' }}</span>
       </div>

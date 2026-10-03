@@ -2,7 +2,9 @@
   <div class="h-full w-full flex flex-col bg-slate-950 text-slate-100 p-6 overflow-y-auto space-y-6 select-text text-sm">
     <!-- Header -->
     <div class="border-b border-slate-800/80 pb-4">
-      <h2 class="text-lg font-semibold text-white">System Settings</h2>
+      <h2 class="text-lg font-semibold text-white">
+        System Settings
+      </h2>
       <p class="text-xs text-slate-400 mt-1">
         Configure your frontier LLM provider credentials and manage OS persistence.
       </p>
@@ -42,7 +44,7 @@
           :placeholder="selectedProvider === 'custom' ? 'e.g. openai/gpt-4o-mini or llama3.2' : 'gpt-5, claude-sonnet-5, gemini-2.5-pro, or deepseek-chat'"
           class="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-xs text-white placeholder:text-slate-500 transition focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
           @input="baseUrlError = ''"
-        />
+        >
       </div>
 
       <!-- API Key Input -->
@@ -64,7 +66,7 @@
           autocomplete="off"
           spellcheck="false"
           class="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 font-mono text-xs text-white placeholder:text-slate-500 transition focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
-        />
+        >
         <span class="text-[11px] text-slate-500">
           Your key never leaves your browser at rest. It is passed ephemerally per request.
         </span>
@@ -73,8 +75,14 @@
       <!-- Custom Base URL -->
       <div class="space-y-1.5">
         <label class="text-xs text-slate-300 font-medium">
-          Custom Base URL <span v-if="selectedProvider === 'custom'" class="text-rose-400">(required)</span>
-          <span v-else class="text-slate-500">(Optional)</span>
+          Custom Base URL <span
+            v-if="selectedProvider === 'custom'"
+            class="text-rose-400"
+          >(required)</span>
+          <span
+            v-else
+            class="text-slate-500"
+          >(Optional)</span>
         </label>
         <input
           v-model="baseUrlInput"
@@ -82,8 +90,11 @@
           :placeholder="selectedProvider === 'custom' ? 'https://openrouter.ai/api/v1' : 'https://api.openai.com/v1 or custom proxy'"
           class="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 font-mono text-xs text-white placeholder:text-slate-500 transition focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
           @input="baseUrlError = ''"
-        />
-        <span v-if="selectedProvider === 'custom'" class="text-[11px] text-slate-500">
+        >
+        <span
+          v-if="selectedProvider === 'custom'"
+          class="text-[11px] text-slate-500"
+        >
           Any OpenAI-compatible endpoint, e.g. https://openrouter.ai/api/v1, http://localhost:11434/v1
         </span>
       </div>
@@ -98,11 +109,17 @@
           Save Credentials
         </button>
 
-        <span v-if="savedNotice" class="text-xs text-emerald-400 animate-fade-in">
+        <span
+          v-if="savedNotice"
+          class="text-xs text-emerald-400 animate-fade-in"
+        >
           ✓ Saved to local storage
         </span>
 
-        <span v-if="baseUrlError" class="text-xs text-rose-400">
+        <span
+          v-if="baseUrlError"
+          class="text-xs text-rose-400"
+        >
           {{ baseUrlError }}
         </span>
       </div>

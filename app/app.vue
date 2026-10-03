@@ -155,13 +155,25 @@ onMounted(() => {
   <div class="relative h-screen w-screen overflow-hidden bg-gradient-to-br from-slate-950 via-indigo-950 to-slate-900 text-slate-100 max-md:overflow-y-auto max-md:overscroll-contain max-md:pb-16">
     <div class="pointer-events-none absolute inset-0 flex items-center justify-center">
       <div class="text-center opacity-25">
-        <h1 class="text-5xl font-bold tracking-tight max-md:text-4xl">DOMinic</h1>
-        <p class="mt-3 text-slate-400 max-md:px-6">An AI agent is the primary app author.</p>
+        <h1 class="text-5xl font-bold tracking-tight max-md:text-4xl">
+          DOMinic
+        </h1>
+        <p class="mt-3 text-slate-400 max-md:px-6">
+          An AI agent is the primary app author.
+        </p>
       </div>
     </div>
 
-    <WindowFrame v-for="win in os.windows" :key="win.id" :win="win">
-      <ChatWindow v-if="win.appId === 'chat'" :ref="setChat" :options="{ getProviderConfig: () => settings, getInstalledApps: () => apps.installed, getAppSource, onInstallApp: installApp, onUpdateApp: updateApp, onOpenWindow: openApp }" />
+    <WindowFrame
+      v-for="win in os.windows"
+      :key="win.id"
+      :win="win"
+    >
+      <ChatWindow
+        v-if="win.appId === 'chat'"
+        :ref="setChat"
+        :options="{ getProviderConfig: () => settings, getInstalledApps: () => apps.installed, getAppSource, onInstallApp: installApp, onUpdateApp: updateApp, onOpenWindow: openApp }"
+      />
       <SettingsApp v-else-if="win.appId === 'settings'" />
       <pre
         v-else-if="win.appId?.startsWith('source:')"
@@ -175,7 +187,12 @@ onMounted(() => {
         :source-code="readFile(getApp(win.appId)?.entry || '') || ''"
         @ask-fix="askFix"
       />
-      <p v-else class="text-sm text-slate-400">{{ win.title }}</p>
+      <p
+        v-else
+        class="text-sm text-slate-400"
+      >
+        {{ win.title }}
+      </p>
     </WindowFrame>
 
     <Taskbar

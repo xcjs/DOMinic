@@ -33,7 +33,6 @@ export function deleteFile(path: string): void {
 export function listFiles(dir: string = ''): { path: string; size: number }[] {
   if (!isBrowser()) return []
   const normalizedDir = normalizePath(dir)
-  const prefix = `${VFS_PREFIX}${normalizedDir}`
   const results: { path: string; size: number }[] = []
 
   for (let i = 0; i < window.localStorage.length; i++) {
