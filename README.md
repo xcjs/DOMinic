@@ -19,15 +19,17 @@ first-party software.
 ## What DOMinic is
 
 - A desktop-metaphor OS shell — window manager, taskbar, and app
-  registry — that degrades cleanly to a bottom-nav sheet and stacked
-  windows on phone viewports.
+  registry — built for desktop browsers. Phone viewports are not
+  supported yet: the bottom-nav sheet and stacked windows designed in
+  ADR 0004 are roadmap step 3.1.
 - A chat-driven agent surface that streams from virtually any LLM
   provider; users bring their own API keys, which stay in their
   browser and travel per-request, never at rest on a server.
 - A platform for agent-authored apps: Vue single-file components
   compiled at runtime in the browser, persisting their source in a
-  virtual filesystem and loading npm dependencies from a vetted ESM
-  CDN.
+  virtual filesystem and loading npm dependencies from the esm.sh
+  CDN. Dependencies are not vetted yet: the vetting gate decided in
+  ADR 0008 is roadmap step 1.3.
 
 The hackathon proof of concept shipped the whole core loop; the project
 now follows the sequenced roadmap in [NEXT.md](NEXT.md). See

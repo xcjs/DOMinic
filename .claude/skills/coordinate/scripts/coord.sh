@@ -2,7 +2,7 @@
 # coord.sh - multi-agent coordination over GitHub Issues via the gh CLI.
 # Protocol: ../SKILL.md and ../references/protocol.md
 # Usage:    bash .claude/skills/coordinate/scripts/coord.sh <command> [args]
-# Env:      COORD_AGENT (who you are), COORD_REPO, COORD_HUB, COORD_STALE_MIN
+# Env:      COORD_AGENT (who you are), COORD_HUMAN, COORD_REPO, COORD_HUB, COORD_STALE_MIN
 set -euo pipefail
 
 REPO="${COORD_REPO:-xcjs/DOMinic}"
@@ -50,9 +50,11 @@ EOF
 command -v gh >/dev/null 2>&1 || die "gh CLI not found: https://cli.github.com"
 gh auth status >/dev/null 2>&1 || die "gh is not authenticated; run: gh auth login"
 ME="$(gh api user --jq .login)"
+# An agent with its own GitHub account signs for its human; defaults to the account itself.
+HUMAN="${COORD_HUMAN:-$ME}"
 
 # ---------- helpers ----------
-header() { printf '**%s** | agent: %s | human: @%s | at: %s' "$1" "$AGENT" "$ME" "$(now)"; }
+header() { printf '**%s** | agent: %s | human: @%s | at: %s' "$1" "$AGENT" "$HUMAN" "$(now)"; }
 
 comment() { # issue verb body
   gh issue comment "$1" --repo "$REPO" --body "$(header "$2")"$'\n\n'"$3" >/dev/null
@@ -72,6 +74,20 @@ files_of() { # issue
     sed 's/_(none listed)_//g; s/-(none listed)-//g' |
     tr ';' ',' | tr ',' '\n' | sed 's/^[[:space:]]*//; s/[[:space:]]*$//' |
     grep -v '^$' || true
+}
+
+in_scope() { # path, newline-separated Files entries -> true if an entry covers the path
+  # Mirrors coord.ps1: a wildcard match either way, or a prefix match on the
+  # entry with trailing '*' and '/' trimmed. String matching only (no regex, no
+  # pathname expansion), so it behaves the same with BSD and GNU tools.
+  local p="$1" a pre
+  while IFS= read -r a; do
+    [ -n "$a" ] || continue
+    pre="${a%"${a##*[!*]}"}"; pre="${pre%"${pre##*[!/]}"}"
+    # shellcheck disable=SC2053 # unquoted right-hand sides: glob matching on purpose
+    if [[ $p == $a || $a == $p || $p == "$pre"* ]]; then return 0; fi
+  done <<< "$2"
+  return 1
 }
 
 # Issue numbers referenced as #N anywhere in a body (unique, first-ref order).
@@ -292,8 +308,9 @@ cmd_claim() {
     [ -n "$o" ] || continue
     their="$(files_of "$o")"
     [ -n "$their" ] || continue
-    clash="$(printf '%s\n' $scope | sort -u | while read -r p; do
-      printf '%s\n' $their | grep -qx "$p" && echo "$p"
+    clash="$(printf '%s\n' "$scope" | sort -u | while IFS= read -r p; do
+      # if/fi, not &&: a final non-match must not leave status 1 for set -e to trip on.
+      if printf '%s\n' "$their" | grep -qxF -- "$p"; then echo "$p"; fi
     done)"
     [ -n "$clash" ] || continue
     if gh issue view "$o" --repo "$REPO" --json body --jq '.body // ""' | grep -q '^split:'; then
@@ -306,7 +323,7 @@ cmd_claim() {
     [ -n "$common" ] && continue
     die "#$N scope overlaps #$o on: $(printf '%s' "$clash" | paste -sd, -) - record a split on one of the issues or hand off ownership first"
   done < <(gh issue list --repo "$REPO" --state open --limit 100 --json number,labels,body \
-             --jq '.[] | select(((.labels // []) | map(.name) | index("hub")) | not) | select(.number != '"$N"') | "\(.number)\t\(.body // "")"')
+             --jq '.[] | select(((.labels // []) | map(.name) | index("hub")) | not) | select(.number != '"$N"') | .number')
   comment "$N" CLAIM "plan: ${OPT_plan:-_(none given)_}"$'\n'"eta: ${OPT_eta:-_(none given)_}"
   gh issue edit "$N" --repo "$REPO" --add-assignee "@me" >/dev/null
   set_status "$N" claimed
@@ -397,7 +414,7 @@ cmd_accept() {
     gh issue edit "$N" --repo "$REPO" --body "$body
 
 ## Agreed
-_(accepted by @$ME via $AGENT at $(now))_
+_(accepted by @$HUMAN via $AGENT at $(now))_
 
 $proposal" >/dev/null
     echo "#$N contract recorded under ## Agreed"
@@ -445,8 +462,8 @@ cmd_review() {
   if [ -n "$allowed" ]; then
     local undeclared p
     undeclared="$(gh pr view "$prn" --repo "$REPO" --json files --jq '.files[].path' |
-      while read -r p; do
-        printf '%s\n' $allowed | grep -qF "$p" || echo "$p"
+      while IFS= read -r p; do
+        in_scope "$p" "$allowed" || echo "$p"
       done)"
     if [ -n "$undeclared" ]; then
       die "PR #$prn touches paths outside the linked issues' Files scope: $(printf '%s' "$undeclared" | paste -sd, -) - update the issues' Files or drop the paths"
@@ -473,7 +490,7 @@ cmd_done() {
   if [ -n "$prurl" ]; then
     [[ "$prurl" =~ /pull/([0-9]+) ]] || die "cannot parse a PR number from: $prurl"
     local prn="${BASH_REMATCH[1]}" state
-    state="$(gh pr view "$prn" --repo "$REPO" --json state,merged --jq '.state')"
+    state="$(gh pr view "$prn" --repo "$REPO" --json state,mergedAt --jq '.state')"
     [ "$state" = "MERGED" ] || die "PR #$prn is not merged yet - merge it before closing #$N"
   fi
   comment "$N" DONE "pr: ${prurl:-_(none given)_}"$'\n'"${POS[1]:-}"
