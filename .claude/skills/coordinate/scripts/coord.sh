@@ -74,6 +74,20 @@ files_of() { # issue
     grep -v '^$' || true
 }
 
+in_scope() { # path, newline-separated Files entries -> true if an entry covers the path
+  # Mirrors coord.ps1: a wildcard match either way, or a prefix match on the
+  # entry with trailing '*' and '/' trimmed. String matching only (no regex, no
+  # pathname expansion), so it behaves the same with BSD and GNU tools.
+  local p="$1" a pre
+  while IFS= read -r a; do
+    [ -n "$a" ] || continue
+    pre="${a%"${a##*[!*]}"}"; pre="${pre%"${pre##*[!/]}"}"
+    # shellcheck disable=SC2053 # unquoted right-hand sides: glob matching on purpose
+    if [[ $p == $a || $a == $p || $p == "$pre"* ]]; then return 0; fi
+  done <<< "$2"
+  return 1
+}
+
 # Issue numbers referenced as #N anywhere in a body (unique, first-ref order).
 referenced_issues() { # body
   printf '%s' "$1" | grep -o '#[0-9]\+' | tr -d '#' | awk '!seen[$0]++' || true
@@ -292,8 +306,8 @@ cmd_claim() {
     [ -n "$o" ] || continue
     their="$(files_of "$o")"
     [ -n "$their" ] || continue
-    clash="$(printf '%s\n' $scope | sort -u | while read -r p; do
-      printf '%s\n' $their | grep -qx "$p" && echo "$p"
+    clash="$(printf '%s\n' "$scope" | sort -u | while IFS= read -r p; do
+      printf '%s\n' "$their" | grep -qxF -- "$p" && echo "$p"
     done)"
     [ -n "$clash" ] || continue
     if gh issue view "$o" --repo "$REPO" --json body --jq '.body // ""' | grep -q '^split:'; then
@@ -445,8 +459,8 @@ cmd_review() {
   if [ -n "$allowed" ]; then
     local undeclared p
     undeclared="$(gh pr view "$prn" --repo "$REPO" --json files --jq '.files[].path' |
-      while read -r p; do
-        printf '%s\n' $allowed | grep -qF "$p" || echo "$p"
+      while IFS= read -r p; do
+        in_scope "$p" "$allowed" || echo "$p"
       done)"
     if [ -n "$undeclared" ]; then
       die "PR #$prn touches paths outside the linked issues' Files scope: $(printf '%s' "$undeclared" | paste -sd, -) - update the issues' Files or drop the paths"
