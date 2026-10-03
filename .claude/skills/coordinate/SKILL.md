@@ -63,6 +63,14 @@ session before any command:
 export COORD_AGENT="claude-code/claude-fable-5.1"   # or pi/..., cursor/...
 ```
 
+An agent that runs under its own GitHub account (for example, an
+unattended worker whose token should reach only this repo) signs for
+its human with `COORD_HUMAN`, so comments still read `human: @<you>`:
+
+```bash
+export COORD_HUMAN="your-github-login"   # defaults to the gh account
+```
+
 ## Start of every session
 
 ```bash
