@@ -26,7 +26,7 @@ function onTaskbarClick(id: string): void {
 </script>
 
 <template>
-  <footer class="absolute bottom-0 left-0 right-0 z-40 flex h-12 max-md:h-14 items-center gap-2 max-md:gap-1 border-t border-white/10 bg-slate-950/90 px-3 max-md:px-2 backdrop-blur max-md:pb-[max(env(safe-area-inset-bottom),0.25rem)]">
+  <footer class="absolute bottom-0 left-0 right-0 z-40 flex h-12 max-md:h-14 max-md:fixed items-center gap-2 max-md:gap-1 border-t border-white/10 bg-slate-950/90 px-3 max-md:px-2 backdrop-blur max-md:pb-[max(env(safe-area-inset-bottom),0.25rem)]">
     <div class="flex min-w-0 flex-1 max-md:flex-none items-center gap-2 max-md:gap-1 overflow-x-auto">
       <span class="text-sm font-bold tracking-tight text-indigo-300 max-md:hidden">DOMinic</span>
       <span class="mx-2 h-6 w-px bg-white/10 max-md:hidden" />
@@ -36,7 +36,7 @@ function onTaskbarClick(id: string): void {
         class="flex h-8 max-md:h-11 items-stretch overflow-hidden rounded border border-white/10 bg-slate-800 shrink-0"
       >
         <button
-          class="flex min-w-0 items-center gap-1.5 px-3 max-md:px-4 text-xs max-md:text-sm text-slate-200 hover:bg-slate-700"
+          class="flex min-w-0 items-center gap-1.5 px-3 max-md:px-4 text-xs max-md:text-sm text-slate-200 hover:bg-slate-700 max-md:py-[10px]"
           :aria-label="`Open ${app.title}`"
           @click="props.onOpenApp(app.id)"
         >
@@ -69,7 +69,7 @@ function onTaskbarClick(id: string): void {
       <button
         v-for="win in store.windows"
         :key="win.id"
-        class="max-w-48 truncate rounded border px-3 max-md:px-4 py-1 max-md:py-2 text-xs max-md:text-sm transition-colors shrink-0"
+        class="max-w-48 truncate rounded border px-3 max-md:px-4 py-1 max-md:py-2.5 text-xs max-md:text-sm transition-colors shrink-0"
         :class="
           win.minimized
             ? 'border-white/10 bg-slate-900 text-slate-400 hover:text-slate-100'

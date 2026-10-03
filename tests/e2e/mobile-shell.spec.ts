@@ -59,7 +59,16 @@ test('phone viewport: cards stack, drag is off, the taskbar sheet works', async 
     expect(chatBox).toBeTruthy()
     expect(pomodoroBox).toBeTruthy()
     // Chat mounted first, so it is the top card; cards never overlap.
-    expect(chatBox!.y).toBeLessThan(pomodoroBox!.y)
+    expect(chatBox!.y + chatBox!.height).toBeLessThanOrEqual(pomodoroBox!.y)
+  })
+
+  await test.step('the sheet stays pinned to the viewport bottom while cards scroll', async () => {
+    await page.locator('footer').evaluate((f) => {
+      const root = f.closest('.h-screen') as HTMLElement
+      root.scrollTop = root.scrollHeight
+    })
+    const sheet = await page.locator('footer').boundingBox()
+    expect(sheet!.y + sheet!.height).toBeCloseTo(844, 0)
   })
 
   await test.step('the focused card scrolls into view above the sheet', async () => {
@@ -77,9 +86,16 @@ test('phone viewport: cards stack, drag is off, the taskbar sheet works', async 
     const box = await sheet.boundingBox()
     expect(box).toBeTruthy()
     expect(box!.height).toBeGreaterThanOrEqual(52) // h-14 = 56px, allow scroll rounding
-    // The sheet spans the full viewport width at the bottom of the page
-    // (y grows as you scroll; Playwright bb is document-relative here).
+    // Viewport-relative: pinned by max-md:fixed, bottom edge sits at 844.
     expect(box!.width).toBeGreaterThan(380)
+    // h-11 targets 44px touch targets on the sheet's own controls.
+    const buttons = sheet.locator('button')
+    const count = await buttons.count()
+    expect(count).toBeGreaterThan(0)
+    for (let i = 0; i < count; i++) {
+      const bb = await buttons.nth(i).boundingBox()
+      expect(bb!.height).toBeGreaterThanOrEqual(38)
+    }
   })
 
   await test.step('tapping the window button minimizes and restores', async () => {
