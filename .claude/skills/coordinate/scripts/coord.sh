@@ -321,7 +321,7 @@ cmd_claim() {
     [ -n "$common" ] && continue
     die "#$N scope overlaps #$o on: $(printf '%s' "$clash" | paste -sd, -) - record a split on one of the issues or hand off ownership first"
   done < <(gh issue list --repo "$REPO" --state open --limit 100 --json number,labels,body \
-             --jq '.[] | select(((.labels // []) | map(.name) | index("hub")) | not) | select(.number != '"$N"') | "\(.number)\t\(.body // "")"')
+             --jq '.[] | select(((.labels // []) | map(.name) | index("hub")) | not) | select(.number != '"$N"') | .number')
   comment "$N" CLAIM "plan: ${OPT_plan:-_(none given)_}"$'\n'"eta: ${OPT_eta:-_(none given)_}"
   gh issue edit "$N" --repo "$REPO" --add-assignee "@me" >/dev/null
   set_status "$N" claimed
