@@ -490,7 +490,7 @@ cmd_done() {
   if [ -n "$prurl" ]; then
     [[ "$prurl" =~ /pull/([0-9]+) ]] || die "cannot parse a PR number from: $prurl"
     local prn="${BASH_REMATCH[1]}" state
-    state="$(gh pr view "$prn" --repo "$REPO" --json state,merged --jq '.state')"
+    state="$(gh pr view "$prn" --repo "$REPO" --json state,mergedAt --jq '.state')"
     [ "$state" = "MERGED" ] || die "PR #$prn is not merged yet - merge it before closing #$N"
   fi
   comment "$N" DONE "pr: ${prurl:-_(none given)_}"$'\n'"${POS[1]:-}"
