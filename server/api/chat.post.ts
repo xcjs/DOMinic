@@ -23,14 +23,9 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  // Resolve API key: per-request client key takes precedence, fallback to server env
-  let apiKey = clientApiKey
-  if (!apiKey) {
-    if (provider === 'openai') apiKey = process.env.OPENAI_API_KEY
-    else if (provider === 'anthropic') apiKey = process.env.ANTHROPIC_API_KEY
-    else if (provider === 'google') apiKey = process.env.GEMINI_API_KEY || process.env.GOOGLE_GENERATIVE_AI_API_KEY
-    else if (provider === 'deepseek') apiKey = process.env.DEEPSEEK_API_KEY
-  }
+  // API keys are per-request (client-side Settings only); the server never
+  // reads keys from the environment (ADR 0012 full scope).
+  const apiKey = clientApiKey
 
   if (!apiKey) {
     throw createError({
