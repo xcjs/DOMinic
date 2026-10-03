@@ -154,11 +154,11 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="relative h-screen w-screen overflow-hidden bg-gradient-to-br from-slate-950 via-indigo-950 to-slate-900 text-slate-100">
+  <div class="relative h-screen w-screen overflow-hidden bg-gradient-to-br from-slate-950 via-indigo-950 to-slate-900 text-slate-100 max-md:overflow-y-auto max-md:overscroll-contain max-md:pb-16">
     <div class="pointer-events-none absolute inset-0 flex items-center justify-center">
       <div class="text-center opacity-25">
-        <h1 class="text-5xl font-bold tracking-tight">DOMinic</h1>
-        <p class="mt-3 text-slate-400">An AI agent is the primary app author.</p>
+        <h1 class="text-5xl font-bold tracking-tight max-md:text-4xl">DOMinic</h1>
+        <p class="mt-3 text-slate-400 max-md:px-6">An AI agent is the primary app author.</p>
       </div>
     </div>
 
@@ -187,7 +187,7 @@ onMounted(() => {
       :on-uninstall-app="uninstallApp"
     />
 
-    <div class="absolute right-4 top-4 z-50 flex flex-col gap-2 rounded-lg border border-white/10 bg-slate-900/90 p-3 backdrop-blur">
+    <div class="absolute right-4 top-4 z-50 flex flex-col gap-2 rounded-lg border border-white/10 bg-slate-900/90 p-3 backdrop-blur max-md:right-3 max-md:top-3">
       <span class="text-xs font-semibold uppercase tracking-wide text-slate-400">System</span>
       <button
         class="rounded border border-dashed border-white/20 px-3 py-1.5 text-left text-xs text-slate-400 hover:text-slate-100"
@@ -197,6 +197,6 @@ onMounted(() => {
       </button>
     </div>
 
-    <span class="absolute right-4 bottom-16 z-50 text-xs text-slate-400">{{ now ?? "" }}</span>
+    <span class="absolute right-4 bottom-16 z-50 text-xs text-slate-400 max-md:hidden">{{ now ?? "" }}</span>
   </div>
 </template>
