@@ -2,7 +2,6 @@
 type: Roadmap
 title: DOMinic Post-Hackathon Roadmap
 description: The sequenced roadmap from hackathon demo to a self-hostable product that safely runs untrusted agent-authored code, with named lanes for each collaborator.
-tags: [roadmap, future, roles]
 generated: { by: claude-code/claude-fable-5.1, at: 2026-10-02T00:00:00Z }
 verified: { by: human:brandon, at: 2026-10-02T00:00:00Z }
 sources:
@@ -18,6 +17,10 @@ sources:
   - id: playbook
     resource: docs/agents/coordination-best-practices-3.md
     title: Coordination best practices v3
+tags: [roadmap, future, dominic]
+source: NEXT.md
+ingested: 2026-10-02
+repo_head: 0fc772d
 ---
 
 # DOMinic: Post-Hackathon Roadmap (NEXT)
@@ -67,7 +70,7 @@ part-time work across the team.
 | 0.2 | Remove the server env-var API-key fallback in `server/api/chat.post.ts`; return 401 without a per-request key. | ADR 0005 conformance. Five lines; the only server-side hole. | Charles |
 | 0.3 | Baseline Content Security Policy: `script-src 'self' esm.sh cdn.tailwindcss.com`; `connect-src` = self + provider hosts + esm.sh. | Config-only. The Tailwind Play CDN needs `'unsafe-inline'`; accepted for now (decision D1). | Zack |
 | 0.4 | ESLint flat config with a slice-boundary rule, plus lint-staged running `vue-tsc` on staged files in pre-commit. | ADR 0002 as decided. Turns "boundaries by convention" into a lint. | Zack |
-| 0.5 | Truth pass: correct the README's mobile and "vetted CDN" claims. (The ADR half - ADR 0012 recording the five-slice layout and mixed store style, decision D2 - shipped in PR #78.) | Judges and contributors read the ADRs; drift costs trust. | Michael (README), Brandon (ADR 0012, done) |
+| 0.5 | Truth pass: correct the README's mobile and "vetted CDN" claims; write ADR 0012 superseding ADR 0001 and 0003 to record the five-slice layout and mixed store style (decision D2). | Judges and contributors read the ADRs; drift costs trust. | Michael (README), Brandon (ADR 0012) |
 | 0.6 | Dead code: delete the unused `useChatStore`; make `useAppsStore` the registry's reactive face or delete the mirror. | Two sources of truth for "installed apps" is a latent bug. | Justin |
 
 **Exit:** CI runs lint, typecheck, build, and e2e, all green; no key is
@@ -81,8 +84,8 @@ the same seam. Roughly two to three weeks.
 | Step | Work | Why here | Owner |
 | --- | --- | --- | --- |
 | 1.1 | Async `VirtualFileSystem` interface plus a driver registry, as ADR 0007 originally decided: `/system/*` on localStorage, `/apps/*` on IndexedDB, with a one-time migration of existing localStorage data. | Breaking interface change; cheapest while the callers are `app.vue`, `registry.ts`, `settings.ts`, and the runner. Unblocks snapshots, window persistence, bigger apps. | Charles |
-| 1.2 | Sandboxed runner: compile in the host, mount in a `sandbox="allow-scripts"` iframe via `srcdoc`, with a `postMessage` bridge contract for props, `askFix`, and later IPC. Record it as a new ADR. | The single biggest safety gap. Doing it before IPC and notifications means those are built on the bridge once, not twice. | Charles |
-| 1.3 | Dependency vetting gate in front of esm.sh: npm registry and advisory data, age, downloads, known CVEs; verdicts cached in the VFS; refusals surfaced with reasons. Completes ADR 0008 in a new ADR. | Only meaningful once 1.2 exists. | Charles |
+| 1.2 | Sandboxed runner: compile in the host, mount in a `sandbox="allow-scripts"` iframe via `srcdoc`, with a `postMessage` bridge contract for props, `askFix`, and later IPC. Record it as ADR 0013. | The single biggest safety gap. Doing it before IPC and notifications means those are built on the bridge once, not twice. | Charles |
+| 1.3 | Dependency vetting gate in front of esm.sh: npm registry and advisory data, age, downloads, known CVEs; verdicts cached in the VFS; refusals surfaced with reasons. Completes ADR 0008 as ADR 0014. | Only meaningful once 1.2 exists. | Charles |
 | 1.4 | Tighten CSP to the sandbox model: the host page drops esm.sh; only the iframe origin may load it. Revisit the Play CDN here. | Closes the loop opened in 0.3. | Zack |
 
 **Exit:** an app that reaches for `parent.document` or the host's
@@ -113,7 +116,7 @@ the seams and may start during Phase 1.
 | --- | --- | --- |
 | 3.1 | Mobile responsive shell: bottom-sheet taskbar and stacked windows below 768px, as ADR 0004 designed. | Zack |
 | 3.2 | Window snapping and tiling; multi-desktop workspaces. | Zack |
-| 3.3 | `/api/proxy` shipped together with its SSRF blocklist (RFC 1918, cloud metadata endpoints) - never one without the other - plus a `useSmartFetch` direct-then-proxy fallback. Only when an app needs a non-CORS API. Record as a new ADR. | Charles |
+| 3.3 | `/api/proxy` shipped together with its SSRF blocklist (RFC 1918, cloud metadata endpoints) - never one without the other - plus a `useSmartFetch` direct-then-proxy fallback. Only when an app needs a non-CORS API. Record as ADR 0015. | Charles |
 | 3.4 | Snapshot export and import of the whole OS state; File System Access API mount of a local directory. | Justin |
 | 3.5 | Multi-tab sync via `BroadcastChannel` (ADR 0003's deferred item). | Justin |
 | 3.6 | Agent-generated unit tests verified in-browser before install. After 2.3, which it depends on. | Charles |
@@ -123,10 +126,9 @@ the seams and may start during Phase 1.
 
 - **Every step is one issue.** Open it with `## Files` and
   `## Done when` before writing code; claim it with a branch name.
-- **Every changed decision is a new ADR**, never an edit to an old one.
-  Written so far: 0012 (end of the hackathon scope; slices and stores),
-  0013 (in-repo vault and the work loop). Still to write, numbered when
-  they land: the sandbox bridge, the vetting gate, the proxy.
+- **Every changed decision is a new ADR**, never an edit to an old one:
+  0012 (slices and stores), 0013 (sandbox bridge), 0014 (vetting gate),
+  0015 (proxy).
 - **The e2e suite from 0.1 is the definition of "still works."** A PR
   that turns it red does not merge, whatever else it does.
 
@@ -145,7 +147,7 @@ sprint, so each person owns what they already know.
 | Charles (`Sullux`) | Runtime, persistence, and the chat route | `app/features/apps/runner/**`, `app/features/apps/registry/**`, `app/features/shared/vfs.ts`, `server/api/**` | 0.2, 1.1, 1.2, 1.3, 2.3, 3.3, 3.6 |
 | Justin (`ImNewToC0de`) | Integration and the agent product loop | `app/app.vue`, `app/features/chat/**`, `app/features/apps/stores/**`, `app/features/settings/**` | 0.6, 2.1, 2.2, 2.4, 3.4, 3.5 |
 | Michael (`m-vawter`) | Quality, docs, and process | `tests/**`, `README.md`, `docs/agents/**`, `docs/JUDGES.md`, board hygiene | 0.1, 0.5 (README), the e2e gate, release notes |
-| Brandon (`r0073d-l053r`) | Coordination, security review, and this roadmap | `.claude/skills/coordinate/**`, `.claude/skills/work-loop/**`, `NEXT.md`, `docs/adrs/**` (new ADRs), `vault/` | 0.5 (ADR 0012, done), second reviewer on 1.2-1.4, retrospectives |
+| Brandon (`r0073d-l053r`) | Coordination, security review, and this roadmap | `.claude/skills/coordinate/**`, `NEXT.md`, `docs/adrs/**` (new ADRs), the knowledge-base vault | 0.5 (ADR 0012), second reviewer on 1.2-1.4, retrospectives |
 
 A path not listed belongs to whoever opens the issue that first touches
 it; add it to this table in the same PR.

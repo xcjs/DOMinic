@@ -1,0 +1,11 @@
+{
+  "roadmap": "NEXT.md",
+  "vault": "vault",
+  "coordinate": ".claude/skills/coordinate/scripts",
+  "issueTitlePrefix": "[{id}] ",
+  "branchPrefix": "step/",
+  "sequentialPhases": [1],
+  "parallel": { "3.1": 1 },
+  "stepHours": 4,
+  "wsByHandle": {}
+}
