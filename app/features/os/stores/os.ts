@@ -118,7 +118,7 @@ export const useOsStore = defineStore("os", () => {
       if (!win.preSnap) {
         win.preSnap = {
           x: win.state === "maximized" ? (window.innerWidth - win.width) / 2 : win.x,
-          y: win.y,
+          y: win.state === "maximized" ? 0 : win.y,
           width: win.width,
           height: win.state === "maximized" ? vh : win.height,
         };

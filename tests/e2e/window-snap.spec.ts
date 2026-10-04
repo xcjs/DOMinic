@@ -51,16 +51,24 @@ test('drag to edges snaps halves, corners, top; drag away restores', async ({ pa
     const box = await handle.boundingBox()
     await page.mouse.move(box!.x + box!.width / 2, box!.y + box!.height / 2)
     await page.mouse.down()
-    await page.mouse.move(box!.x + box!.width / 2 + 200, box!.y + 200, { steps: 6 })
+    // Track where the pointer ends up: 200px right and down from the grab.
+    const px = box!.x + box!.width / 2 + 200
+    const py = box!.y + box!.height / 2 + 200
+    await page.mouse.move(px, py, { steps: 6 })
     await page.mouse.up()
 
     const after = await win.boundingBox()
     expect(after, `after=${JSON.stringify(after)} before=${JSON.stringify(before)}`).toBeTruthy()
-    // The pre-snap geometry (the rect the window had mid-drag when the
-    // zone fired) comes back: full original size, no longer at x=0.
+    // The pre-snap geometry comes back: full original size, no longer at
+    // x=0, and the title bar stays under the pointer (review guard).
     expect(after!.width).toBe(restored.width)
     expect(after!.height).toBe(restored.height)
     expect(after!.x).not.toBe(0)
+    const header = await handle.boundingBox()
+    expect(header!.x).toBeLessThanOrEqual(px)
+    expect(header!.x + header!.width).toBeGreaterThanOrEqual(px)
+    expect(header!.y).toBeLessThanOrEqual(py)
+    expect(header!.y + header!.height).toBeGreaterThanOrEqual(py)
   })
 
   await test.step('drag to the top-left corner snaps a quarter', async () => {
@@ -129,19 +137,26 @@ test('snapped windows ignore in-band grabs and jitter', async ({ page }) => {
     expect(after!.width).toBe(before!.width)
   })
 
-  await test.step('dragging away restores the pre-snap rect including y', async () => {
+    await test.step('dragging away restores the pre-snap rect including y', async () => {
     const handle = win.locator('header')
     const box = await handle.boundingBox()
     await page.mouse.move(box!.x + box!.width / 2, box!.y + box!.height / 2)
     await page.mouse.down()
-    await page.mouse.move(box!.x + box!.width / 2 + 200, box!.y + 200, { steps: 6 })
+    const px = box!.x + box!.width / 2 + 200
+    const py = box!.y + box!.height / 2 + 200
+    await page.mouse.move(px, py, { steps: 6 })
     await page.mouse.up()
 
     const after = await win.boundingBox()
     expect(after!.width).toBe(520)
     expect(after!.height).toBe(560)
-    // Pre-snap y (382 here) + pointer travel delta: the preSnap.y=0 bug
-    // m-vawter measured would land near y=200 instead of y=582.
-    expect(after!.y).toBeGreaterThan(500)
+    // Windows-style restore: the pointer keeps its title-bar grab spot, so
+    // the restored window's header still contains the pointer (review
+    // guard). The stale-origin bug teleported it away from the pointer.
+    const header = await handle.boundingBox()
+    expect(header!.x).toBeLessThanOrEqual(px)
+    expect(header!.x + header!.width).toBeGreaterThanOrEqual(px)
+    expect(header!.y).toBeLessThanOrEqual(py)
+    expect(header!.y + header!.height).toBeGreaterThanOrEqual(py)
   })
 })

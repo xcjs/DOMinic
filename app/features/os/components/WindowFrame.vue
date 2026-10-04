@@ -126,7 +126,20 @@ function onPointerMove(event: PointerEvent): void {
     armed.value = true;
   }
   if (props.win.preSnap) {
+    // Windows-style unsnap (NEXT.md 3.2): restore the saved size, then
+    // re-place the window so the pointer keeps its relative spot on the
+    // title bar instead of teleporting to the stale pre-snap origin.
+    const pre = props.win.preSnap;
+    const fracX = clamp((event.clientX - props.win.x) / props.win.width, 0, 1);
+    const grabY = clamp(event.clientY - props.win.y, 0, 30); // stays in the 36px header
     store.unsnapWindow(props.win.id);
+    store.moveWindow(
+      props.win.id,
+      event.clientX - clamp(fracX * pre.width, 8, pre.width - 8),
+      event.clientY - grabY,
+    );
+    snapZone.value = zoneAt(event.clientX, event.clientY);
+    return;
   }
   const handle = dragHandle.value;
   if (!handle) return;
