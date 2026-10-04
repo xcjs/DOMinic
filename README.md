@@ -19,9 +19,9 @@ first-party software.
 ## What DOMinic is
 
 - A desktop-metaphor OS shell — window manager, taskbar, and app
-  registry — built for desktop browsers. Phone viewports are not
-  supported yet: the bottom-nav sheet and stacked windows designed in
-  ADR 0004 are roadmap step 3.1.
+  registry — built for desktop browsers, with a phone layout below
+  768px: windows stack as full-width cards and the taskbar becomes a
+  scrollable bottom sheet (ADR 0004; roadmap step 3.1).
 - A chat-driven agent surface that streams from virtually any LLM
   provider; users bring their own API keys, which stay in their
   browser and travel per-request, never at rest on a server.
