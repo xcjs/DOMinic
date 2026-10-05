@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { Code2, Trash2 } from "lucide-vue-next";
+import { computed } from "vue";
+import { Code2, Plus, Trash2 } from "lucide-vue-next";
 import { useOsStore } from "../stores/os";
 
 defineOptions({ name: "OsTaskbar" });
@@ -13,7 +14,9 @@ const props = defineProps<{
 }>();
 
 function isRunning(appId: string): boolean {
-  return store.windows.some((win) => win.appId === appId);
+  return store.windows.some(
+    (win) => win.appId === appId && win.workspace === store.activeWorkspace,
+  );
 }
 
 function onTaskbarClick(id: string): void {
@@ -25,6 +28,10 @@ function onTaskbarClick(id: string): void {
     store.toggleMinimize(id);
   }
 }
+
+const windowButtons = computed(() =>
+  store.windows.filter((win) => win.workspace === store.activeWorkspace),
+);
 </script>
 
 <template>
@@ -69,7 +76,7 @@ function onTaskbarClick(id: string): void {
       </div>
       <span v-if="props.apps.length" class="h-6 w-px bg-white/10 max-md:hidden" />
       <button
-        v-for="win in store.windows"
+        v-for="win in windowButtons"
         :key="win.id"
         class="max-w-48 truncate rounded border px-3 max-md:px-4 py-1 max-md:py-2.5 text-xs max-md:text-sm transition-colors shrink-0"
         :class="
@@ -82,6 +89,37 @@ function onTaskbarClick(id: string): void {
         @click="onTaskbarClick(win.id)"
       >
         {{ win.title }}
+      </button>
+    </div>
+    <div
+      class="flex items-center gap-1 shrink-0 pl-2 max-md:pl-1 border-l border-white/10 max-md:border-l-0"
+      role="tablist"
+      aria-label="Workspaces"
+    >
+      <button
+        v-for="i in store.workspaceCount"
+        :key="i"
+        class="flex h-8 max-md:h-11 w-8 max-md:w-9 items-center justify-center rounded border text-xs max-md:text-sm font-semibold transition-colors"
+        :class="
+          store.activeWorkspace === i - 1
+            ? 'border-indigo-400/60 bg-indigo-500/20 text-indigo-100'
+            : 'border-white/10 bg-slate-800 text-slate-400 hover:bg-slate-700 hover:text-slate-100'
+        "
+        role="tab"
+        :aria-selected="store.activeWorkspace === i - 1"
+        :aria-label="`Workspace ${i}`"
+        @click="store.setWorkspace(i - 1)"
+      >
+        {{ i }}
+      </button>
+      <button
+        v-if="store.workspaceCount < 4"
+        class="flex h-8 max-md:h-11 w-8 max-md:w-9 items-center justify-center rounded border border-white/10 bg-slate-800 text-slate-400 hover:bg-slate-700 hover:text-slate-100"
+        aria-label="Add workspace"
+        title="Add workspace"
+        @click="store.createWorkspace"
+      >
+        <Plus :size="14" aria-hidden="true" />
       </button>
     </div>
   </footer>

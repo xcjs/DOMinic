@@ -22,14 +22,16 @@ const now = ref<string | null>(null);
 const sourceVersion = reactive<Record<string, number>>({});
 
 function openBuiltin(appId: 'chat' | 'settings') {
-  if (os.windows.some((win) => win.appId === appId)) return;
+  // The same app may exist on several workspaces; open one on the active
+  // desktop instead of focusing a window on another one.
+  if (os.visibleWindows.some((win) => win.appId === appId)) return;
   os.openWindow({ appId, title: appId === 'chat' ? 'Agent Chat' : 'Settings', width: appId === 'chat' ? 520 : 480, height: 560 });
 }
 
 function openApp(appId: string) {
   const app = getApp(appId);
   if (!app) return;
-  const existing = os.windows.find((win) => win.appId === appId);
+  const existing = os.visibleWindows.find((win) => win.appId === appId);
   if (existing) {
     os.focusWindow(existing.id);
     return;
