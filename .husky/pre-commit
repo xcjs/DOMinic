@@ -1,1 +1,2 @@
 npm run lint:md
+npx lint-staged

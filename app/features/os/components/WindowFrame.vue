@@ -203,7 +203,10 @@ watch(dragging, (active) => {
       @pointerup="onPointerUp"
     >
       <span class="truncate text-xs font-medium text-slate-200">{{ win.title }}</span>
-      <span class="flex items-center gap-1" @pointerdown.stop>
+      <span
+        class="flex items-center gap-1"
+        @pointerdown.stop
+      >
         <button
           class="flex h-5 w-5 items-center justify-center rounded text-slate-400 hover:bg-white/10 hover:text-slate-100"
           aria-label="Minimize"
