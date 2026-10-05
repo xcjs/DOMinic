@@ -32,8 +32,9 @@ export const useOsStore = defineStore("os", () => {
   const topZ = computed(() =>
     windows.value.reduce((max, w) => Math.max(max, w.z), 0),
   );
-  // Visible windows are scoped to the active workspace; other desktops keep
-  // their windows alive but out of view (NEXT.md 3.2b).
+  // Windows on other desktops stay mounted but hidden by WindowFrame's
+  // v-show (their component state — chat drafts, running apps — must
+  // survive a desktop switch; NEXT.md 3.2b).
   const visibleWindows = computed(() =>
     windows.value.filter((w) => w.workspace === activeWorkspace.value),
   );

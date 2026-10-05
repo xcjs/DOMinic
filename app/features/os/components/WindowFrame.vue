@@ -188,8 +188,8 @@ watch(dragging, (active) => {
     />
   </Teleport>
   <section
+    v-show="!win.minimized && win.workspace === store.activeWorkspace"
     ref="el"
-    v-show="!win.minimized"
     class="absolute flex flex-col overflow-hidden rounded-lg border border-white/10 bg-slate-900/95 shadow-2xl backdrop-blur max-md:!static max-md:!mx-2 max-md:!mb-3 max-md:!mt-4 first:max-md:!mt-0 max-md:!h-[70vh] max-md:!w-auto"
     :class="store.focusedId === win.id ? 'ring-2 ring-indigo-400' : ''"
     :style="style"

@@ -57,3 +57,12 @@ export function appWindow(page: Page, title: string): Locator {
     .locator('section')
     .filter({ has: page.locator('header').getByText(title, { exact: true }) })
 }
+
+/**
+ * The window of `title` that is currently shown (its workspace is active).
+ * Windows on other desktops stay mounted but hidden, so title-only
+ * locators match several records once more than one desktop has windows.
+ */
+export function shownWindow(page: Page, title: string): Locator {
+  return appWindow(page, title).filter({ visible: true })
+}
