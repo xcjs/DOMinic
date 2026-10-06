@@ -125,6 +125,43 @@ deliberate type error and a lint error both fail CI.
 
 Reconciled against main on 2026-09-12; the decision text above is unchanged.
 
+### As built (2026-10-06)
+
+Reconciled against main at 07a353f, after Phase 0 (NEXT.md 0.4, #94).
+
+**Matches the decision:**
+
+- ESLint runs from a flat config with typescript-eslint and
+  eslint-plugin-vue (`eslint.config.mjs:44`, `eslint.config.mjs:45`);
+  `npm run lint` and `npm run lint:fix` run it (`package.json:15`).
+- A slice-boundary rule bans imports between feature slices
+  (`eslint.config.mjs:23`, `eslint.config.mjs:114`).
+- CI runs Markdown lint, Typecheck, ESLint, Build and E2E
+  (`.github/workflows/ci.yml:10`, `.github/workflows/ci.yml:27`,
+  `.github/workflows/ci.yml:45`, `.github/workflows/ci.yml:63`,
+  `.github/workflows/ci.yml:85`), so a type error or a lint error fails
+  CI, as the Confirmation asks. Branch protection requires the first
+  four; ESLint is not yet a required check.
+- The pre-commit hook runs `npm run lint:md` and lint-staged
+  (`.husky/pre-commit:1`, `.husky/pre-commit:2`); lint-staged runs
+  `eslint --fix` on staged code (`package.json:20`).
+
+**Differs from this record:**
+
+- ADR: type-checked typescript-eslint and `@nuxt/eslint` -> the config
+  extends typescript-eslint's `recommended` preset, not the type-checked
+  ones (`eslint.config.mjs:44`), and `@nuxt/eslint` is not installed.
+- ADR: enforcement "in CI and pre-commit" -> `vue-tsc` runs in CI only
+  (`npm run typecheck`, `package.json:13`), not in the pre-commit hook.
+  Issue #82 records why: `nuxt typecheck` needs the full Nuxt context
+  and is too slow for a hook.
+- The slice-boundary rule matches import specifiers as written, so a
+  relative import between slices (`../../os/...`) passes it; none exists
+  on main today.
+
+Reconciled against main on 2026-10-06; the decision text above is
+unchanged.
+
 ## Pros and Cons of the Options
 
 ### ESLint (typescript-eslint + eslint-plugin-vue) + vue-tsc
