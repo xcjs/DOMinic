@@ -66,7 +66,7 @@ part-time work across the team.
 | 0.1 | Playwright end-to-end test of the core loop using the existing `window.__dominic` hooks: `installFixture` -> reload -> `updateApp` -> `injectBrokenApp` -> Ask Agent to Fix. Gate it in CI. | The net under Phases 1-2. The hooks are a harness waiting for a runner. | Michael |
 | 0.2 | Remove the server env-var API-key fallback in `server/api/chat.post.ts`; return 401 without a per-request key. | ADR 0005 conformance. Five lines; the only server-side hole. | Charles |
 | 0.3 | Baseline Content Security Policy: `script-src 'self' esm.sh cdn.tailwindcss.com`; `connect-src` = self + provider hosts + esm.sh. | Config-only. The Tailwind Play CDN needs `'unsafe-inline'`; accepted for now (decision D1). | Zack |
-| 0.4 | ESLint flat config with a slice-boundary rule, plus lint-staged running `vue-tsc` on staged files in pre-commit. | ADR 0002 as decided. Turns "boundaries by convention" into a lint. | Zack |
+| 0.4 | ESLint flat config with a slice-boundary rule, plus lint-staged running `vue-tsc` on staged files in pre-commit. As built (#94): lint-staged runs `eslint --fix`; `vue-tsc` stays in CI (#82). | ADR 0002 as decided. Turns "boundaries by convention" into a lint. | Zack |
 | 0.5 | Truth pass: correct the README's mobile and "vetted CDN" claims; write ADR 0012 superseding ADR 0001 and 0003 to record the five-slice layout and mixed store style (decision D2). | Judges and contributors read the ADRs; drift costs trust. | Michael (README), Brandon (ADR 0012) |
 | 0.6 | Dead code: delete the unused `useChatStore`; make `useAppsStore` the registry's reactive face or delete the mirror. | Two sources of truth for "installed apps" is a latent bug. | Justin |
 
