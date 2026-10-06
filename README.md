@@ -98,28 +98,35 @@ npm install
 npm run dev          # Nuxt dev server, default http://localhost:3000
 ```
 
-Open **Settings** from the taskbar and paste an API key for your model
-provider. The key stays in your browser and travels per request; the
-server never stores it (ADR 0005). Then open the Agent Chat and
-describe an app: it is written, compiled in the browser, installed
-to the taskbar, and kept across reloads.
+Open **Settings** from the System panel (top right) and paste an API
+key for your model provider. The key stays in your browser and
+travels per request; the server never stores it (ADR 0005). Then
+describe an app in the Agent Chat, which opens with the desktop: it
+is written, compiled in the browser, installed to the taskbar, and
+kept across reloads.
 
-Other scripts: `npm run build`, `npm run typecheck`, `npm run lint:md`.
+Other scripts: `npm run build`, `npm run typecheck`, `npm run lint`
+(`npm run lint:fix` applies fixes), `npm run lint:md`, and
+`npm run test:e2e` (see [tests/e2e/README.md](tests/e2e/README.md)).
 
 ## Development
 
-Markdown is linted with markdownlint-cli2 (80-column prose) and
-carries OKF frontmatter.
+Code is linted with ESLint (`eslint.config.mjs`), including a rule
+against imports between feature slices (ADR 0001). Markdown is
+linted with markdownlint-cli2 (80-column prose) and carries OKF
+frontmatter.
 Node 24 LTS is the standard runtime — see
 [ADR 0011](docs/adrs/0011-node-24-lts-runtime-standard.md); `nvm use`
 picks it up from the checked-in `.nvmrc`.
 
 ```bash
 npm install
+npm run lint
 npm run lint:md
 ```
 
-A pre-commit hook runs the lint automatically; write with the
+A pre-commit hook lints the Markdown and runs ESLint with `--fix` on
+staged files; type-checking runs in CI (ADR 0002). Write with the
 conventions in [docs/agents/use-okf.md](docs/agents/use-okf.md) and
 [docs/adrs/template.md](docs/adrs/template.md).
 
