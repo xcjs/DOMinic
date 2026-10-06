@@ -35,6 +35,7 @@ if ($LASTEXITCODE -ne 0) { Die 'gh is not authenticated; run: gh auth login' }
 $ME = (& $GH api user | ConvertFrom-Json).login
 # An agent with its own GitHub account signs for its human; defaults to the account itself.
 $HUMAN = if ($env:COORD_HUMAN) { $env:COORD_HUMAN } else { $ME }
+$HUMAN = $HUMAN.TrimStart('@')   # accept "@login" too: the header adds its own @
 
 function Gh {
   & $GH @args

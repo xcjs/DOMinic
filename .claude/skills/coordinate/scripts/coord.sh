@@ -52,6 +52,7 @@ gh auth status >/dev/null 2>&1 || die "gh is not authenticated; run: gh auth log
 ME="$(gh api user --jq .login)"
 # An agent with its own GitHub account signs for its human; defaults to the account itself.
 HUMAN="${COORD_HUMAN:-$ME}"
+HUMAN="${HUMAN#@}"   # accept "@login" too: the header adds its own @
 
 # ---------- helpers ----------
 header() { printf '**%s** | agent: %s | human: @%s | at: %s' "$1" "$AGENT" "$HUMAN" "$(now)"; }
