@@ -22,14 +22,16 @@ const now = ref<string | null>(null);
 const sourceVersion = reactive<Record<string, number>>({});
 
 function openBuiltin(appId: 'chat' | 'settings') {
-  if (os.windows.some((win) => win.appId === appId)) return;
+  // The same app may exist on several workspaces; open one on the active
+  // desktop instead of focusing a window on another one.
+  if (os.windows.some((win) => win.appId === appId && win.workspace === os.activeWorkspace)) return;
   os.openWindow({ appId, title: appId === 'chat' ? 'Agent Chat' : 'Settings', width: appId === 'chat' ? 520 : 480, height: 560 });
 }
 
 function openApp(appId: string) {
   const app = getApp(appId);
   if (!app) return;
-  const existing = os.windows.find((win) => win.appId === appId);
+  const existing = os.windows.find((win) => win.appId === appId && win.workspace === os.activeWorkspace);
   if (existing) {
     os.focusWindow(existing.id);
     return;
@@ -82,6 +84,9 @@ function getAppSource(id: string) {
 async function askFix(payload: { appId: string; error: string; sourceCode?: string }) {
   const chatWin = os.windows.find((w) => w.appId === 'chat');
   if (chatWin) {
+    // The chat window stays mounted on its own desktop; bring that desktop,
+    // then the window, forward so the reply is visible.
+    os.setWorkspace(chatWin.workspace);
     os.focusWindow(chatWin.id);
   } else {
     openBuiltin('chat');

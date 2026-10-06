@@ -18,6 +18,8 @@ export interface OsWindow {
   minimized: boolean;
   // Geometry to restore when a snapped window is dragged away (NEXT.md 3.2).
   preSnap?: { x: number; y: number; width: number; height: number } | null;
+  // Multi-desktop workspaces (NEXT.md 3.2b): window lives on exactly one.
+  workspace: number;
 }
 
 let nextId = 1;
@@ -25,8 +27,16 @@ let nextId = 1;
 export const useOsStore = defineStore("os", () => {
   const windows = ref<OsWindow[]>([]);
   const focusedId = ref<string | null>(null);
+  const activeWorkspace = ref(0);
+  const workspaceCount = ref(1);
   const topZ = computed(() =>
     windows.value.reduce((max, w) => Math.max(max, w.z), 0),
+  );
+  // Windows on other desktops stay mounted but hidden by WindowFrame's
+  // v-show (their component state — chat drafts, running apps — must
+  // survive a desktop switch; NEXT.md 3.2b).
+  const visibleWindows = computed(() =>
+    windows.value.filter((w) => w.workspace === activeWorkspace.value),
   );
 
   function openWindow(init: Partial<OsWindow> & { title: string }): OsWindow {
@@ -43,6 +53,7 @@ export const useOsStore = defineStore("os", () => {
       z: topZ.value + 1,
       state: init.state ?? "normal",
       minimized: false,
+      workspace: activeWorkspace.value,
     };
     windows.value.push(win);
     focusedId.value = id;
@@ -153,9 +164,36 @@ export const useOsStore = defineStore("os", () => {
     if (!win.minimized) focusWindow(id);
   }
 
+  // Switching desktops keeps focused windows on their own desktop; a focus
+  // is only kept when it is visible on the one becoming active.
+  function setWorkspace(index: number): void {
+    const target = Math.min(Math.max(index, 0), workspaceCount.value - 1);
+    activeWorkspace.value = target;
+    const focused = windows.value.find((w) => w.id === focusedId.value);
+    if (focused && focused.workspace !== target) {
+      const visible = windows.value.filter(
+        (w) => w.workspace === target && !w.minimized,
+      );
+      const top = visible.reduce<OsWindow | null>(
+        (best, w) => (!best || w.z > best.z ? w : best),
+        null,
+      );
+      focusedId.value = top?.id ?? null;
+    }
+  }
+
+  // Workspaces grow on demand; switching to an empty desktop is allowed.
+  function createWorkspace(): void {
+    workspaceCount.value += 1;
+    setWorkspace(workspaceCount.value - 1);
+  }
+
   return {
     windows,
     focusedId,
+    activeWorkspace,
+    workspaceCount,
+    visibleWindows,
     openWindow,
     closeWindow,
     focusWindow,
@@ -165,5 +203,7 @@ export const useOsStore = defineStore("os", () => {
     unsnapWindow,
     toggleMaximize,
     toggleMinimize,
+    setWorkspace,
+    createWorkspace,
   };
 });
