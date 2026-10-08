@@ -11,6 +11,7 @@ import { removeAppStyles } from "./features/apps/runner/loader";
 import { getApp, hydrateRegistry, registerApp, unregisterApp } from "./features/apps/registry";
 import { installFixture } from "./features/apps/fixtures";
 import { readFile, writeFile } from "./features/shared/vfs";
+import { startRegistrySync } from "./features/shared/multitab-sync";
 import { useSettingsStore } from "./features/settings/stores/settings";
 import type { InstallAppParams, UpdateAppParams } from "./features/chat/tools/schemas";
 
@@ -114,6 +115,7 @@ onMounted(() => {
   setInterval(tick, 1000);
   settings.hydrate();
   hydrateRegistry();
+  startRegistrySync();
   openBuiltin('chat');
 
   if (import.meta.client) {

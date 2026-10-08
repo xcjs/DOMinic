@@ -48,6 +48,7 @@ them with new ones.
 | [0010](0010-agent-app-interface-and-tool-protocol.md) | Agent app interface and tool protocol | accepted |
 | [0011](0011-node-24-lts-runtime-standard.md) | Node 24 LTS runtime standard | accepted |
 | [0012](0012-end-of-hackathon-scope.md) | End of the hackathon scope | accepted |
+| [0016](0016-multi-tab-registry-sync-via-broadcastchannel.md) | Multi-tab registry sync via BroadcastChannel | accepted |
 
 ## As-built reconciliation
 

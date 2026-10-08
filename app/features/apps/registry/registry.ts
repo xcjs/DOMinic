@@ -98,6 +98,21 @@ export function listApps(): AppMeta[] {
   return appsState.value
 }
 
+// Replaces the in-memory app registry with the state another tab synced
+// via BroadcastChannel (NEXT.md 3.5), then persists and notifies.
+// Entries carry meta only, never source; the importing tab reads source
+// from the shared VFS (localStorage) once it needs to run the app.
+export function importApps(metas: AppMeta[]): void {
+  appsState.value = metas.map((meta) => ({
+    ...meta,
+    createdAt: meta.createdAt ?? Date.now(),
+    updatedAt: meta.updatedAt ?? Date.now(),
+  }))
+  isHydrated = true
+  persist()
+  notify()
+}
+
 export function getApp(id: string): AppMeta | undefined {
   if (!isHydrated) hydrateRegistry()
   return appsState.value.find((a) => a.id === id)
