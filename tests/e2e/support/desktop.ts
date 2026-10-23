@@ -1,9 +1,11 @@
 import type { Locator, Page } from '@playwright/test'
-import type { UpdateAppParams } from '../../../app/features/chat/tools/schemas'
+import type { InstallAppParams, UpdateAppParams } from '../../../app/features/chat/tools/schemas'
 
 /** The test hooks `app/app.vue` puts on `window.__dominic` once it mounts. */
 interface DominicHooks {
   installFixture(fixtureId: string): boolean
+  installApp(params: InstallAppParams): void
+  openApp(appId: string): void
   updateApp(params: UpdateAppParams): void
   injectBrokenApp(type?: 'compile' | 'runtime'): void
 }
@@ -44,6 +46,10 @@ export function dominicHooks(page: Page) {
   return {
     installFixture: (fixtureId: string) =>
       page.evaluate((id) => window.__dominic!.installFixture(id), fixtureId),
+    installApp: (params: InstallAppParams) =>
+      page.evaluate((p) => window.__dominic!.installApp(p), params),
+    openApp: (appId: string) =>
+      page.evaluate((id) => window.__dominic!.openApp(id), appId),
     updateApp: (params: UpdateAppParams) =>
       page.evaluate((p) => window.__dominic!.updateApp(p), params),
     injectBrokenApp: (type: 'compile' | 'runtime') =>
