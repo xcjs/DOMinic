@@ -90,3 +90,16 @@ Two guards keep the suite self-contained:
 - Use web-first assertions (`await expect(locator)...`), not sleeps.
 - Each test gets a fresh browser context, so the virtual filesystem
   (`localStorage`) starts empty.
+
+## Expected-fail specs
+
+A spec can encode a roadmap exit criterion before the code that meets
+it exists. Mark the test `test.fail()`: Playwright passes it while it
+fails, so CI stays green, and reports it once it starts passing. That
+report is the cue to remove the annotation in the pull request that
+closes the gap. Pair each one with a normal control test that proves
+the setup still runs, so a broken probe can't pass for the wrong reason.
+
+| Spec | Criterion | Closes with |
+| --- | --- | --- |
+| `sandbox-isolation.spec.ts` | an app that reaches for `parent.document` or the host's `localStorage` fails (Phase 1 exit) | 1.2, the sandboxed runner |
