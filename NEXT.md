@@ -143,7 +143,7 @@ sprint, so each person owns what they already know.
 | Zack (`xcjs`) | Platform and shell | `app/features/os/**`, `nuxt.config.ts`, `tsconfig.json`, `.github/**`, `package.json`, `.husky/**` | 0.3, 0.4, 1.4, 2.5, 3.1, 3.2 |
 | Charles (`Sullux`) | Runtime, persistence, and the chat route | `app/features/apps/runner/**`, `app/features/apps/registry/**`, `app/features/shared/vfs.ts`, `server/api/**` | 0.2, 1.1, 1.2, 1.3, 2.3, 3.3, 3.6 |
 | Justin (`ImNewToC0de`) | Integration and the agent product loop | `app/app.vue`, `app/features/chat/**`, `app/features/apps/stores/**`, `app/features/settings/**` | 0.6, 2.1, 2.2, 2.4, 3.4, 3.5 |
-| Michael (`m-vawter`) | Quality, docs, and process | `tests/**`, `README.md`, `docs/agents/**`, `docs/JUDGES.md`, board hygiene | 0.1, 0.5 (README), the e2e gate, release notes |
+| Michael (`m-vawter`) | Quality, docs, and process | `tests/**`, `README.md`, `CHANGELOG.md`, `docs/agents/**`, `docs/JUDGES.md`, board hygiene | 0.1, 0.5 (README), the e2e gate, release notes |
 | Brandon (`r0073d-l053r`) | Coordination, security review, and this roadmap | `.claude/skills/coordinate/**`, `NEXT.md`, `docs/adrs/**` (new ADRs), the knowledge-base vault | 0.5 (ADR 0012), second reviewer on 1.2-1.4, retrospectives |
 
 A path not listed belongs to whoever opens the issue that first touches
